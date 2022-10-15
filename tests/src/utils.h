@@ -27,7 +27,7 @@ inline H5::Group list_opener(const H5::Group& parent, const std::string& name) {
 inline H5::Group vector_opener(const H5::Group& parent, const std::string& name, const std::string& type) {
     std::map<std::string, std::string> attrs;
     attrs["uzuki_object"] = "vector";
-    attrs["delayed_array"] = type;
+    attrs["uzuki_type"] = type;
     return super_group_opener(parent, name, attrs);
 }
 
@@ -35,6 +35,51 @@ inline H5::Group null_opener(const H5::Group& parent, const std::string& name) {
     std::map<std::string, std::string> attrs;
     attrs["uzuki_object"] = "null";
     return super_group_opener(parent, name, attrs);
+}
+
+inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, hsize_t len, const H5::DataType& dtype) {
+    H5::DataSpace dspace(1, &len);
+    return parent.createDataSet(name, dtype, dspace);
+}
+
+template<typename T>
+H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, std::vector<T> values, const H5::DataType& dtype) {
+    hsize_t len = values.size();
+    H5::DataSpace dspace(1, &len);
+    auto dhandle = parent.createDataSet(name, dtype, dspace);
+
+    if constexpr(std::is_same<T, int>::value) {
+        dhandle.write(values.data(), H5::PredType::NATIVE_INT);
+    } else if constexpr(std::is_same<T, double>::value) {
+        dhandle.write(values.data(), H5::PredType::NATIVE_DOUBLE);
+    } else {
+        throw std::runtime_error("unknown type!");
+    }
+
+    return dhandle;
+}
+
+inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, std::vector<std::string> values, bool variable = false) {
+    if (!variable) {
+        size_t maxlen = 1;
+        for (const auto& v : values) {
+            if (v.size() > maxlen) {
+                maxlen = v.size();
+            }
+        }
+
+        std::vector<char> buffer(maxlen * values.size());
+        for (size_t v = 0; v < values.size(); ++v) {
+            const auto& current = values[v];
+            std::copy(current.begin(), current.end(), buffer.data() + v * maxlen);
+        }
+
+        hsize_t len = values.size();
+        H5::DataSpace dspace(1, &len);
+        H5::StrType stype(0, maxlen);
+        auto dhandle = parent.createDataSet(name, stype, dspace);
+        dhandle.write(buffer.data(), stype);
+    }
 }
 
 #endif

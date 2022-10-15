@@ -9,6 +9,7 @@
 
 #include "H5Cpp.h"
 #include "interfaces.hpp"
+#include "Dummy.hpp"
 
 namespace uzuki2 {
 
@@ -108,25 +109,16 @@ void parse_integer_like(H5::DataSet handle, Host* ptr, const std::string& path, 
         throw std::runtime_error("expected an integer dataset at '" + path + "'");
     }
 
-    bool has_missing = handle.attrExists("uzuki_missing");
-    int missing_val = 0;
-    if (has_missing) {
-        auto attr = handle.openAttribute("uzuki_missing");
-        if (attr.getTypeClass() != H5T_INTEGER || attr.getSpace().getSimpleExtentNdims() != 0) {
-            throw std::runtime_error("'uzuki_missing' attribute should be a scalar integer at '" + path + "'");
-        }
-        attr.read(H5::PredType::NATIVE_INT, &missing_val);
-    }
-
     size_t len = ptr->size();
 
     // TODO: loop in chunks to reduce memory usage.
     std::vector<int> buffer(len);
     handle.read(buffer.data(), H5::PredType::NATIVE_INT);
+    constexpr int missing_value = -2147483648;
 
     for (hsize_t i = 0; i < len; ++i) {
         auto current = buffer[i];
-        if (has_missing && missing_val == current) {
+        if (current == missing_value) {
             ptr->set_missing(i);
         } else {
             check(current);
@@ -142,10 +134,12 @@ void parse_string_like(H5::DataSet handle, Host* ptr, const std::string& path, F
         throw std::runtime_error("expected a string dataset at '" + path + "'");
     }
 
-    bool has_missing = handle.attrExists("uzuki_missing");
+    const std::string placeholder = "missing-value-placeholder";
+    bool has_missing = handle.attrExists(placeholder);
     std::string missing_val = 0;
     if (has_missing) {
-        missing_val = load_string_attribute(handle.openAttribute("uzuki_missing"), "uzuki_missing", path);
+        auto ahandle = handle.openAttribute(placeholder);
+        missing_val = load_string_attribute(ahandle, placeholder, path);
     }
 
     load_string_dataset(handle, ptr->size(), path, [&](size_t i, std::string x) -> void {
@@ -164,16 +158,6 @@ void parse_floats(H5::DataSet handle, Host* ptr, const std::string& path, Functi
         throw std::runtime_error("expected a float dataset at '" + path + "'");
     }
 
-    bool has_missing = handle.attrExists("uzuki_missing");
-    double missing_val; 
-    if (has_missing) {
-        auto attr = handle.openAttribute("uzuki_missing");
-        if (attr.getDataType().getClass() != H5T_FLOAT || attr.getSpace().getSimpleExtentNdims() != 0) {
-            throw std::runtime_error("'usuki_missing' attribute should be a scalar float at '" + path + "'");
-        }
-        attr.read(H5::PredType::NATIVE_DOUBLE, &missing_val);
-    }
-
     size_t len = ptr->size();
 
     // TODO: loop in chunks to reduce memory usage.
@@ -182,12 +166,8 @@ void parse_floats(H5::DataSet handle, Host* ptr, const std::string& path, Functi
 
     for (hsize_t i = 0; i < len; ++i) {
         auto current = buffer[i];
-        if (has_missing && missing_val == current) {
-            ptr->set_missing(i);
-        } else {
-            check(current);
-            ptr->set(i, current);
-        }
+        check(current);
+        ptr->set(i, current);
     }
 }
 
@@ -215,12 +195,9 @@ void parse_names(H5::Group handle, Host* ptr, const std::string& path, const std
         load_string_dataset(nhandle, nlen, npath, [&](size_t i, std::string x) -> void { ptr->set_name(i, x); });
     }
 }
-/**
- * @endcond
- */
 
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse(const H5::Group& handle, Externals& ext, const std::string& path) {
+std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const std::string& path) {
     // Deciding what type we're dealing with.
     auto object_type = load_string_attribute(handle, "uzuki_object", path);
     std::shared_ptr<Base> output;
@@ -228,7 +205,7 @@ std::shared_ptr<Base> parse(const H5::Group& handle, Externals& ext, const std::
     if (object_type == "list") {
         auto dpath = path + "/data";
         if (!handle.exists("data") || handle.childObjType("data") != H5O_TYPE_GROUP) {
-            throw std::runtime_error("expected a group at '" + dpath);
+            throw std::runtime_error("expected a group at '" + dpath + "'");
         }
         auto dhandle = handle.openGroup("data");
         auto len = dhandle.getNumObjs();
@@ -242,13 +219,13 @@ std::shared_ptr<Base> parse(const H5::Group& handle, Externals& ext, const std::
                 throw std::runtime_error("expected a group at '" + ipath + "'");
             }
             auto lhandle = dhandle.openGroup(istr);
-            lptr->set(i, parse<Provisioner>(lhandle, ext, dpath));
+            lptr->set(i, parse_inner<Provisioner>(lhandle, ext, ipath));
         }
 
         parse_names(handle, lptr, path, dpath);
 
     } else if (object_type == "vector") {
-        auto vector_type = load_string_attribute(handle, "uzuki_object", path);
+        auto vector_type = load_string_attribute(handle, "uzuki_type", path);
 
         auto dpath = path + "/data";
         if (!handle.exists("data") || handle.childObjType("data") != H5O_TYPE_DATASET) {
@@ -257,7 +234,7 @@ std::shared_ptr<Base> parse(const H5::Group& handle, Externals& ext, const std::
         auto dhandle = handle.openDataSet("data");
         auto dspace = dhandle.getSpace();
         int ndims = dspace.getSimpleExtentNdims();
-        if (ndims !=  0) {
+        if (ndims != 1) {
             throw std::runtime_error("expected 1-dimensional dataset at '" + dpath + "'");
         } 
         hsize_t len;
@@ -359,10 +336,98 @@ std::shared_ptr<Base> parse(const H5::Group& handle, Externals& ext, const std::
     return output;
 }
 
+template<class CustomExternals>
+struct ExternalTracker {
+    ExternalTracker(CustomExternals e) : getter(std::move(e)) {}
+
+    void* get(size_t i) {
+        indices.push_back(i);
+        return getter.get(i);
+    };
+
+    size_t size() const {
+        return getter.size();
+    }
+
+    CustomExternals getter;
+    std::vector<size_t> indices;
+};
+/**
+ * @endcond
+ */
+
+/**
+ * Parse JSON file contents using the **uzuki2** specification.
+ *
+ * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+ * @tparam Externals Class describing how to resolve external references for type `OTHER`.
+ *
+ * @param handle Handle for a HDF5 group.
+ * @param name Name of the HDF5 group in `handle`. 
+ * @param ext Instance of an external reference resolver class.
+ *
+ * @return Pointer to the root `Base` object.
+ * Depending on `Provisioner`, this may contain references to all nested objects. 
+ * 
+ * Any invalid representations in `contents` will cause an error to be thrown.
+ *
+ * @section provisioner-contract Provisioner requirements
+ * The `Provisioner` class is expected to provide the following static methods:
+ *
+ * - `Nothing* new_Nothing()`, which returns a new instance of a `Nothing` subclass.
+ * - `Other* new_Other(void* p)`, which returns a new instance of a `Other` subclass.
+ *   `p` is a pointer to an "other" object, generated by calling `ext.get()` (see below).
+ * - `List* new_List(size_t l)`, which returns a new instance of a `List` with length `l`.
+ * - `IntegerVector* new_Integer(size_t l)`, which returns a new instance of an `IntegerVector` subclass of length `l`.
+ * - `NumberVector* new_Number(size_t l)`, which returns a new instance of a `NumberVector` subclass of length `l`.
+ * - `StringVector* new_String(size_t l)`, which returns a new instance of a `StringVector` subclass of length `l`.
+ * - `BooleanVector* new_Boolean(size_t l)`, which returns a new instance of a `BooleanVector` subclass of length `l`.
+ * - `DateVector* new_Date(size_t l)`, which returns a new instance of a `DateVector` subclass of length `l`.
+ * - `Factor* new_Factor(size_t l, size_t ll)`, which returns a new instance of a `Factor` subclass of length `l` and with `ll` unique levels.
+
+ * @section external-contract Externals requirements
+ * The `Externals` class is expected to provide the following `const` methods:
+ *
+ * - `void* get(size_t i) const`, which returns a pointer to an "other" object, given the index of that object.
+ *   This will be stored in the corresponding `Other` subclass generated by `Provisioner::new_Other`.
+ * - `size_t size()`, which returns the number of available external references.
+ */
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse(const std::string& file, Externals& ext, const std::string& path) {
+std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name, Externals ext) {
+    ExternalTracker etrack(std::move(ext));
+    auto ptr = parse_inner<Provisioner>(handle, etrack, name);
+
+    // Checking that the external indices match up.
+    auto& other_indices = etrack.indices;
+    if (other_indices.size() != etrack.getter.size()) {
+        throw std::runtime_error("fewer instances of type \"other\" than expected from 'ext'");
+    }
+
+    std::sort(other_indices.begin(), other_indices.end());
+    for (int i = 0; i < static_cast<int>(other_indices.size()); ++i) {
+        if (i != other_indices[i]) {
+            throw std::runtime_error("set of \"index\" values for type \"other\" should be consecutive starting from zero");
+        }
+    }
+
+    return ptr;
+}
+
+template<class Provisioner, class Externals>
+std::shared_ptr<Base> parse(const std::string& file, const std::string& name, Externals ext) {
     H5::H5File handle(file, H5F_ACC_RDONLY);
-    return parse<Provisioner>(handle.openGroup(path), ext, path);
+    return parse<Provisioner>(handle.openGroup(name), name, std::move(ext));
+}
+
+template<class Provisioner>
+std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name) {
+    return parse<Provisioner>(handle, name, uzuki2::DummyExternals(0));
+}
+
+template<class Provisioner>
+std::shared_ptr<Base> parse(const std::string& file, const std::string& name) {
+    H5::H5File handle(file, H5F_ACC_RDONLY);
+    return parse<Provisioner>(handle.openGroup(name), name, uzuki2::DummyExternals(0));
 }
 
 }
