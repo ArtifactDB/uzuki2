@@ -396,7 +396,7 @@ $(function() {
 <div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>        <span class="keyword">auto</span> vptr = <span class="keyword">static_cast&lt;</span>Vector*<span class="keyword">&gt;</span>(output.get());</div>
 <div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>        parse_names(handle, vptr, path, dpath);</div>
 <div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span> </div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (object_type == <span class="stringliteral">&quot;null&quot;</span>) {</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (object_type == <span class="stringliteral">&quot;nothing&quot;</span>) {</div>
 <div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>        output.reset(Provisioner::new_Nothing());</div>
 <div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span> </div>
 <div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (object_type == <span class="stringliteral">&quot;external&quot;</span>) {</div>
@@ -419,71 +419,74 @@ $(function() {
 <div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>        }</div>
 <div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span> </div>
 <div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>        output.reset(Provisioner::new_External(ext.get(idx)));</div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    }</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span> </div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <span class="keywordflow">return</span> output;</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>}</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span> </div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;unknown uzuki2 object type &#39;&quot;</span> + object_type + <span class="stringliteral">&quot;&#39;&quot;</span>);</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    }</div>
 <div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span> </div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> CustomExternals&gt;</div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="keyword">struct </span>ExternalTracker {</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    ExternalTracker(CustomExternals e) : getter(std::move(e)) {}</div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span> </div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    <span class="keywordtype">void</span>* get(<span class="keywordtype">size_t</span> i) {</div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>        indices.push_back(i);</div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>        <span class="keywordflow">return</span> getter.get(i);</div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    };</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span> </div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    <span class="keywordtype">size_t</span> size()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>        <span class="keywordflow">return</span> getter.size();</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    }</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span> </div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    CustomExternals getter;</div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    std::vector&lt;size_t&gt; indices;</div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>};</div>
-<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
-<div class="line"><a id="l00408" name="l00408"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">  408</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> H5::Group&amp; handle, <span class="keyword">const</span> std::string&amp; name, Externals ext) {</div>
-<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>    ExternalTracker etrack(std::move(ext));</div>
-<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>    <span class="keyword">auto</span> ptr = parse_inner&lt;Provisioner&gt;(handle, etrack, name);</div>
-<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span> </div>
-<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>    <span class="comment">// Checking that the external indices match up.</span></div>
-<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>    <span class="keyword">auto</span>&amp; other_indices = etrack.indices;</div>
-<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>    <span class="keywordflow">if</span> (other_indices.size() != etrack.getter.size()) {</div>
-<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;fewer instances of type \&quot;external\&quot; than expected from &#39;ext&#39;&quot;</span>);</div>
-<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>    }</div>
-<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span> </div>
-<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>    std::sort(other_indices.begin(), other_indices.end());</div>
-<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(other_indices.size()); ++i) {</div>
-<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>        <span class="keywordflow">if</span> (i != other_indices[i]) {</div>
-<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;set of \&quot;index\&quot; values for type \&quot;external\&quot; should be consecutive starting from zero&quot;</span>);</div>
-<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>        }</div>
-<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>    }</div>
-<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span> </div>
-<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>    <span class="keywordflow">return</span> ptr;</div>
-<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>}</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>    <span class="keywordflow">return</span> output;</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>}</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span> </div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> CustomExternals&gt;</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span><span class="keyword">struct </span>ExternalTracker {</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    ExternalTracker(CustomExternals e) : getter(std::move(e)) {}</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span> </div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    <span class="keywordtype">void</span>* get(<span class="keywordtype">size_t</span> i) {</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>        indices.push_back(i);</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>        <span class="keywordflow">return</span> getter.get(i);</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    };</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span> </div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    <span class="keywordtype">size_t</span> size()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>        <span class="keywordflow">return</span> getter.size();</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    }</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span> </div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>    CustomExternals getter;</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>    std::vector&lt;size_t&gt; indices;</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>};</div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">  411</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> H5::Group&amp; handle, <span class="keyword">const</span> std::string&amp; name, Externals ext) {</div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>    ExternalTracker etrack(std::move(ext));</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>    <span class="keyword">auto</span> ptr = parse_inner&lt;Provisioner&gt;(handle, etrack, name);</div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span> </div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>    <span class="comment">// Checking that the external indices match up.</span></div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>    <span class="keyword">auto</span>&amp; other_indices = etrack.indices;</div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>    <span class="keywordflow">if</span> (other_indices.size() != etrack.getter.size()) {</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;fewer instances of type \&quot;external\&quot; than expected from &#39;ext&#39;&quot;</span>);</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>    }</div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span> </div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>    std::sort(other_indices.begin(), other_indices.end());</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(other_indices.size()); ++i) {</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>        <span class="keywordflow">if</span> (i != other_indices[i]) {</div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;set of \&quot;index\&quot; values for type \&quot;external\&quot; should be consecutive starting from zero&quot;</span>);</div>
+<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>        }</div>
+<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>    }</div>
 <div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span> </div>
-<div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
-<div class="line"><a id="l00444" name="l00444"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#a1a5539c2525c8f6be4853c66ceebfdbe">  444</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> std::string&amp; file, <span class="keyword">const</span> std::string&amp; name, Externals ext) {</div>
-<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span>    H5::H5File handle(file, H5F_ACC_RDONLY);</div>
-<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span>    <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(handle.openGroup(name), name, std::move(ext));</div>
-<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>}</div>
-<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span> </div>
-<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
-<div class="line"><a id="l00465" name="l00465"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#a259cb6ed8cf70ad4d19a83d5fbeaec2e">  465</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> H5::Group&amp; handle, <span class="keyword">const</span> std::string&amp; name) {</div>
-<div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span>    <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(handle, name, uzuki2::DummyExternals(0));</div>
-<div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span>}</div>
-<div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span> </div>
-<div class="line"><a id="l00483" name="l00483"></a><span class="lineno">  483</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
-<div class="line"><a id="l00484" name="l00484"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#abb745e734bc6bd734ea6c02ebf654f8e">  484</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> std::string&amp; file, <span class="keyword">const</span> std::string&amp; name) {</div>
-<div class="line"><a id="l00485" name="l00485"></a><span class="lineno">  485</span>    H5::H5File handle(file, H5F_ACC_RDONLY);</div>
-<div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span>    <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(handle.openGroup(name), name, uzuki2::DummyExternals(0));</div>
-<div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>}</div>
-<div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span> </div>
-<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span>}</div>
-<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span> </div>
-<div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>    <span class="keywordflow">return</span> ptr;</div>
+<div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>}</div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span> </div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#a1a5539c2525c8f6be4853c66ceebfdbe">  447</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> std::string&amp; file, <span class="keyword">const</span> std::string&amp; name, Externals ext) {</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span>    H5::H5File handle(file, H5F_ACC_RDONLY);</div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>    <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(handle.openGroup(name), name, std::move(ext));</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>}</div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span> </div>
+<div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
+<div class="line"><a id="l00468" name="l00468"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#a259cb6ed8cf70ad4d19a83d5fbeaec2e">  468</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> H5::Group&amp; handle, <span class="keyword">const</span> std::string&amp; name) {</div>
+<div class="line"><a id="l00469" name="l00469"></a><span class="lineno">  469</span>    <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(handle, name, uzuki2::DummyExternals(0));</div>
+<div class="line"><a id="l00470" name="l00470"></a><span class="lineno">  470</span>}</div>
+<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span> </div>
+<div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span><span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
+<div class="line"><a id="l00487" name="l00487"></a><span class="lineno"><a class="line" href="namespaceuzuki2.html#abb745e734bc6bd734ea6c02ebf654f8e">  487</a></span>std::shared_ptr&lt;Base&gt; <a class="code hl_function" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a>(<span class="keyword">const</span> std::string&amp; file, <span class="keyword">const</span> std::string&amp; name) {</div>
+<div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span>    H5::H5File handle(file, H5F_ACC_RDONLY);</div>
+<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span>    <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(handle.openGroup(name), name, uzuki2::DummyExternals(0));</div>
+<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span>}</div>
+<div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span> </div>
+<div class="line"><a id="l00492" name="l00492"></a><span class="lineno">  492</span>}</div>
+<div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span> </div>
+<div class="line"><a id="l00494" name="l00494"></a><span class="lineno">  494</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="ainterfaces_8hpp_html"><div class="ttname"><a href="interfaces_8hpp.html">interfaces.hpp</a></div><div class="ttdoc">Defines the interfaces to use in HDF5 parsing.</div></div>
 <div class="ttc" id="anamespaceuzuki2_html"><div class="ttname"><a href="namespaceuzuki2.html">uzuki2</a></div><div class="ttdoc">Parse an R list from a HDF5 file.</div><div class="ttdef"><b>Definition:</b> parse.hpp:16</div></div>
-<div class="ttc" id="anamespaceuzuki2_html_acc16ce0ffd14b954763920343a52fed0"><div class="ttname"><a href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">uzuki2::parse</a></div><div class="ttdeci">std::shared_ptr&lt; Base &gt; parse(const H5::Group &amp;handle, const std::string &amp;name, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse.hpp:408</div></div>
+<div class="ttc" id="anamespaceuzuki2_html_acc16ce0ffd14b954763920343a52fed0"><div class="ttname"><a href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">uzuki2::parse</a></div><div class="ttdeci">std::shared_ptr&lt; Base &gt; parse(const H5::Group &amp;handle, const std::string &amp;name, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse.hpp:411</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

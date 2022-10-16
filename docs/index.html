@@ -107,10 +107,10 @@ $(function() {
 <li><code>"date"</code>: like <code>"string"</code>, the <code>**/data</code> dataset may contain a <code>missing-value-placeholder</code> attribute. The <code>**/data</code> dataset should only contain <code>YYYY-MM-DD</code> dates or the placeholder value.</li>
 </ul>
 <p >The atomic vector's group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to <code>data</code>.</p>
-<h2>Null</h2>
-<p >A null value is represented as a HDF5 group with the following attributes:</p>
+<h2>Nothing</h2>
+<p >A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:</p>
 <ul>
-<li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"null"</code>.</li>
+<li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"nothing"</code>.</li>
 </ul>
 <h2>External object</h2>
 <p >Each external object is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
