@@ -1,5 +1,9 @@
 # R lists to HDF5
 
+![Unit tests](https://github.com/LTLA/uzuki2/actions/workflows/run-tests.yaml/badge.svg)
+![Documentation](https://github.com/LTLA/uzuki2/actions/workflows/doxygenate.yaml/badge.svg)
+[![codecov](https://codecov.io/gh/LTLA/uzuki2/branch/master/graph/badge.svg?token=J3dxS3MtT1)](https://codecov.io/gh/LTLA/uzuki2)
+
 ## Overview
 
 The **uzuki2** repository describes a format for safely serializing basic R lists into HDF5.
