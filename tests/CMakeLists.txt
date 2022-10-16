@@ -14,6 +14,13 @@ enable_testing()
 add_executable(
     libtest 
     src/list.cpp
+    src/integer.cpp
+    src/boolean.cpp
+    src/factor.cpp
+    src/number.cpp
+    src/string.cpp
+    src/date.cpp
+    src/external.cpp
 )
 
 target_link_libraries(

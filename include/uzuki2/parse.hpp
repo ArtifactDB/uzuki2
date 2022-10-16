@@ -6,6 +6,8 @@
 #include <cctype>
 #include <string>
 #include <stdexcept>
+#include <cstdint>
+#include <unordered_set>
 
 #include "H5Cpp.h"
 #include "interfaces.hpp"
@@ -100,6 +102,14 @@ inline bool is_date(const std::string& val) {
         return false;
     }
 
+    if (val[8] == '3') {
+        if (val[6] > '1') {
+            return false;
+        }
+    } else if (val[8] > '3') {
+        return false;
+    }
+
     return true;
 }
 
@@ -112,9 +122,9 @@ void parse_integer_like(H5::DataSet handle, Host* ptr, const std::string& path, 
     size_t len = ptr->size();
 
     // TODO: loop in chunks to reduce memory usage.
-    std::vector<int> buffer(len);
-    handle.read(buffer.data(), H5::PredType::NATIVE_INT);
-    constexpr int missing_value = -2147483648;
+    std::vector<int32_t> buffer(len);
+    handle.read(buffer.data(), H5::PredType::NATIVE_INT32);
+    constexpr int32_t missing_value = -2147483648;
 
     for (hsize_t i = 0; i < len; ++i) {
         auto current = buffer[i];
@@ -136,7 +146,7 @@ void parse_string_like(H5::DataSet handle, Host* ptr, const std::string& path, F
 
     const std::string placeholder = "missing-value-placeholder";
     bool has_missing = handle.attrExists(placeholder);
-    std::string missing_val = 0;
+    std::string missing_val;
     if (has_missing) {
         auto ahandle = handle.openAttribute(placeholder);
         missing_val = load_string_attribute(ahandle, placeholder, path);
@@ -147,7 +157,7 @@ void parse_string_like(H5::DataSet handle, Host* ptr, const std::string& path, F
             ptr->set_missing(i);
         } else {
             check(x);
-            ptr->set(i, x);
+            ptr->set(i, std::move(x));
         }
     });
 }
@@ -232,23 +242,17 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             throw std::runtime_error("expected a dataset at '" + dpath + "'");
         }
         auto dhandle = handle.openDataSet("data");
-        auto dspace = dhandle.getSpace();
-        int ndims = dspace.getSimpleExtentNdims();
-        if (ndims != 1) {
-            throw std::runtime_error("expected 1-dimensional dataset at '" + dpath + "'");
-        } 
-        hsize_t len;
-        dspace.getSimpleExtentDims(&len);
+        auto len = check_1d_length(dhandle, dpath);
 
         if (vector_type == "integer") {
             auto iptr = Provisioner::new_Integer(len);
             output.reset(iptr);
-            parse_integer_like(dhandle, iptr, dpath, [](int x) -> void {});
+            parse_integer_like(dhandle, iptr, dpath, [](int32_t x) -> void {});
 
         } else if (vector_type == "boolean") {
             auto bptr = Provisioner::new_Boolean(len);
             output.reset(bptr);
-            parse_integer_like(dhandle, bptr, dpath, [&](int x) -> void { 
+            parse_integer_like(dhandle, bptr, dpath, [&](int32_t x) -> void { 
                 if (x != 0 && x != 1) {
                      throw std::runtime_error("boolean values should be 0 or 1 in '" + dpath + "'");
                 }
@@ -274,13 +278,20 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 fptr->is_ordered();
             }
 
-            parse_integer_like(dhandle, fptr, dpath, [&](int x) -> void { 
+            parse_integer_like(dhandle, fptr, dpath, [&](int32_t x) -> void { 
                 if (x < 0 || x >= levlen) {
                      throw std::runtime_error("factor codes should be non-negative and less than the number of levels in '" + dpath + "'");
                 }
             });
 
-            load_string_dataset(levhandle, levlen, levpath, [&](size_t i, std::string x) -> void { fptr->set_level(i, x); });
+            std::unordered_set<std::string> present;
+            load_string_dataset(levhandle, levlen, levpath, [&](size_t i, std::string x) -> void { 
+                if (present.find(x) != present.end()) {
+                    throw std::runtime_error("levels should be unique at '" + levpath + "'");
+                }
+                fptr->set_level(i, x); 
+                present.insert(x);
+            });
 
         } else if (vector_type == "string") {
             auto sptr = Provisioner::new_String(len);
@@ -320,7 +331,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
         auto ispace = ihandle.getSpace();
         int idims = ispace.getSimpleExtentNdims();
-        if (idims != 1) {
+        if (idims != 0) {
             throw std::runtime_error("expected scalar dataset at '" + ipath + "'");
         } 
 
@@ -357,7 +368,7 @@ struct ExternalTracker {
  */
 
 /**
- * Parse JSON file contents using the **uzuki2** specification.
+ * Parse HDF5 file contents using the **uzuki2** specification.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
  * @tparam Externals Class describing how to resolve external references for type `OTHER`.

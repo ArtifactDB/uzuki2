@@ -2,9 +2,10 @@
 #include <gmock/gmock.h>
 
 #include "uzuki2/parse.hpp"
-#include "uzuki2/validate.hpp"
+
 #include "test_subclass.h"
 #include "utils.h"
+#include "error.h"
 
 TEST(ListTest, SimpleLoading) {
     auto path = "TEST-list.h5";
@@ -78,17 +79,6 @@ TEST(ListTest, NestedLoading) {
         auto lptr = static_cast<const DefaultList*>(stuff->values[1].get());
         EXPECT_EQ(lptr->size(), 1);
     }
-}
-
-static void expect_error(std::string file, std::string name, std::string msg) {
-    EXPECT_ANY_THROW({
-        try {
-            uzuki2::validate(file, name);
-        } catch (std::exception& e) {
-            EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
-            throw;
-        }
-    });
 }
 
 TEST(ListTest, CheckError) {

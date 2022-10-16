@@ -12,7 +12,7 @@
 template<typename T>
 void set_missing_internal(std::vector<T>& values, size_t i) {
     if constexpr(std::is_same<T, double>::value) {
-        values[i] = std::numeric_limits<double>::quiet_NaN();
+        values[i] = -123456789;
     }
     if constexpr(std::is_same<T, size_t>::value) {
         values[i] = -1;
@@ -21,7 +21,7 @@ void set_missing_internal(std::vector<T>& values, size_t i) {
         values[i] = -1;
     }
     if constexpr(std::is_same<T, int32_t>::value) {
-        values[i] = std::numeric_limits<int32_t>::min();
+        values[i] = -123456789;
     }
     if constexpr(std::is_same<T, std::string>::value) {
         values[i] = "ich bin missing";

@@ -37,9 +37,31 @@ inline H5::Group null_opener(const H5::Group& parent, const std::string& name) {
     return super_group_opener(parent, name, attrs);
 }
 
+inline H5::Group other_opener(const H5::Group& parent, const std::string& name) {
+    std::map<std::string, std::string> attrs;
+    attrs["uzuki_object"] = "other";
+    return super_group_opener(parent, name, attrs);
+}
+
 inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, hsize_t len, const H5::DataType& dtype) {
     H5::DataSpace dspace(1, &len);
     return parent.createDataSet(name, dtype, dspace);
+}
+
+template<typename T>
+H5::DataSet write_scalar(const H5::Group& parent, const std::string& name, T value, const H5::DataType& dtype) {
+    H5::DataSpace dspace;
+    auto dhandle = parent.createDataSet(name, dtype, dspace);
+
+    if constexpr(std::is_same<T, int>::value) {
+        dhandle.write(&value, H5::PredType::NATIVE_INT);
+    } else if constexpr(std::is_same<T, double>::value) {
+        dhandle.write(&value, H5::PredType::NATIVE_DOUBLE);
+    } else {
+        throw std::runtime_error("unknown type!");
+    }
+
+    return dhandle;
 }
 
 template<typename T>
@@ -60,6 +82,9 @@ H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, std
 }
 
 inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, std::vector<std::string> values, bool variable = false) {
+    hsize_t len = values.size();
+    H5::DataSpace dspace(1, &len);
+
     if (!variable) {
         size_t maxlen = 1;
         for (const auto& v : values) {
@@ -74,11 +99,22 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
             std::copy(current.begin(), current.end(), buffer.data() + v * maxlen);
         }
 
-        hsize_t len = values.size();
-        H5::DataSpace dspace(1, &len);
         H5::StrType stype(0, maxlen);
         auto dhandle = parent.createDataSet(name, stype, dspace);
         dhandle.write(buffer.data(), stype);
+        return dhandle;
+
+    } else {
+        std::vector<const char*> ptrs;
+        ptrs.reserve(values.size());
+        for (const auto& v : values) {
+            ptrs.push_back(v.c_str());
+        }
+
+        H5::StrType stype(H5::PredType::C_S1, H5T_VARIABLE); 
+        auto dhandle = parent.createDataSet(name, stype, dspace);
+        dhandle.write(ptrs.data(), stype);
+        return dhandle;
     }
 }
 
