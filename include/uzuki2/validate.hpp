@@ -24,14 +24,14 @@ namespace uzuki2 {
  * @param num_external Expected number of external references. 
  */
 inline void validate(const H5::Group& handle, const std::string& name, int num_external = 0) {
-    DummyExternals others(num_external);
-    parse<DummyProvisioner>(handle, name, others);
+    DummyExternals ext(num_external);
+    parse<DummyProvisioner>(handle, name, ext);
     return;
 }
 
 inline void validate(const std::string& file, const std::string& name, int num_external = 0) {
-    DummyExternals others(num_external);
-    parse<DummyProvisioner>(file, name, others);
+    DummyExternals ext(num_external);
+    parse<DummyProvisioner>(file, name, ext);
     return;
 }
 

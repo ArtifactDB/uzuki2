@@ -28,7 +28,7 @@ struct DummyTypedVector : public TypedVector<T, tt> {
 };
 
 typedef DummyTypedVector<int32_t, INTEGER> DummyIntegerVector;
-typedef DummyTypedVector<double, FLOAT> DummyDoubleVector;
+typedef DummyTypedVector<double, NUMBER> DummyNumberVector;
 typedef DummyTypedVector<std::string, STRING> DummyStringVector;
 typedef DummyTypedVector<unsigned char, BOOLEAN> DummyBooleanVector;
 typedef DummyTypedVector<std::string, DATE> DummyDateVector;
@@ -54,7 +54,7 @@ struct DummyFactor : public Factor {
 
 struct DummyNothing : public Nothing {};
 
-struct DummyOther : public Other {};
+struct DummyExternal : public External {};
 
 struct DummyList : public List {
     DummyList(size_t n) : length(n) {}
@@ -73,13 +73,13 @@ struct DummyList : public List {
 struct DummyProvisioner {
     static Nothing* new_Nothing() { return (new DummyNothing); }
 
-    static Other* new_Other(void* p) { return (new DummyOther); }
+    static External* new_External(void* p) { return (new DummyExternal); }
 
     static List* new_List(size_t l) { return (new DummyList(l)); }
 
     static IntegerVector* new_Integer(size_t l) { return (new DummyIntegerVector(l)); }
 
-    static DoubleVector* new_Double(size_t l) { return (new DummyDoubleVector(l)); }
+    static NumberVector* new_Number(size_t l) { return (new DummyNumberVector(l)); }
 
     static StringVector* new_String(size_t l) { return (new DummyStringVector(l)); }
 

@@ -37,9 +37,9 @@ inline H5::Group null_opener(const H5::Group& parent, const std::string& name) {
     return super_group_opener(parent, name, attrs);
 }
 
-inline H5::Group other_opener(const H5::Group& parent, const std::string& name) {
+inline H5::Group external_opener(const H5::Group& parent, const std::string& name) {
     std::map<std::string, std::string> attrs;
-    attrs["uzuki_object"] = "other";
+    attrs["uzuki_object"] = "external";
     return super_group_opener(parent, name, attrs);
 }
 

@@ -17,18 +17,18 @@ namespace uzuki2 {
  * Data type of an embedded R object.
  *
  * - `INTEGER`: 32-bit signed integer vector.
- * - `FLOAT`: double-precision vector.
+ * - `NUMBER`: double-precision vector.
  * - `STRING`: vector of strings.
  * - `BOOLEAN`: vector of booleans.
  * - `DATE`: vector of date strings in `YYYY-MM-DD` format.
  * - `FACTOR`: factor containing integer indices to unique levels.
  * - `LIST`: a list containing nested objects.
  * - `NOTHING`: equivalent to R's `NULL`.
- * - `OTHER`: an external reference to an unknown R object.
+ * - `EXTERNAL`: an external reference to an unknown R object.
  */
 enum Type {
     INTEGER,
-    FLOAT,
+    NUMBER,
     STRING,
     BOOLEAN,
     FACTOR,
@@ -36,7 +36,7 @@ enum Type {
 
     LIST,
     NOTHING,
-    OTHER
+    EXTERNAL
 };
 
 /**
@@ -126,7 +126,7 @@ typedef TypedVector<int32_t, INTEGER> IntegerVector;
 /**
  * Interface for a double-precision vector.
  */
-typedef TypedVector<double, FLOAT> DoubleVector;
+typedef TypedVector<double, NUMBER> NumberVector;
 
 /**
  * Interface for a string vector.
@@ -188,9 +188,9 @@ struct Nothing : public Base {
  *
  * This usually captures links to external sources that can provide more details on the unsupported object.
  */
-struct Other : public Base {
+struct External : public Base {
     Type type() const {
-        return OTHER;
+        return EXTERNAL;
     }
 };
 

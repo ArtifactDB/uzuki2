@@ -96,7 +96,7 @@ struct DefaultTypedVector : public uzuki2::TypedVector<T, tt> {
 };
 
 typedef DefaultTypedVector<int32_t, uzuki2::INTEGER> DefaultIntegerVector; 
-typedef DefaultTypedVector<double, uzuki2::FLOAT> DefaultDoubleVector;
+typedef DefaultTypedVector<double, uzuki2::NUMBER> DefaultNumberVector;
 typedef DefaultTypedVector<std::string, uzuki2::STRING> DefaultStringVector;
 typedef DefaultTypedVector<unsigned char, uzuki2::BOOLEAN> DefaultBooleanVector;
 typedef DefaultTypedVector<std::string, uzuki2::DATE> DefaultDateVector;
@@ -147,8 +147,8 @@ struct DefaultFactor : public uzuki2::Factor {
 
 struct DefaultNothing : public uzuki2::Nothing {};
 
-struct DefaultOther : public uzuki2::Other {
-    DefaultOther(void *p) : ptr(p) {}
+struct DefaultExternal : public uzuki2::External {
+    DefaultExternal(void *p) : ptr(p) {}
     void* ptr;
 };
 
@@ -185,13 +185,13 @@ struct DefaultList : public uzuki2::List {
 struct DefaultProvisioner {
     static uzuki2::Nothing* new_Nothing() { return (new DefaultNothing); }
 
-    static uzuki2::Other* new_Other(void* p) { return (new DefaultOther(p)); }
+    static uzuki2::External* new_External(void* p) { return (new DefaultExternal(p)); }
 
     static uzuki2::List* new_List(size_t l) { return (new DefaultList(l)); }
 
     static uzuki2::IntegerVector* new_Integer(size_t l) { return (new DefaultIntegerVector(l)); }
 
-    static uzuki2::DoubleVector* new_Double(size_t l) { return (new DefaultDoubleVector(l)); }
+    static uzuki2::NumberVector* new_Number(size_t l) { return (new DefaultNumberVector(l)); }
 
     static uzuki2::StringVector* new_String(size_t l) { return (new DefaultStringVector(l)); }
 
