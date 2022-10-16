@@ -31,9 +31,9 @@ inline H5::Group vector_opener(const H5::Group& parent, const std::string& name,
     return super_group_opener(parent, name, attrs);
 }
 
-inline H5::Group null_opener(const H5::Group& parent, const std::string& name) {
+inline H5::Group nothing_opener(const H5::Group& parent, const std::string& name) {
     std::map<std::string, std::string> attrs;
-    attrs["uzuki_object"] = "null";
+    attrs["uzuki_object"] = "nothing";
     return super_group_opener(parent, name, attrs);
 }
 

@@ -60,11 +60,11 @@ For some `uzuki_type`, further considerations may be applicable:
 
 The atomic vector's group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
 
-### Null
+### Nothing
 
-A null value is represented as a HDF5 group with the following attributes:
+A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:
 
-- `uzuki_object`, a scalar string dataset containing the value `"null"`.
+- `uzuki_object`, a scalar string dataset containing the value `"nothing"`.
 
 ### External object
 

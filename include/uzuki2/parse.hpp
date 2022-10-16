@@ -319,7 +319,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         auto vptr = static_cast<Vector*>(output.get());
         parse_names(handle, vptr, path, dpath);
 
-    } else if (object_type == "null") {
+    } else if (object_type == "nothing") {
         output.reset(Provisioner::new_Nothing());
 
     } else if (object_type == "external") {

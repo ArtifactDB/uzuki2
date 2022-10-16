@@ -15,7 +15,7 @@ TEST(ListTest, SimpleLoading) {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
-        null_opener(dhandle, "0");
+        nothing_opener(dhandle, "0");
         auto vhandle = vector_opener(dhandle, "1", "integer");
         create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
@@ -59,11 +59,11 @@ TEST(ListTest, NestedLoading) {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
-        null_opener(dhandle, "0");
+        nothing_opener(dhandle, "0");
 
         auto lhandle = list_opener(dhandle, "1");
         auto dhandle2 = lhandle.createGroup("data");
-        null_opener(dhandle2, "0");
+        nothing_opener(dhandle2, "0");
     }
 
     {
@@ -95,7 +95,7 @@ TEST(ListTest, CheckError) {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
-        null_opener(dhandle, "1");
+        nothing_opener(dhandle, "1");
     }
     expect_error(path, "foo", "expected a group at 'foo/data/0'");
 
