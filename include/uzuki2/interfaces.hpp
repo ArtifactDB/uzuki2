@@ -213,7 +213,7 @@ struct List : public Base {
      * @param i Index of the list element.
      * @param v Value of the list element.
      */
-    virtual void set(size_t, std::shared_ptr<Base> v) = 0;
+    virtual void set(size_t i, std::shared_ptr<Base> v) = 0;
 
     /**
      * Indicate that the elements of the list are named.

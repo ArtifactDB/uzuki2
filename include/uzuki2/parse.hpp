@@ -368,13 +368,14 @@ struct ExternalTracker {
  */
 
 /**
- * Parse HDF5 file contents using the **uzuki2** specification.
+ * Parse HDF5 file contents using the **uzuki2** specification, given the group handle.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
  * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
  *
- * @param handle Handle for a HDF5 group.
- * @param name Name of the HDF5 group in `handle`. 
+ * @param handle Handle for a HDF5 group corresponding to the list.
+ * @param name Name of the HDF5 group corresponding to `handle`. 
+ * Only used for error messages.
  * @param ext Instance of an external reference resolver class.
  *
  * @return Pointer to the root `Base` object.
@@ -424,17 +425,61 @@ std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name, Ex
     return ptr;
 }
 
+/**
+ * Parse HDF5 file contents using the **uzuki2** specification, given the file name.
+ *
+ * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+ * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
+ *
+ * @param file Path to a HDF5 file.
+ * @param name Name of the HDF5 group containing the list in `file`.
+ * @param ext Instance of an external reference resolver class.
+ *
+ * @return Pointer to the root `Base` object.
+ * Depending on `Provisioner`, this may contain references to all nested objects. 
+ * 
+ * Any invalid representations in `contents` will cause an error to be thrown.
+ */
 template<class Provisioner, class Externals>
 std::shared_ptr<Base> parse(const std::string& file, const std::string& name, Externals ext) {
     H5::H5File handle(file, H5F_ACC_RDONLY);
     return parse<Provisioner>(handle.openGroup(name), name, std::move(ext));
 }
 
+/**
+ * Parse HDF5 file contents using the **uzuki2** specification, given the group handle.
+ * It is assumed that there are no external references.
+ *
+ * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+ *
+ * @param handle Handle for a HDF5 group corresponding to the list.
+ * @param name Name of the HDF5 group corresponding to `handle`. 
+ * Only used for error messages.
+ *
+ * @return Pointer to the root `Base` object.
+ * Depending on `Provisioner`, this may contain references to all nested objects. 
+ * 
+ * Any invalid representations in `contents` will cause an error to be thrown.
+ */
 template<class Provisioner>
 std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name) {
     return parse<Provisioner>(handle, name, uzuki2::DummyExternals(0));
 }
 
+/**
+ * Parse HDF5 file contents using the **uzuki2** specification, given the file name.
+ * It is assumed that there are no external references.
+ *
+ * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+ *
+ * @param file Path to a HDF5 file.
+ * @param name Name of the HDF5 group containing the list in `file`.
+ *
+ * @return Pointer to the root `Base` object.
+ * Depending on `Provisioner`, this may contain references to all nested objects. 
+ * 
+ * Any invalid representations in `contents` will cause an error to be thrown.
+ */
 template<class Provisioner>
 std::shared_ptr<Base> parse(const std::string& file, const std::string& name) {
     H5::H5File handle(file, H5F_ACC_RDONLY);

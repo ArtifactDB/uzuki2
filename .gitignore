@@ -1,3 +1,5 @@
 *.swp
 build/
 TEST-*
+docs/html/*
+docs/latex/*
