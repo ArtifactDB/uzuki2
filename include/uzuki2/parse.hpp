@@ -342,6 +342,9 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         }
 
         output.reset(Provisioner::new_External(ext.get(idx)));
+
+    } else {
+        throw std::runtime_error("unknown uzuki2 object type '" + object_type + "'");
     }
 
     return output;

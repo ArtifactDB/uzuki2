@@ -21,6 +21,7 @@ add_executable(
     src/string.cpp
     src/date.cpp
     src/external.cpp
+    src/misc.cpp
 )
 
 target_link_libraries(
