@@ -1,5 +1,5 @@
-#ifndef UZUKI2_PARSE_HPP
-#define UZUKI2_PARSE_HPP
+#ifndef UZUKI2_PARSE_JSON_HPP
+#define UZUKI2_PARSE_JSON_HPP
 
 #include <memory>
 #include <vector>
@@ -49,7 +49,7 @@ struct Boolean : public Base {
     JsonType type() const { return BOOLEAN; }
 };
 
-struct Null : public Base {
+struct Nothing : public Base {
     JsonType type() const { return NOTHING; }
 };
 
@@ -58,45 +58,54 @@ struct Array : public Base {
     JsonType type() const { return ARRAY; }
 };
 
-struct Object {
+struct Object : public Base {
     std::unordered_map<std::string, std::shared_ptr<Base> > values;
     JsonType type() const { return OBJECT; }
 };
 
 struct CurrentBuffer {
+private:
     const char* ptr = nullptr;
     size_t available = 0;
-    size_t position = 0;
+    size_t current = 0;
     bool remaining = false;
     size_t overall = 0;
 
-    std::string locstr() const {
-        return std::to_string(overall + position + 1);
+    template<class Reader>
+    void fill(Reader& reader) {
+        remaining = reader();
+        ptr = reinterpret_cast<const char*>(reader.buffer());
+        available = reader.available();
+        current = 0;
+        if (available == 0) {
+            throw std::runtime_error("no available bytes left");
+        }
+    }
+public:
+    template<class Reader>
+    CurrentBuffer(Reader& reader) {
+        fill(reader);
     }
 
     bool valid() const {
-        return position < available || remaining;
+        return current < available || remaining;
     }
 
     void advance() {
-        ++position;
+        ++current;
     }
 
     template<class Reader>
     char get(Reader& reader) {
-        if (position == available) {
+        if (current == available) {
             overall += available;
-            remaining = reader();
-            ptr = reinterpret_cast<const char*>(reader.buffer());
-            available = reader.available();
-            position = 0;
-
-            if (available == 0) {
-                throw std::runtime_error("no available bytes left");
-            }
+            fill(reader);
         }
+        return ptr[current];
+    }
 
-        return ptr[position];
+    size_t position() {
+        return overall + current;
     }
 };
 
@@ -124,7 +133,7 @@ bool is_expected_string(CurrentBuffer& buffer, Reader& reader, const std::string
 
 template<class Reader>
 std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
-    size_t start = i + buffer.overall;
+    size_t start = buffer.position() + 1;
     buffer.advance(); // get past the opening quote.
     std::string output;
 
@@ -132,37 +141,40 @@ std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
         char next = buffer.get(reader);
         switch (next) {
             case '"':
-                // Auto-increment in get() will automatically get past the trailing quote.
+                buffer.advance(); // get past the closing quote.
                 return output;
             case '\\':
+                buffer.advance();
                 if (!buffer.valid()) {
-                    throw std::runtime_error("unterminated string at position " + std::to_string(start + 1));
-                }
-                switch (buffer.get(reader)) {
-                    case '"':
-                        output += '"';          
-                        break;
-                    case 'n':
-                        output += '\n';
-                        break;
-                    case 'r':
-                        output += '\r';
-                        break;
-                    case '\\':
-                        output += '\\';
-                        break;
-                    case 'b':
-                        output += '\b';
-                        break;
-                    case 'f':
-                        output += '\f';
-                        break;
-                    case 't':
-                        output += '\t';
-                        break;
-                    // TODO: \u unicode?
-                    default:
-                        throw std::runtime_error("unrecognized escape '\\" + buffer.ptr[i] + "'");
+                    throw std::runtime_error("unterminated string at position " + std::to_string(start));
+                } else {
+                    char next2 = buffer.get(reader);
+                    switch (next2) {
+                        case '"':
+                            output += '"';          
+                            break;
+                        case 'n':
+                            output += '\n';
+                            break;
+                        case 'r':
+                            output += '\r';
+                            break;
+                        case '\\':
+                            output += '\\';
+                            break;
+                        case 'b':
+                            output += '\b';
+                            break;
+                        case 'f':
+                            output += '\f';
+                            break;
+                        case 't':
+                            output += '\t';
+                            break;
+                        // TODO: \u unicode?
+                        default:
+                            throw std::runtime_error("unrecognized escape '\\" + std::string(1, next2) + "'");
+                    }
                 }
                 break;
             default:
@@ -172,7 +184,7 @@ std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
 
         buffer.advance();
         if (!buffer.valid()) {
-            throw std::runtime_error("unterminated string at position " + std::to_string(start + 1));
+            throw std::runtime_error("unterminated string at position " + std::to_string(start));
         }
     }
 
@@ -181,7 +193,7 @@ std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
 
 template<class Reader>
 double extract_number(CurrentBuffer& buffer, Reader& reader) {
-    size_t start = i + buffer.overall;
+    size_t start = buffer.position() + 1;
     double value = 0;
     double fractional = 10;
     double exponent = 0; 
@@ -221,7 +233,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
         } else if (is_terminator(val)) {
             return finalizer();
         } else {
-            throw std::runtime_error("invalid number starting with 0 at position " + std::to_string(start + 1));
+            throw std::runtime_error("invalid number starting with 0 at position " + std::to_string(start));
         }
 
     } else if (std::isdigit(lead)) {
@@ -239,7 +251,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
             } else if (is_terminator(val)) {
                 return finalizer();
             } else if (!std::isdigit(val)) {
-                throw std::runtime_error("invalid number containing '" + val + "' at position " + std::to_string(start + 1));
+                throw std::runtime_error("invalid number containing '" + std::string(1, val) + "' at position " + std::to_string(start));
             }
             value *= 10;
             value += val - '0';
@@ -253,12 +265,12 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
     if (in_fraction) {
         buffer.advance();
         if (!buffer.valid()) {
-            throw std::runtime_error("invalid number with trailing '.' at position " + std::to_string(start + 1));
+            throw std::runtime_error("invalid number with trailing '.' at position " + std::to_string(start));
         }
 
         char val = buffer.get(reader);
         if (!std::isdigit(val)) {
-            throw std::runtime_error("'.' must be followed by at least one digit at position " + std::to_string(start + 1));
+            throw std::runtime_error("'.' must be followed by at least one digit at position " + std::to_string(start));
         }
         value += (val - '0') / fractional;
 
@@ -271,7 +283,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
             } else if (is_terminator(val)) {
                 return finalizer();
             } else if (!std::isdigit(val)) {
-                throw std::runtime_error("invalid number containing '" + val + "' at position " + std::to_string(start + 1));
+                throw std::runtime_error("invalid number containing '" + std::string(1, val) + "' at position " + std::to_string(start));
             }
             fractional *= 10;
             value += (val - '0') / fractional;
@@ -282,7 +294,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
     if (in_exponent) {
         buffer.advance();
         if (!buffer.valid()) {
-            throw std::runtime_error("invalid number with trailing 'e/E' at position " + std::to_string(start + 1));
+            throw std::runtime_error("invalid number with trailing 'e/E' at position " + std::to_string(start));
         }
 
         char val = buffer.get(reader);
@@ -291,16 +303,16 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
         } else if (val == '-') {
             negative_exponent = true;
         } else {
-            throw std::runtime_error("'e/E' must be followed by at least one digit at position " + std::to_string(start + 1));
+            throw std::runtime_error("'e/E' must be followed by at least one digit in number at position " + std::to_string(start));
         }
 
         buffer.advance();
         if (!buffer.valid()) {
-            throw std::runtime_error("invalid number with trailing exponent sign at position " + std::to_string(start + 1));
+            throw std::runtime_error("invalid number with trailing exponent sign in number at position " + std::to_string(start));
         }
         val = buffer.get(reader);
         if (!std::isdigit(val)) {
-            throw std::runtime_error("exponent sign must be followed by at least one digit at position " + std::to_string(start + 1));
+            throw std::runtime_error("exponent sign must be followed by at least one digit in number at position " + std::to_string(start));
         }
         exponent += (val - '0');
 
@@ -310,7 +322,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
             if (is_terminator(val)) {
                 return finalizer();
             } else if (!std::isdigit(val)) {
-                throw std::runtime_error("invalid number containing '" + val + "' at position " + std::to_string(start + 1));
+                throw std::runtime_error("invalid number containing '" + std::string(1, val) + "' at position " + std::to_string(start));
             }
             exponent *= 10;
             exponent += (val - '0');
@@ -325,7 +337,7 @@ template<class Reader>
 std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
     std::shared_ptr<Base> output;
 
-    size_t start = buffer.position + buffer.overall + 1;
+    size_t start = buffer.position() + 1;
     const char current = buffer.get(reader);
 
     if (current == 't') {
@@ -354,27 +366,36 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
         output.reset(ptr);
 
         buffer.advance();
-        bool okay = false;
-        while (1) {
-            chomp(buffer, reader);
-            if (!buffer.valid()) {
-                throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
-            }
-            ptr->values.push_back(parse_thing(buffer, reader));
+        chomp(buffer, reader);
+        if (!buffer.valid()) {
+            throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
+        }
 
-            chomp(buffer, reader);
-            if (!buffer.valid()) {
-                throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
-            }
+        if (buffer.get(reader) != ']') {
+            while (1) {
+                ptr->values.push_back(parse_thing(buffer, reader));
 
-            char next = buffer.get(reader);
-            buffer.advance(); // make sure we skip the closing brace before returning.
-            if (next == ']') {
-                break;
-            } else if (next != ',') {
-                throw std::runtime_error("unknown character '" + std::string(next) + "' in array at position " + std::to_string(buffer.position + buffer.overall + 1));
+                chomp(buffer, reader);
+                if (!buffer.valid()) {
+                    throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
+                }
+
+                char next = buffer.get(reader);
+                if (next == ']') {
+                    break;
+                } else if (next != ',') {
+                    throw std::runtime_error("unknown character '" + std::string(1, next) + "' in array at position " + std::to_string(buffer.position() + 1));
+                }
+
+                buffer.advance(); 
+                chomp(buffer, reader);
+                if (!buffer.valid()) {
+                    throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
+                }
             }
         }
+
+        buffer.advance(); // skip the closing bracket.
 
     } else if (current == '{') {
         auto ptr = new Object;
@@ -382,61 +403,85 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
         auto& map = ptr->values;
 
         buffer.advance();
-        while (1) {
-            chomp(buffer, reader);
-            if (!buffer.valid()) {
-                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
-            }
+        chomp(buffer, reader);
+        if (!buffer.valid()) {
+            throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+        }
 
-            char next = buffer.get(reader);
-            if (next != '"') {
-                throw std::runtime_error("expected a string as the object key at position " + std::to_string(buffer.position + buffer.overall + 1));
-            }
-            auto key = parse_string(buffer, reader);
-            if (map.find(key) != map.end()) {
-                throw std::runtime_error("detected duplicate keys in the object at position " + std::to_string(buffer.position + buffer.overall + 1));
-            }
+        if (buffer.get(reader) != '}') {
+            while (1) {
+                char next = buffer.get(reader);
+                if (next != '"') {
+                    throw std::runtime_error("expected a string as the object key at position " + std::to_string(buffer.position() + 1));
+                }
+                auto key = extract_string(buffer, reader);
+                if (map.find(key) != map.end()) {
+                    throw std::runtime_error("detected duplicate keys in the object at position " + std::to_string(buffer.position() + 1));
+                }
 
-            chomp(buffer, reader);
-            if (!buffer.valid()) {
-                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
-            }
-            if (buffer.get(reader) != ':') {
-                throw std::runtime_error("expected ':' to separate keys and values at position " + std::to_string(buffer.position + buffer.overall + 1));
-            }
+                chomp(buffer, reader);
+                if (!buffer.valid()) {
+                    throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+                }
+                if (buffer.get(reader) != ':') {
+                    throw std::runtime_error("expected ':' to separate keys and values at position " + std::to_string(buffer.position() + 1));
+                }
 
-            buffer.advance();
-            chomp(buffer, reader);
-            if (!buffer.valid()) {
-                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
-            }
-            map[key] = parse_thing(buffer, reader);
+                buffer.advance();
+                chomp(buffer, reader);
+                if (!buffer.valid()) {
+                    throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+                }
+                map[key] = parse_thing(buffer, reader);
 
-            chomp(buffer, reader);
-            if (!buffer.valid()) {
-                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
-            }
+                chomp(buffer, reader);
+                if (!buffer.valid()) {
+                    throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+                }
 
-            char next = buffer.get(reader);
-            buffer.advance(); // make sure we skip the closing brace before returning.
-            if (next == '}') {
-                break;
-            } else if (next != ',') {
-                throw std::runtime_error("unknown character '" + std::string(next) + "' in array at position " + std::to_string(buffer.position + buffer.overall + 1));
+                next = buffer.get(reader);
+                if (next == '}') {
+                    break;
+                } else if (next != ',') {
+                    throw std::runtime_error("unknown character '" + std::string(1, next) + "' in array at position " + std::to_string(buffer.position() + 1));
+                }
+
+                buffer.advance(); 
+                chomp(buffer, reader);
+                if (!buffer.valid()) {
+                    throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+                }
             }
         }
 
+        buffer.advance(); // skip the closing brace.
+
     } else if (current == '-') {
         buffer.advance(); 
-        output.reset(new Number(-extract_number(buffer, reader);
+        if (!buffer.valid()) {
+            throw std::runtime_error("incomplete number starting at position " + std::to_string(start));
+        }
+        output.reset(new Number(-extract_number(buffer, reader)));
 
     } else if (std::isdigit(current)) {
-        output.reset(new Number(extract_number(buffer, reader);
+        output.reset(new Number(extract_number(buffer, reader)));
 
     } else {
-        throw std::runtime_error(std::string("unknown type starting with '") + std::string(current) + "' at position " + std::to_string(buffer.position + 1));
+        throw std::runtime_error(std::string("unknown type starting with '") + std::string(1, current) + "' at position " + std::to_string(start));
     }
 
+    return output;
+}
+
+template<class Reader>
+std::shared_ptr<Base> parse_json(Reader& reader) {
+    CurrentBuffer buffer(reader);
+    chomp(buffer, reader);
+    auto output = parse_thing(buffer, reader);
+    chomp(buffer, reader);
+    if (buffer.valid()) {
+        throw std::runtime_error("invalid json with trailing non-space characters at position " + std::to_string(buffer.position() + 1));
+    }
     return output;
 }
 
@@ -445,4 +490,8 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
  * @endcond
  */
 
+
+
 }
+
+#endif
