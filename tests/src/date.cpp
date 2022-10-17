@@ -6,7 +6,7 @@
 #include "test_subclass.h"
 #include "utils.h"
 
-TEST(DateTest, SimpleLoading) {
+TEST(Hdf5DateTest, SimpleLoading) {
     auto path = "TEST-date.h5";
 
     // Simple stuff works correctly.
@@ -29,7 +29,7 @@ TEST(DateTest, SimpleLoading) {
      ********************************************/
 }
 
-TEST(DateTest, MissingValues) {
+TEST(Hdf5DateTest, MissingValues) {
     auto path = "TEST-date.h5";
 
     {
@@ -51,7 +51,7 @@ TEST(DateTest, MissingValues) {
     }
 }
 
-TEST(DateTest, CheckError) {
+TEST(Hdf5DateTest, CheckError) {
     auto path = "TEST-date.h5";
 
     {

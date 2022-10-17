@@ -726,7 +726,6 @@ std::shared_ptr<Base> parse_object(const raw::Base* contents, Externals& ext, co
         output.reset(ptr);
         extract_strings(vals, ptr, [&](const std::string& x) -> void {
             if (!is_date(x)) {
-            std::cout << x << std::endl;
                  throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
             }
         }, path);
@@ -754,50 +753,53 @@ std::shared_ptr<Base> parse_object(const raw::Base* contents, Externals& ext, co
  */
 
 template<class Provisioner, class Reader, class Externals>
-std::shared_ptr<Base> parse_json(Reader& reader, Externals& ext) {
+std::shared_ptr<Base> parse_json(Reader& reader, Externals ext) {
     auto contents = json::raw::parse_json(reader);
-    return json::parse_object<Provisioner>(contents.get(), ext, "");
+    ExternalTracker etrack(std::move(ext));
+    auto output = json::parse_object<Provisioner>(contents.get(), etrack, "");
+    etrack.validate();
+    return output;
 }
 
 template<class Provisioner, class Reader>
 std::shared_ptr<Base> parse_json(Reader& reader) {
     DummyExternals ext(0);
-    return parse_json<Provisioner>(reader, ext);
+    return parse_json<Provisioner>(reader, std::move(ext));
 }
 
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_json(const std::string& file, Externals& ext, size_t buffer_size = 65536) {
+std::shared_ptr<Base> parse_json(const std::string& file, Externals ext, size_t buffer_size = 65536) {
     byteme::SomeFileReader reader(file.c_str(), buffer_size);
-    return parse_json<Provisioner>(reader, ext);
+    return parse_json<Provisioner>(reader, std::move(ext));
 }
 
 template<class Provisioner>
 std::shared_ptr<Base> parse_json(const std::string& file, size_t buffer_size = 65536) {
     DummyExternals ext(0);
-    return parse_json<Provisioner>(file, ext, buffer_size);
+    return parse_json<Provisioner>(file, std::move(ext), buffer_size);
 }
 
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, Externals& ext, size_t buffer_size = 65536) {
+std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, Externals ext, size_t buffer_size = 65536) {
     byteme::SomeBufferReader reader(buffer, len, buffer_size);
-    return parse_json<Provisioner>(reader, ext);
+    return parse_json<Provisioner>(reader, std::move(ext));
 }
 
 template<class Provisioner>
 std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, size_t buffer_size = 65536) {
     DummyExternals ext(0);
-    return parse_json<Provisioner>(buffer, len, ext, buffer_size);
+    return parse_json<Provisioner>(buffer, len, std::move(ext), buffer_size);
 }
 
 inline void validate_json(const std::string& file, int num_external = 0, size_t buffer_size = 65536) {
     DummyExternals ext(num_external);
-    parse_json<DummyProvisioner>(file, ext, buffer_size);
+    parse_json<DummyProvisioner>(file, std::move(ext), buffer_size);
     return;
 }
 
 inline void validate_json(const unsigned char* buffer, size_t len, int num_external = 0, size_t buffer_size = 65536) {
     DummyExternals ext(num_external);
-    parse_json<DummyProvisioner>(buffer, len, ext, buffer_size);
+    parse_json<DummyProvisioner>(buffer, len, std::move(ext), buffer_size);
     return;
 }
 
