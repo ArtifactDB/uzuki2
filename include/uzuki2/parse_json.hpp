@@ -726,6 +726,7 @@ std::shared_ptr<Base> parse_object(const raw::Base* contents, Externals& ext, co
         output.reset(ptr);
         extract_strings(vals, ptr, [&](const std::string& x) -> void {
             if (!is_date(x)) {
+            std::cout << x << std::endl;
                  throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
             }
         }, path);

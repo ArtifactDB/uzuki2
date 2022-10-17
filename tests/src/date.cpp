@@ -115,3 +115,33 @@ TEST(DateTest, CheckError) {
      *** See integer.cpp for vector error tests. ***
      ***********************************************/
 }
+
+TEST(JsonDateTest, SimpleLoading) {
+    auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::DATE);
+    auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+    EXPECT_EQ(dptr->size(), 2);
+    EXPECT_EQ(dptr->base.values[0], "2022-01-22");
+    EXPECT_EQ(dptr->base.values[1], "1990-06-30");
+
+    /********************************************
+     *** See integer.cpp for tests for names. ***
+     ********************************************/
+}
+
+TEST(JsonDateTest, MissingValues) {
+    auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", null ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::DATE);
+    auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+    EXPECT_EQ(dptr->size(), 2);
+    EXPECT_EQ(dptr->base.values.back(), "ich bin missing");
+}
+
+TEST(JsonDateTest, CheckError) {
+    expect_json_error("{\"type\":\"date\", \"values\":[true,1,2] }", "expected a string");
+    expect_json_error("{\"type\":\"date\", \"values\":[\"foo\", \"bar\"] }", "YYYY-MM-DD");
+
+    /***********************************************
+     *** See integer.cpp for vector error tests. ***
+     ***********************************************/
+}

@@ -32,7 +32,7 @@ inline bool is_date(const std::string& val) {
     }
 
     if (val[8] == '3') {
-        if (val[6] > '1') {
+        if (val[9] > '1') {
             return false;
         }
     } else if (val[8] > '3') {
