@@ -15,6 +15,11 @@ add_subdirectory(extern)
 
 target_link_libraries(uzuki2 INTERFACE byteme)
 
+find_package(ZLIB)
+if(ZLIB_FOUND)
+    target_link_libraries(uzuki2 INTERFACE ZLIB::ZLIB)
+endif() 
+
 # Building the test-related machinery, if we are compiling this library directly.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     option(INSTALL_GTEST OFF)

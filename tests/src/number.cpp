@@ -5,7 +5,6 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
 TEST(NumberTest, SimpleLoading) {
     auto path = "TEST-number.h5";
@@ -55,7 +54,7 @@ TEST(NumberTest, CheckError) {
         auto ghandle = vector_opener(handle, "foo", "number");
         create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "expected a float");
+    expect_hdf5_error(path, "foo", "expected a float");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

@@ -10,8 +10,10 @@
 #include <unordered_set>
 
 #include "H5Cpp.h"
+
 #include "interfaces.hpp"
 #include "Dummy.hpp"
+#include "utils.hpp"
 
 namespace uzuki2 {
 
@@ -75,42 +77,6 @@ inline hsize_t check_1d_length(const H5::DataSet& handle, const std::string& pat
     hsize_t dims;
     dspace.getSimpleExtentDims(&dims);
     return dims;
-}
-
-inline bool is_date(const std::string& val) {
-    if (val.size() != 10) {
-        return false;
-    } 
-    
-    for (size_t p = 0; p < val.size(); ++p) {
-        if (p == 4 || p == 7) {
-            if (val[p] != '-') {
-                return false;
-            }
-        } else {
-            if (!std::isdigit(val[p])) {
-                return false;
-            }
-        }
-    }
-
-    if (val[5] == '1') {
-        if (val[6] > '2') {
-            return false;
-        }
-    } else if (val[5] != '0') {
-        return false;
-    }
-
-    if (val[8] == '3') {
-        if (val[6] > '1') {
-            return false;
-        }
-    } else if (val[8] > '3') {
-        return false;
-    }
-
-    return true;
 }
 
 template<class Host, class Function>

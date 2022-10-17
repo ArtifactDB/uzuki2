@@ -5,7 +5,6 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
 TEST(ListTest, SimpleLoading) {
     auto path = "TEST-list.h5";
@@ -89,7 +88,7 @@ TEST(ListTest, CheckError) {
         auto ghandle = list_opener(handle, "foo");
         create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "expected a group at 'foo/data'");
+    expect_hdf5_error(path, "foo", "expected a group at 'foo/data'");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -97,7 +96,7 @@ TEST(ListTest, CheckError) {
         auto dhandle = ghandle.createGroup("data");
         nothing_opener(dhandle, "1");
     }
-    expect_error(path, "foo", "expected a group at 'foo/data/0'");
+    expect_hdf5_error(path, "foo", "expected a group at 'foo/data/0'");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -105,6 +104,6 @@ TEST(ListTest, CheckError) {
         auto dhandle = ghandle.createGroup("data");
         create_dataset<int>(dhandle, "0", { 1, 2, 3 }, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "expected a group at 'foo/data/0'");
+    expect_hdf5_error(path, "foo", "expected a group at 'foo/data/0'");
 }
 

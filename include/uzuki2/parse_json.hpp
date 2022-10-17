@@ -6,10 +6,16 @@
 #include <cctype>
 #include <string>
 #include <stdexcept>
+#include <cmath>
 #include <unordered_map>
+#include <unordered_set>
+
+#include "byteme/SomeFileReader.hpp"
+#include "byteme/SomeBufferReader.hpp"
 
 #include "interfaces.hpp"
 #include "Dummy.hpp"
+#include "utils.hpp"
 
 namespace uzuki2 {
 
@@ -17,6 +23,8 @@ namespace uzuki2 {
  * @cond
  */
 namespace json {
+
+namespace raw {
 
 enum JsonType {
     NUMBER,
@@ -486,11 +494,311 @@ std::shared_ptr<Base> parse_json(Reader& reader) {
 }
 
 }
+
+inline const std::vector<std::shared_ptr<raw::Base> >& extract_array(const std::unordered_map<std::string, std::shared_ptr<raw::Base> >& properties, const std::string& name, const std::string& path) {
+    auto vIt = properties.find(name);
+    if (vIt == properties.end()) {
+        throw std::runtime_error("expected '" + name + "' property for object at '" + path + "'");
+    }
+
+    const auto& values_ptr = vIt->second;
+    if (values_ptr->type() != raw::ARRAY) {
+        throw std::runtime_error("expected an array in '" + path + "." + name + "'"); 
+    }
+
+    return static_cast<const raw::Array*>(values_ptr.get())->values;
+}
+
+template<class Destination, class Function>
+void extract_integers(const std::vector<std::shared_ptr<raw::Base> >& values, Destination* dest, Function check, const std::string& path) {
+    for (size_t i = 0; i < values.size(); ++i) {
+        if (values[i]->type() == raw::NOTHING) {
+            dest->set_missing(i);
+            continue;
+        }
+
+        if (values[i]->type() != raw::NUMBER) {
+            throw std::runtime_error("expected a number at '" + path + ".values[" + std::to_string(i) + "]'");
+        }
+
+        auto val = static_cast<const raw::Number*>(values[i].get())->value;
+        if (val != std::floor(val)) {
+            throw std::runtime_error("expected an integer at '" + path + ".values[" + std::to_string(i) + "]'");
+        }
+
+        constexpr double upper = std::numeric_limits<int32_t>::max();
+        constexpr double lower = std::numeric_limits<int32_t>::min();
+        if (val < lower || val > upper) {
+            throw std::runtime_error("value at '" + path + ".values[" + std::to_string(i) + "]' cannot be represented by a 32-bit signed integer");
+        }
+
+        int32_t ival = val;
+        check(ival);
+        dest->set(i, ival);
+    }
+}
+
+template<class Destination, class Function>
+void extract_strings(const std::vector<std::shared_ptr<raw::Base> >& values, Destination* dest, Function check, const std::string& path) {
+    for (size_t i = 0; i < values.size(); ++i) {
+        if (values[i]->type() == raw::NOTHING) {
+            dest->set_missing(i);
+            continue;
+        }
+
+        if (values[i]->type() != raw::STRING) {
+            throw std::runtime_error("expected a string at '" + path + ".values[" + std::to_string(i) + "]'");
+        }
+
+        const auto& str = static_cast<const raw::String*>(values[i].get())->value;
+        check(str);
+        dest->set(i, str);
+    }
+}
+
+template<class Destination>
+void extract_names(const std::unordered_map<std::string, std::shared_ptr<raw::Base> >& properties, Destination* dest, const std::string& path) {
+    auto nIt = properties.find("names");
+    if (nIt == properties.end()) {
+        return;
+    }
+
+    const auto name_ptr = nIt->second;
+    if (name_ptr->type() != raw::ARRAY) {
+        throw std::runtime_error("expected an array in '" + path + ".names'"); 
+    }
+
+    const auto& names = static_cast<const raw::Array*>(name_ptr.get())->values;
+    if (names.size() != dest->size()) {
+        throw std::runtime_error("length of names and values should be the same in '" + path + "'"); 
+    }
+    dest->use_names();
+
+    for (size_t i = 0; i < names.size(); ++i) {
+        if (names[i]->type() != raw::STRING) {
+            throw std::runtime_error("expected a string at '" + path + ".names[" + std::to_string(i) + "]'");
+        }
+        dest->set_name(i, static_cast<const raw::String*>(names[i].get())->value);
+    }
+}
+
+template<class Provisioner, class Externals>
+std::shared_ptr<Base> parse_object(const raw::Base* contents, Externals& ext, const std::string& path) {
+    if (contents->type() != raw::OBJECT) {
+        throw std::runtime_error("each R object should be represented by a JSON object at '" + path + "'");
+    }
+
+    auto optr = static_cast<const raw::Object*>(contents);
+    const auto& map = optr->values;
+
+    auto tIt = map.find("type");
+    if (tIt == map.end()) {
+        throw std::runtime_error("missing 'type' property for JSON object at '" + path + "'");
+    }
+    const auto& type_ptr = tIt->second;
+    if (type_ptr->type() != raw::STRING) {
+        throw std::runtime_error("expected a string at '" + path + ".type'");
+    }
+    const auto& type = static_cast<const raw::String*>(type_ptr.get())->value;
+
+    std::shared_ptr<Base> output;
+    if (type == "nothing") {
+        output.reset(Provisioner::new_Nothing());
+
+    } else if (type == "external") {
+        auto iIt = map.find("index");
+        if (iIt == map.end()) {
+            throw std::runtime_error("expected 'index' property for 'external' type at '" + path + "'");
+        }
+        const auto& index_ptr = iIt->second;
+        if (index_ptr->type() != raw::NUMBER) {
+            throw std::runtime_error("expected a number at '" + path + ".index'");
+        }
+        auto index = static_cast<const raw::Number*>(index_ptr.get())->value;
+
+        if (index != std::floor(index)) {
+            throw std::runtime_error("expected an integer at '" + path + ".index'");
+        } else if (index < 0 || index >= static_cast<double>(ext.size())) {
+            throw std::runtime_error("external index out of range at '" + path + ".index'");
+        }
+        output.reset(Provisioner::new_External(ext.get(index)));
+
+    } else if (type == "integer") {
+        const auto& vals = extract_array(map, "values", path);
+        auto ptr = Provisioner::new_Integer(vals.size());
+        output.reset(ptr);
+        extract_integers(vals, ptr, [](int32_t) -> void {}, path);
+        extract_names(map, ptr, path);
+
+    } else if (type == "factor" || type == "ordered") {
+        const auto& vals = extract_array(map, "values", path);
+        const auto& lvals = extract_array(map, "levels", path);
+
+        auto ptr = Provisioner::new_Factor(vals.size(), lvals.size());
+        output.reset(ptr);
+        if (type == "ordered") {
+            ptr->is_ordered();
+        }
+
+        int32_t nlevels = lvals.size();
+        extract_integers(vals, ptr, [&](int32_t x) -> void {
+            if (x < 0 || x >= nlevels) {
+                throw std::runtime_error("factor indices of out of range of levels in '" + path + "'");
+            }
+        }, path);
+
+        std::unordered_set<std::string> existing;
+        for (size_t l = 0; l < lvals.size(); ++l) {
+            if (lvals[l]->type() != raw::STRING) {
+                throw std::runtime_error("expected strings at '" + path + ".levels[" + std::to_string(l) + "]'");
+            }
+
+            const auto& level = static_cast<const raw::String*>(lvals[l].get())->value;
+            if (existing.find(level) != existing.end()) {
+                throw std::runtime_error("detected duplicate string at '" + path + ".levels[" + std::to_string(l) + "]'");
+            }
+            ptr->set_level(l, level);
+            existing.insert(level);
+        }
+
+        extract_names(map, ptr, path);
+
+    } else if (type == "boolean") {
+        const auto& vals = extract_array(map, "values", path);
+        auto ptr = Provisioner::new_Boolean(vals.size());
+        output.reset(ptr);
+
+        for (size_t i = 0; i < vals.size(); ++i) {
+            if (vals[i]->type() == raw::NOTHING) {
+                ptr->set_missing(i);
+                continue;
+            }
+
+            if (vals[i]->type() != raw::BOOLEAN) {
+                throw std::runtime_error("expected a boolean at '" + path + ".values[" + std::to_string(i) + "]'");
+            }
+            ptr->set(i, static_cast<const raw::Boolean*>(vals[i].get())->value);
+        }
+
+        extract_names(map, ptr, path);
+
+    } else if (type == "number") {
+        const auto& vals = extract_array(map, "values", path);
+        auto ptr = Provisioner::new_Number(vals.size());
+        output.reset(ptr);
+
+        for (size_t i = 0; i < vals.size(); ++i) {
+            if (vals[i]->type() == raw::NOTHING) {
+                ptr->set_missing(i);
+                continue;
+            }
+
+            if (vals[i]->type() == raw::NUMBER) {
+                ptr->set(i, static_cast<const raw::Number*>(vals[i].get())->value);
+            } else if (vals[i]->type() == raw::STRING) {
+                auto str = static_cast<const raw::String*>(vals[i].get())->value;
+                if (str == "NaN") {
+                    ptr->set(i, std::numeric_limits<double>::quiet_NaN());
+                } else if (str == "Inf") {
+                    ptr->set(i, std::numeric_limits<double>::infinity());
+                } else if (str == "-Inf") {
+                    ptr->set(i, -std::numeric_limits<double>::infinity());
+                } else {
+                    throw std::runtime_error("unsupported string '" + str + "' at '" + path + ".values[" + std::to_string(i) + "]'");
+                }
+            } else {
+                throw std::runtime_error("expected a number at '" + path + ".values[" + std::to_string(i) + "]'");
+            }
+        }
+
+        extract_names(map, ptr, path);
+
+    } else if (type == "string") {
+        const auto& vals = extract_array(map, "values", path);
+        auto ptr = Provisioner::new_String(vals.size());
+        output.reset(ptr);
+        extract_strings(vals, ptr, [](const std::string&) -> void {}, path);
+        extract_names(map, ptr, path);
+
+    } else if (type == "date") {
+        const auto& vals = extract_array(map, "values", path);
+        auto ptr = Provisioner::new_Date(vals.size());
+        output.reset(ptr);
+        extract_strings(vals, ptr, [&](const std::string& x) -> void {
+            if (!is_date(x)) {
+                 throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
+            }
+        }, path);
+        extract_names(map, ptr, path);
+
+    } else if (type == "list") {
+        const auto& vals = extract_array(map, "values", path);
+        auto ptr = Provisioner::new_List(vals.size());
+        output.reset(ptr);
+        for (size_t i = 0; i < vals.size(); ++i) {
+            ptr->set(i, parse_object<Provisioner>(vals[i].get(), ext, path + ".values[" + std::to_string(i) + "]"));
+        }
+        extract_names(map, ptr, path);
+
+    } else {
+        throw std::runtime_error("unknown object type '" + type + "' at '" + path + ".type'");
+    }
+
+    return output;
+}
+
+}
 /**
  * @endcond
  */
 
+template<class Provisioner, class Reader, class Externals>
+std::shared_ptr<Base> parse_json(Reader& reader, Externals& ext) {
+    auto contents = json::raw::parse_json(reader);
+    return json::parse_object<Provisioner>(contents.get(), ext, "");
+}
 
+template<class Provisioner, class Reader>
+std::shared_ptr<Base> parse_json(Reader& reader) {
+    DummyExternals ext(0);
+    return parse_json<Provisioner>(reader, ext);
+}
+
+template<class Provisioner, class Externals>
+std::shared_ptr<Base> parse_json(const std::string& file, Externals& ext, size_t buffer_size = 65536) {
+    byteme::SomeFileReader reader(file.c_str(), buffer_size);
+    return parse_json<Provisioner>(reader, ext);
+}
+
+template<class Provisioner>
+std::shared_ptr<Base> parse_json(const std::string& file, size_t buffer_size = 65536) {
+    DummyExternals ext(0);
+    return parse_json<Provisioner>(file, ext, buffer_size);
+}
+
+template<class Provisioner, class Externals>
+std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, Externals& ext, size_t buffer_size = 65536) {
+    byteme::SomeBufferReader reader(buffer, len, buffer_size);
+    return parse_json<Provisioner>(reader, ext);
+}
+
+template<class Provisioner>
+std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, size_t buffer_size = 65536) {
+    DummyExternals ext(0);
+    return parse_json<Provisioner>(buffer, len, ext, buffer_size);
+}
+
+inline void validate_json(const std::string& file, int num_external = 0, size_t buffer_size = 65536) {
+    DummyExternals ext(num_external);
+    parse_json<DummyProvisioner>(file, ext, buffer_size);
+    return;
+}
+
+inline void validate_json(const unsigned char* buffer, size_t len, int num_external = 0, size_t buffer_size = 65536) {
+    DummyExternals ext(num_external);
+    parse_json<DummyProvisioner>(buffer, len, ext, buffer_size);
+    return;
+}
 
 }
 

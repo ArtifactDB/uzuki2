@@ -5,7 +5,6 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
 TEST(DateTest, SimpleLoading) {
     auto path = "TEST-date.h5";
@@ -60,56 +59,56 @@ TEST(DateTest, CheckError) {
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "2077-12-12", "2055-23-01", "2022-05-06" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "2077-12-12", "2055-2-01", "2022-05-06" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "2077-12-12", "2055-12-1", "2022-05-06" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "2077-12-12", "22-12-12", "2022-05-06" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "2077-12-12", "2022-12-35", "2022-05-06" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "2077-12-12", "2022-12-55", "2022-05-06" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "2077-12-12", "asda-sd-as", "2022-05-06" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
         create_dataset(vhandle, "data", { "harry", "ron", "hermoine" });
     }
-    expect_error(path, "foo", "dates should follow");
+    expect_hdf5_error(path, "foo", "dates should follow");
 
 
     /***********************************************

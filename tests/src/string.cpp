@@ -5,7 +5,6 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
 TEST(StringTest, SimpleLoading) {
     auto path = "TEST-string.h5";
@@ -75,7 +74,7 @@ TEST(StringTest, CheckError) {
         auto ghandle = vector_opener(handle, "foo", "string");
         create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "expected a string");
+    expect_hdf5_error(path, "foo", "expected a string");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

@@ -5,7 +5,6 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
 TEST(FactorTest, SimpleLoading) {
     auto path = "TEST-factor.h5";
@@ -80,7 +79,7 @@ TEST(FactorTest, CheckError) {
         create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
         create_dataset(vhandle, "levels", { "Albo", "Rudd" });
     }
-    expect_error(path, "blub", "less than the number of levels");
+    expect_hdf5_error(path, "blub", "less than the number of levels");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -88,7 +87,7 @@ TEST(FactorTest, CheckError) {
         create_dataset<int>(vhandle, "data", { 0, 1, -1, -1, 1 }, H5::PredType::NATIVE_INT);
         create_dataset(vhandle, "levels", { "Albo", "Rudd" });
     }
-    expect_error(path, "blub", "non-negative");
+    expect_hdf5_error(path, "blub", "non-negative");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -96,7 +95,7 @@ TEST(FactorTest, CheckError) {
         create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
         create_dataset(vhandle, "levels", { "Malcolm", "Malcolm", "John" });
     }
-    expect_error(path, "blub", "unique");
+    expect_hdf5_error(path, "blub", "unique");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

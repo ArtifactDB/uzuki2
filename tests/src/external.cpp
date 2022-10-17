@@ -49,7 +49,7 @@ TEST(ExternalTest, SimpleLoading) {
     }
 }
 
-static void expect_error(std::string path, std::string name, std::string msg, int num_expected) {
+static void expect_hdf5_error(std::string path, std::string name, std::string msg, int num_expected) {
     H5::H5File file(path, H5F_ACC_RDONLY); 
     EXPECT_ANY_THROW({
         try {
@@ -69,14 +69,14 @@ TEST(ExternalTest, CheckErrors) {
         auto ghandle = external_opener(handle, "foo");
         write_scalar(ghandle, "index", 1, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "out of range", 1);
+    expect_hdf5_error(path, "foo", "out of range", 1);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
         write_scalar(ghandle, "index", 0, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "fewer instances", 2);
+    expect_hdf5_error(path, "foo", "fewer instances", 2);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -87,5 +87,5 @@ TEST(ExternalTest, CheckErrors) {
         auto ohandle2 = external_opener(dhandle, "1");
         write_scalar(ohandle2, "index", 0, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "consecutive", 2);
+    expect_hdf5_error(path, "foo", "consecutive", 2);
 }

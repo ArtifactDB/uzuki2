@@ -1,12 +1,21 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "H5Cpp.h"
 #include <iostream>
 #include <map>
 #include <vector>
 #include <string>
 #include <type_traits>
+
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include "H5Cpp.h"
+
+#include "uzuki2/parse_json.hpp"
+#include "uzuki2/validate.hpp"
+#include "uzuki2/parse_json.hpp"
+
+#include "test_subclass.h"
 
 inline H5::Group super_group_opener(const H5::Group& parent, const std::string& name, const std::map<std::string, std::string>& attributes) {
     auto ghandle = parent.createGroup(name);
@@ -116,6 +125,32 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
         dhandle.write(ptrs.data(), stype);
         return dhandle;
     }
+}
+
+inline std::shared_ptr<uzuki2::Base> load_json(std::string x) {
+    return uzuki2::parse_json<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size());
+}
+
+inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {
+    EXPECT_ANY_THROW({
+        try {
+            uzuki2::validate(file, name);
+        } catch (std::exception& e) {
+            EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
+            throw;
+        }
+    });
+}
+
+inline void expect_json_error(std::string json, std::string msg) {
+    EXPECT_ANY_THROW({
+        try {
+            uzuki2::validate_json(reinterpret_cast<const unsigned char*>(json.c_str()), json.size());
+        } catch (std::exception& e) {
+            EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
+            throw;
+        }
+    });
 }
 
 #endif

@@ -5,7 +5,6 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
 TEST(IntegerTest, SimpleLoading) {
     auto path = "TEST-integer.h5";
@@ -68,21 +67,21 @@ TEST(IntegerTest, CheckError) {
         auto ghandle = vector_opener(handle, "foo", "integer");
         ghandle.createGroup("data");
     }
-    expect_error(path, "foo", "expected a dataset at 'foo/data'");
+    expect_hdf5_error(path, "foo", "expected a dataset at 'foo/data'");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = vector_opener(handle, "foo", "integer");
         create_dataset<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_DOUBLE);
     }
-    expect_error(path, "foo", "expected an integer dataset at 'foo/data'");
+    expect_hdf5_error(path, "foo", "expected an integer dataset at 'foo/data'");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = vector_opener(handle, "foo", "integer");
         write_scalar(ghandle, "data", 1, H5::PredType::NATIVE_DOUBLE);
     }
-    expect_error(path, "foo", "1-dimensional");
+    expect_hdf5_error(path, "foo", "1-dimensional");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -90,5 +89,5 @@ TEST(IntegerTest, CheckError) {
         create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
         create_dataset(vhandle, "names", { "A", "B", "C", "D" });
     }
-    expect_error(path, "blub", "should be equal to length");
+    expect_hdf5_error(path, "blub", "should be equal to length");
 }
