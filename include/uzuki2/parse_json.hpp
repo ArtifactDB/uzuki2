@@ -125,7 +125,7 @@ bool is_expected_string(CurrentBuffer& buffer, Reader& reader, const std::string
 template<class Reader>
 std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
     size_t start = i + buffer.overall;
-    ++buffer.position; // get past the opening quote.
+    buffer.advance(); // get past the opening quote.
     std::string output;
 
     while (1) {
@@ -323,30 +323,24 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
 
 template<class Reader>
 std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
-    chomp(buffer, reader);
-    if (buffer.available == buffer.position) {
-        throw std::runtime_error("Error message HERE");
-    }
-
     std::shared_ptr<Base> output;
 
-    const char current = buffer.get(reader, false);
+    size_t start = buffer.position + buffer.overall + 1;
+    const char current = buffer.get(reader);
+
     if (current == 't') {
-        size_t start = buffer.position + 1;
         if (!is_expected_string(buffer, reader, "true")) {
             throw std::runtime_error("expected a 'true' string at position " + std::to_string(start));
         }
         output.reset(new Boolean(true));
 
     } else if (current == 'f') {
-        size_t start = buffer.position + 1;
         if (!is_expected_string(buffer, reader, "false")) {
             throw std::runtime_error("expected a 'false' string at position " + std::to_string(start));
         }
         output.reset(new Boolean(false));
 
     } else if (current == 'n') {
-        size_t start = buffer.position + 1;
         if (!is_expected_string(buffer, reader, "null")) {
             throw std::runtime_error("expected a 'null' string at position " + std::to_string(start));
         }
@@ -356,11 +350,84 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
         output.reset(new String(extract_string(buffer, reader)));
 
     } else if (current == '[') {
+        auto ptr = new Array;
+        output.reset(ptr);
+
+        buffer.advance();
+        bool okay = false;
+        while (1) {
+            chomp(buffer, reader);
+            if (!buffer.valid()) {
+                throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
+            }
+            ptr->values.push_back(parse_thing(buffer, reader));
+
+            chomp(buffer, reader);
+            if (!buffer.valid()) {
+                throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
+            }
+
+            char next = buffer.get(reader);
+            buffer.advance(); // make sure we skip the closing brace before returning.
+            if (next == ']') {
+                break;
+            } else if (next != ',') {
+                throw std::runtime_error("unknown character '" + std::string(next) + "' in array at position " + std::to_string(buffer.position + buffer.overall + 1));
+            }
+        }
 
     } else if (current == '{') {
+        auto ptr = new Object;
+        output.reset(ptr);
+        auto& map = ptr->values;
+
+        buffer.advance();
+        while (1) {
+            chomp(buffer, reader);
+            if (!buffer.valid()) {
+                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+            }
+
+            char next = buffer.get(reader);
+            if (next != '"') {
+                throw std::runtime_error("expected a string as the object key at position " + std::to_string(buffer.position + buffer.overall + 1));
+            }
+            auto key = parse_string(buffer, reader);
+            if (map.find(key) != map.end()) {
+                throw std::runtime_error("detected duplicate keys in the object at position " + std::to_string(buffer.position + buffer.overall + 1));
+            }
+
+            chomp(buffer, reader);
+            if (!buffer.valid()) {
+                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+            }
+            if (buffer.get(reader) != ':') {
+                throw std::runtime_error("expected ':' to separate keys and values at position " + std::to_string(buffer.position + buffer.overall + 1));
+            }
+
+            buffer.advance();
+            chomp(buffer, reader);
+            if (!buffer.valid()) {
+                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+            }
+            map[key] = parse_thing(buffer, reader);
+
+            chomp(buffer, reader);
+            if (!buffer.valid()) {
+                throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
+            }
+
+            char next = buffer.get(reader);
+            buffer.advance(); // make sure we skip the closing brace before returning.
+            if (next == '}') {
+                break;
+            } else if (next != ',') {
+                throw std::runtime_error("unknown character '" + std::string(next) + "' in array at position " + std::to_string(buffer.position + buffer.overall + 1));
+            }
+        }
 
     } else if (current == '-') {
-        buffer.get(reader); // advance to the next one.
+        buffer.advance(); 
         output.reset(new Number(-extract_number(buffer, reader);
 
     } else if (std::isdigit(current)) {
