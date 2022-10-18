@@ -17,6 +17,11 @@
 #include "Dummy.hpp"
 #include "utils.hpp"
 
+/**
+ * @file parse_json.hpp
+ * @brief Parsing methods for JSON files.
+ */
+
 namespace uzuki2 {
 
 /**
