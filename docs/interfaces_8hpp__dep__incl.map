@@ -1,6 +1,7 @@
 <map id="uzuki2/interfaces.hpp" name="uzuki2/interfaces.hpp">
-<area shape="rect" id="node1" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="5,5,149,31"/>
-<area shape="rect" id="node2" href="$parse_8hpp_source.html" title=" " alt="" coords="18,79,137,104"/>
-<area shape="rect" id="node3" href="$uzuki2_8hpp_source.html" title=" " alt="" coords="15,225,139,251"/>
-<area shape="rect" id="node4" href="$validate_8hpp.html" title="Validate HDF5 file contents against the uzuki2 spec." alt="" coords="63,152,195,177"/>
+<area shape="rect" id="node1" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="74,5,218,31"/>
+<area shape="rect" id="node2" href="$parse_8hpp_source.html" title=" " alt="" coords="8,79,127,104"/>
+<area shape="rect" id="node5" href="$parse__json_8hpp_source.html" title=" " alt="" coords="151,79,301,104"/>
+<area shape="rect" id="node3" href="$uzuki2_8hpp_source.html" title=" " alt="" coords="5,225,129,251"/>
+<area shape="rect" id="node4" href="$validate_8hpp.html" title="Validate HDF5 file contents against the uzuki2 spec." alt="" coords="53,152,185,177"/>
 </map>
