@@ -79,59 +79,56 @@ private:
     bool remaining = false;
     size_t overall = 0;
 
-    template<class Reader>
-    void fill(Reader& reader) {
-        remaining = reader();
-        ptr = reinterpret_cast<const char*>(reader.buffer());
-        available = reader.available();
+    byteme::Reader* reader = nullptr;
+
+    void refill() {
+        remaining = (*reader)();
+        ptr = reinterpret_cast<const char*>(reader->buffer());
+        available = reader->available();
         current = 0;
-        if (available == 0) {
-            throw std::runtime_error("no available bytes left");
-        }
     }
 public:
     template<class Reader>
-    CurrentBuffer(Reader& reader) {
-        fill(reader);
+    CurrentBuffer(Reader& r) : reader(&r) {
+        refill();
     }
 
     bool valid() const {
-        return current < available || remaining;
+        return current < available;
     }
 
     void advance() {
         ++current;
-    }
-
-    template<class Reader>
-    char get(Reader& reader) {
         if (current == available) {
             overall += available;
-            fill(reader);
+            if (remaining) {
+                refill();
+            }
         }
+    }
+
+    char get() const {
         return ptr[current];
     }
 
-    size_t position() {
+    size_t position() const {
         return overall + current;
     }
 };
 
-template<class Reader>
-void chomp(CurrentBuffer& buffer, Reader& reader) {
-    while (buffer.valid() && std::isspace(buffer.get(reader))) {
+inline void chomp(CurrentBuffer& buffer) {
+    while (buffer.valid() && std::isspace(buffer.get())) {
         buffer.advance();
     }
     return;
 }
 
-template<class Reader>
-bool is_expected_string(CurrentBuffer& buffer, Reader& reader, const std::string& expected) {
+inline bool is_expected_string(CurrentBuffer& buffer, const std::string& expected) {
     for (auto x : expected) {
         if (!buffer.valid()) {
             return false;
         }
-        if (buffer.get(reader) != x) {
+        if (buffer.get() != x) {
             return false;
         }
         buffer.advance();
@@ -139,14 +136,13 @@ bool is_expected_string(CurrentBuffer& buffer, Reader& reader, const std::string
     return true;
 }
 
-template<class Reader>
-std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
+inline std::string extract_string(CurrentBuffer& buffer) {
     size_t start = buffer.position() + 1;
     buffer.advance(); // get past the opening quote.
     std::string output;
 
     while (1) {
-        char next = buffer.get(reader);
+        char next = buffer.get();
         switch (next) {
             case '"':
                 buffer.advance(); // get past the closing quote.
@@ -156,7 +152,7 @@ std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
                 if (!buffer.valid()) {
                     throw std::runtime_error("unterminated string at position " + std::to_string(start));
                 } else {
-                    char next2 = buffer.get(reader);
+                    char next2 = buffer.get();
                     switch (next2) {
                         case '"':
                             output += '"';          
@@ -199,8 +195,7 @@ std::string extract_string(CurrentBuffer& buffer, Reader& reader) {
     return output; // Technically unreachable, but whatever.
 }
 
-template<class Reader>
-double extract_number(CurrentBuffer& buffer, Reader& reader) {
+inline double extract_number(CurrentBuffer& buffer) {
     size_t start = buffer.position() + 1;
     double value = 0;
     double fractional = 10;
@@ -226,14 +221,14 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
     bool in_exponent = false;
 
     // We assume we're starting from the absolute value, after removing any preceding negative sign. 
-    char lead = buffer.get(reader);
+    char lead = buffer.get();
     if (lead == '0') {
         buffer.advance();
         if (!buffer.valid()) {
             return 0;
         }
 
-        char val = buffer.get(reader);
+        char val = buffer.get();
         if (val == '.') {
             in_fraction = true;
         } else if (val == 'e' || val == 'E') {
@@ -249,7 +244,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
         buffer.advance();
 
         while (buffer.valid()) {
-            char val = buffer.get(reader);
+            char val = buffer.get();
             if (val == '.') {
                 in_fraction = true;
                 break;
@@ -276,7 +271,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
             throw std::runtime_error("invalid number with trailing '.' at position " + std::to_string(start));
         }
 
-        char val = buffer.get(reader);
+        char val = buffer.get();
         if (!std::isdigit(val)) {
             throw std::runtime_error("'.' must be followed by at least one digit at position " + std::to_string(start));
         }
@@ -284,7 +279,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
 
         buffer.advance();
         while (buffer.valid()) {
-            char val = buffer.get(reader);
+            char val = buffer.get();
             if (val == 'e' || val == 'E') {
                 in_exponent = true;
                 break;
@@ -305,7 +300,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
             throw std::runtime_error("invalid number with trailing 'e/E' at position " + std::to_string(start));
         }
 
-        char val = buffer.get(reader);
+        char val = buffer.get();
         if (val == '+') {
             ;
         } else if (val == '-') {
@@ -318,7 +313,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
         if (!buffer.valid()) {
             throw std::runtime_error("invalid number with trailing exponent sign in number at position " + std::to_string(start));
         }
-        val = buffer.get(reader);
+        val = buffer.get();
         if (!std::isdigit(val)) {
             throw std::runtime_error("exponent sign must be followed by at least one digit in number at position " + std::to_string(start));
         }
@@ -326,7 +321,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
 
         buffer.advance();
         while (buffer.valid()) {
-            char val = buffer.get(reader);
+            char val = buffer.get();
             if (is_terminator(val)) {
                 return finalizer();
             } else if (!std::isdigit(val)) {
@@ -341,54 +336,53 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
     return finalizer();
 }
 
-template<class Reader>
-std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
+inline std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer) {
     std::shared_ptr<Base> output;
 
     size_t start = buffer.position() + 1;
-    const char current = buffer.get(reader);
+    const char current = buffer.get();
 
     if (current == 't') {
-        if (!is_expected_string(buffer, reader, "true")) {
+        if (!is_expected_string(buffer, "true")) {
             throw std::runtime_error("expected a 'true' string at position " + std::to_string(start));
         }
         output.reset(new Boolean(true));
 
     } else if (current == 'f') {
-        if (!is_expected_string(buffer, reader, "false")) {
+        if (!is_expected_string(buffer, "false")) {
             throw std::runtime_error("expected a 'false' string at position " + std::to_string(start));
         }
         output.reset(new Boolean(false));
 
     } else if (current == 'n') {
-        if (!is_expected_string(buffer, reader, "null")) {
+        if (!is_expected_string(buffer, "null")) {
             throw std::runtime_error("expected a 'null' string at position " + std::to_string(start));
         }
         output.reset(new Nothing);
 
     } else if (current == '"') {
-        output.reset(new String(extract_string(buffer, reader)));
+        output.reset(new String(extract_string(buffer)));
 
     } else if (current == '[') {
         auto ptr = new Array;
         output.reset(ptr);
 
         buffer.advance();
-        chomp(buffer, reader);
+        chomp(buffer);
         if (!buffer.valid()) {
             throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
         }
 
-        if (buffer.get(reader) != ']') {
+        if (buffer.get() != ']') {
             while (1) {
-                ptr->values.push_back(parse_thing(buffer, reader));
+                ptr->values.push_back(parse_thing(buffer));
 
-                chomp(buffer, reader);
+                chomp(buffer);
                 if (!buffer.valid()) {
                     throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
                 }
 
-                char next = buffer.get(reader);
+                char next = buffer.get();
                 if (next == ']') {
                     break;
                 } else if (next != ',') {
@@ -396,7 +390,7 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
                 }
 
                 buffer.advance(); 
-                chomp(buffer, reader);
+                chomp(buffer);
                 if (!buffer.valid()) {
                     throw std::runtime_error("unterminated array starting at position " + std::to_string(start));
                 }
@@ -411,43 +405,43 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
         auto& map = ptr->values;
 
         buffer.advance();
-        chomp(buffer, reader);
+        chomp(buffer);
         if (!buffer.valid()) {
             throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
         }
 
-        if (buffer.get(reader) != '}') {
+        if (buffer.get() != '}') {
             while (1) {
-                char next = buffer.get(reader);
+                char next = buffer.get();
                 if (next != '"') {
                     throw std::runtime_error("expected a string as the object key at position " + std::to_string(buffer.position() + 1));
                 }
-                auto key = extract_string(buffer, reader);
+                auto key = extract_string(buffer);
                 if (map.find(key) != map.end()) {
                     throw std::runtime_error("detected duplicate keys in the object at position " + std::to_string(buffer.position() + 1));
                 }
 
-                chomp(buffer, reader);
+                chomp(buffer);
                 if (!buffer.valid()) {
                     throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
                 }
-                if (buffer.get(reader) != ':') {
+                if (buffer.get() != ':') {
                     throw std::runtime_error("expected ':' to separate keys and values at position " + std::to_string(buffer.position() + 1));
                 }
 
                 buffer.advance();
-                chomp(buffer, reader);
+                chomp(buffer);
                 if (!buffer.valid()) {
                     throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
                 }
-                map[key] = parse_thing(buffer, reader);
+                map[key] = parse_thing(buffer);
 
-                chomp(buffer, reader);
+                chomp(buffer);
                 if (!buffer.valid()) {
                     throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
                 }
 
-                next = buffer.get(reader);
+                next = buffer.get();
                 if (next == '}') {
                     break;
                 } else if (next != ',') {
@@ -455,7 +449,7 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
                 }
 
                 buffer.advance(); 
-                chomp(buffer, reader);
+                chomp(buffer);
                 if (!buffer.valid()) {
                     throw std::runtime_error("unterminated object starting at position " + std::to_string(start));
                 }
@@ -469,10 +463,10 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
         if (!buffer.valid()) {
             throw std::runtime_error("incomplete number starting at position " + std::to_string(start));
         }
-        output.reset(new Number(-extract_number(buffer, reader)));
+        output.reset(new Number(-extract_number(buffer)));
 
     } else if (std::isdigit(current)) {
-        output.reset(new Number(extract_number(buffer, reader)));
+        output.reset(new Number(extract_number(buffer)));
 
     } else {
         throw std::runtime_error(std::string("unknown type starting with '") + std::string(1, current) + "' at position " + std::to_string(start));
@@ -481,12 +475,11 @@ std::shared_ptr<Base> parse_thing(CurrentBuffer& buffer, Reader& reader) {
     return output;
 }
 
-template<class Reader>
-std::shared_ptr<Base> parse_json(Reader& reader) {
+inline std::shared_ptr<Base> parse_json(byteme::Reader& reader) {
     CurrentBuffer buffer(reader);
-    chomp(buffer, reader);
-    auto output = parse_thing(buffer, reader);
-    chomp(buffer, reader);
+    chomp(buffer);
+    auto output = parse_thing(buffer);
+    chomp(buffer);
     if (buffer.valid()) {
         throw std::runtime_error("invalid json with trailing non-space characters at position " + std::to_string(buffer.position() + 1));
     }
@@ -752,8 +745,8 @@ std::shared_ptr<Base> parse_object(const raw::Base* contents, Externals& ext, co
  * @endcond
  */
 
-template<class Provisioner, class Reader, class Externals>
-std::shared_ptr<Base> parse_json(Reader& reader, Externals ext) {
+template<class Provisioner, class Externals>
+std::shared_ptr<Base> parse_json(byteme::Reader& reader, Externals ext) {
     auto contents = json::raw::parse_json(reader);
     ExternalTracker etrack(std::move(ext));
     auto output = json::parse_object<Provisioner>(contents.get(), etrack, "");
@@ -761,45 +754,45 @@ std::shared_ptr<Base> parse_json(Reader& reader, Externals ext) {
     return output;
 }
 
-template<class Provisioner, class Reader>
-std::shared_ptr<Base> parse_json(Reader& reader) {
+template<class Provisioner>
+std::shared_ptr<Base> parse_json(byteme::Reader& reader) {
     DummyExternals ext(0);
     return parse_json<Provisioner>(reader, std::move(ext));
 }
 
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_json(const std::string& file, Externals ext, size_t buffer_size = 65536) {
-    byteme::SomeFileReader reader(file.c_str(), buffer_size);
+std::shared_ptr<Base> parse_json(const std::string& file, Externals ext) {
+    byteme::SomeFileReader reader(file.c_str());
     return parse_json<Provisioner>(reader, std::move(ext));
 }
 
 template<class Provisioner>
-std::shared_ptr<Base> parse_json(const std::string& file, size_t buffer_size = 65536) {
+std::shared_ptr<Base> parse_json(const std::string& file) {
     DummyExternals ext(0);
-    return parse_json<Provisioner>(file, std::move(ext), buffer_size);
+    return parse_json<Provisioner>(file, std::move(ext));
 }
 
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, Externals ext, size_t buffer_size = 65536) {
-    byteme::SomeBufferReader reader(buffer, len, buffer_size);
+std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, Externals ext) {
+    byteme::SomeBufferReader reader(buffer, len);
     return parse_json<Provisioner>(reader, std::move(ext));
 }
 
 template<class Provisioner>
-std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, size_t buffer_size = 65536) {
+std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len) {
     DummyExternals ext(0);
-    return parse_json<Provisioner>(buffer, len, std::move(ext), buffer_size);
+    return parse_json<Provisioner>(buffer, len, std::move(ext));
 }
 
-inline void validate_json(const std::string& file, int num_external = 0, size_t buffer_size = 65536) {
+inline void validate_json(const std::string& file, int num_external = 0) {
     DummyExternals ext(num_external);
-    parse_json<DummyProvisioner>(file, std::move(ext), buffer_size);
+    parse_json<DummyProvisioner>(file, std::move(ext));
     return;
 }
 
-inline void validate_json(const unsigned char* buffer, size_t len, int num_external = 0, size_t buffer_size = 65536) {
+inline void validate_json(const unsigned char* buffer, size_t len, int num_external = 0) {
     DummyExternals ext(num_external);
-    parse_json<DummyProvisioner>(buffer, len, std::move(ext), buffer_size);
+    parse_json<DummyProvisioner>(buffer, len, std::move(ext));
     return;
 }
 
