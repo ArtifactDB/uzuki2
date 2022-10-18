@@ -24,7 +24,7 @@
   <td id="projectalign">
    <div id="projectname">uzuki2
    </div>
-   <div id="projectbrief">Recovering R lists faithfully from JSON</div>
+   <div id="projectbrief">Recovering R lists faithfully from HDF5 or JSON</div>
   </td>
  </tr>
  </tbody>
@@ -80,7 +80,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Parse an R list from a HDF5 file.  
+<p>Parse an R list from a HDF5 or JSON file.  
 <a href="namespaceuzuki2.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -140,22 +140,22 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:acc16ce0ffd14b954763920343a52fed0"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
-<tr class="memitem:acc16ce0ffd14b954763920343a52fed0"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse</a> (const H5::Group &amp;handle, const std::string &amp;name, Externals ext)</td></tr>
-<tr class="separator:acc16ce0ffd14b954763920343a52fed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a5539c2525c8f6be4853c66ceebfdbe"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
-<tr class="memitem:a1a5539c2525c8f6be4853c66ceebfdbe"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a1a5539c2525c8f6be4853c66ceebfdbe">parse</a> (const std::string &amp;file, const std::string &amp;name, Externals ext)</td></tr>
-<tr class="separator:a1a5539c2525c8f6be4853c66ceebfdbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a259cb6ed8cf70ad4d19a83d5fbeaec2e"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
-<tr class="memitem:a259cb6ed8cf70ad4d19a83d5fbeaec2e"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a259cb6ed8cf70ad4d19a83d5fbeaec2e">parse</a> (const H5::Group &amp;handle, const std::string &amp;name)</td></tr>
-<tr class="separator:a259cb6ed8cf70ad4d19a83d5fbeaec2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb745e734bc6bd734ea6c02ebf654f8e"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
-<tr class="memitem:abb745e734bc6bd734ea6c02ebf654f8e"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#abb745e734bc6bd734ea6c02ebf654f8e">parse</a> (const std::string &amp;file, const std::string &amp;name)</td></tr>
-<tr class="separator:abb745e734bc6bd734ea6c02ebf654f8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee7fbf7746e1064f4393cbeea912cc15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#aee7fbf7746e1064f4393cbeea912cc15">validate</a> (const H5::Group &amp;handle, const std::string &amp;name, int num_external=0)</td></tr>
-<tr class="separator:aee7fbf7746e1064f4393cbeea912cc15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a262203b54a9a3a054b0df9cbd8ad6105"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a262203b54a9a3a054b0df9cbd8ad6105">validate</a> (const std::string &amp;file, const std::string &amp;name, int num_external=0)</td></tr>
-<tr class="separator:a262203b54a9a3a054b0df9cbd8ad6105"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6788619932dd6670c1af3cebcddfd1d"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
+<tr class="memitem:ac6788619932dd6670c1af3cebcddfd1d"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5</a> (const H5::Group &amp;handle, const std::string &amp;name, Externals ext)</td></tr>
+<tr class="separator:ac6788619932dd6670c1af3cebcddfd1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae255af43cb27220c28b20d1fc1ab649e"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
+<tr class="memitem:ae255af43cb27220c28b20d1fc1ab649e"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#ae255af43cb27220c28b20d1fc1ab649e">parse_hdf5</a> (const std::string &amp;file, const std::string &amp;name, Externals ext)</td></tr>
+<tr class="separator:ae255af43cb27220c28b20d1fc1ab649e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b5b996d43ef798d4194602c1847ddb3"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
+<tr class="memitem:a3b5b996d43ef798d4194602c1847ddb3"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a3b5b996d43ef798d4194602c1847ddb3">parse_hdf5</a> (const H5::Group &amp;handle, const std::string &amp;name)</td></tr>
+<tr class="separator:a3b5b996d43ef798d4194602c1847ddb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b02b664a3edc980a443fca6b47aae80"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
+<tr class="memitem:a2b02b664a3edc980a443fca6b47aae80"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a2b02b664a3edc980a443fca6b47aae80">parse_hdf5</a> (const std::string &amp;file, const std::string &amp;name)</td></tr>
+<tr class="separator:a2b02b664a3edc980a443fca6b47aae80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dbd5847942495b1b54302e2f89c6077"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077">validate_hdf5</a> (const H5::Group &amp;handle, const std::string &amp;name, int num_external=0)</td></tr>
+<tr class="separator:a2dbd5847942495b1b54302e2f89c6077"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ae51814a1ab943fe7ac7d264e9f094"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a54ae51814a1ab943fe7ac7d264e9f094">validate_hdf5</a> (const std::string &amp;file, const std::string &amp;name, int num_external=0)</td></tr>
+<tr class="separator:a54ae51814a1ab943fe7ac7d264e9f094"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a523d2aa023de714e0ab66338cb9fa19d"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
 <tr class="memitem:a523d2aa023de714e0ab66338cb9fa19d"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a523d2aa023de714e0ab66338cb9fa19d">parse_json</a> (byteme::Reader &amp;reader, Externals ext)</td></tr>
 <tr class="separator:a523d2aa023de714e0ab66338cb9fa19d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,7 +182,7 @@ Functions</h2></td></tr>
 <tr class="separator:a66472c68f697e7f6e1ea576a56cb2de8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Parse an R list from a HDF5 file. </p>
+<div class="textblock"><p >Parse an R list from a HDF5 or JSON file. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
 <a id="a73bdb90ee3e3487bf4c9a6b38b60ddfe" name="a73bdb90ee3e3487bf4c9a6b38b60ddfe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a73bdb90ee3e3487bf4c9a6b38b60ddfe">&#9670;&#160;</a></span>BooleanVector</h2>
@@ -320,8 +320,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a259cb6ed8cf70ad4d19a83d5fbeaec2e" name="a259cb6ed8cf70ad4d19a83d5fbeaec2e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a259cb6ed8cf70ad4d19a83d5fbeaec2e">&#9670;&#160;</a></span>parse() <span class="overload">[1/4]</span></h2>
+<a id="a3b5b996d43ef798d4194602c1847ddb3" name="a3b5b996d43ef798d4194602c1847ddb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b5b996d43ef798d4194602c1847ddb3">&#9670;&#160;</a></span>parse_hdf5() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -329,7 +329,7 @@ Functions</h2></td></tr>
 template&lt;class Provisioner &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse </td>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse_hdf5 </td>
           <td>(</td>
           <td class="paramtype">const H5::Group &amp;&#160;</td>
           <td class="paramname"><em>handle</em>, </td>
@@ -347,7 +347,7 @@ template&lt;class Provisioner &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given the group handle. It is assumed that there are no external references.</p>
+<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the group handle. It is assumed that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects.</td></tr>
@@ -366,8 +366,8 @@ template&lt;class Provisioner &gt; </div>
 
 </div>
 </div>
-<a id="acc16ce0ffd14b954763920343a52fed0" name="acc16ce0ffd14b954763920343a52fed0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc16ce0ffd14b954763920343a52fed0">&#9670;&#160;</a></span>parse() <span class="overload">[2/4]</span></h2>
+<a id="ac6788619932dd6670c1af3cebcddfd1d" name="ac6788619932dd6670c1af3cebcddfd1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6788619932dd6670c1af3cebcddfd1d">&#9670;&#160;</a></span>parse_hdf5() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -375,7 +375,7 @@ template&lt;class Provisioner &gt; </div>
 template&lt;class Provisioner , class Externals &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse </td>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse_hdf5 </td>
           <td>(</td>
           <td class="paramtype">const H5::Group &amp;&#160;</td>
           <td class="paramname"><em>handle</em>, </td>
@@ -399,7 +399,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given the group handle.</p>
+<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the group handle.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. </td></tr>
@@ -441,8 +441,8 @@ Externals requirements</h1>
 
 </div>
 </div>
-<a id="abb745e734bc6bd734ea6c02ebf654f8e" name="abb745e734bc6bd734ea6c02ebf654f8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb745e734bc6bd734ea6c02ebf654f8e">&#9670;&#160;</a></span>parse() <span class="overload">[3/4]</span></h2>
+<a id="a2b02b664a3edc980a443fca6b47aae80" name="a2b02b664a3edc980a443fca6b47aae80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b02b664a3edc980a443fca6b47aae80">&#9670;&#160;</a></span>parse_hdf5() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -450,7 +450,7 @@ Externals requirements</h1>
 template&lt;class Provisioner &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse </td>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse_hdf5 </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>file</em>, </td>
@@ -468,7 +468,7 @@ template&lt;class Provisioner &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given the file name. It is assumed that there are no external references.</p>
+<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the file name. It is assumed that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects.</td></tr>
@@ -487,8 +487,8 @@ template&lt;class Provisioner &gt; </div>
 
 </div>
 </div>
-<a id="a1a5539c2525c8f6be4853c66ceebfdbe" name="a1a5539c2525c8f6be4853c66ceebfdbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a5539c2525c8f6be4853c66ceebfdbe">&#9670;&#160;</a></span>parse() <span class="overload">[4/4]</span></h2>
+<a id="ae255af43cb27220c28b20d1fc1ab649e" name="ae255af43cb27220c28b20d1fc1ab649e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae255af43cb27220c28b20d1fc1ab649e">&#9670;&#160;</a></span>parse_hdf5() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -496,7 +496,7 @@ template&lt;class Provisioner &gt; </div>
 template&lt;class Provisioner , class Externals &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse </td>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; uzuki2::parse_hdf5 </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>file</em>, </td>
@@ -520,7 +520,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given the file name.</p>
+<p >Parse HDF5 file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the file name.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. </td></tr>
@@ -558,10 +558,10 @@ template&lt;class Provisioner &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, assuming that there are no external references.</p>
+<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, assuming that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -603,11 +603,11 @@ template&lt;class Provisioner , class Externals &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification.</p>
+<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details. </td></tr>
-    <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details. </td></tr>
+    <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -640,10 +640,10 @@ template&lt;class Provisioner &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given the file path. This assumes that there are no external references.</p>
+<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the file path. This assumes that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -685,11 +685,11 @@ template&lt;class Provisioner , class Externals &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given the file path.</p>
+<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the file path.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details. </td></tr>
-    <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details. </td></tr>
+    <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -732,10 +732,10 @@ template&lt;class Provisioner &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given a buffer containing the file contents. This assumes that there are no external references.</p>
+<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given a buffer containing the file contents. This assumes that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -784,11 +784,11 @@ template&lt;class Provisioner , class Externals &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given a buffer containing the file contents.</p>
+<p >Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given a buffer containing the file contents.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details. </td></tr>
-    <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2.html#acc16ce0ffd14b954763920343a52fed0">parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details. </td></tr>
+    <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2.html#ac6788619932dd6670c1af3cebcddfd1d">parse_hdf5()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -805,8 +805,8 @@ template&lt;class Provisioner , class Externals &gt; </div>
 
 </div>
 </div>
-<a id="aee7fbf7746e1064f4393cbeea912cc15" name="aee7fbf7746e1064f4393cbeea912cc15"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee7fbf7746e1064f4393cbeea912cc15">&#9670;&#160;</a></span>validate() <span class="overload">[1/2]</span></h2>
+<a id="a2dbd5847942495b1b54302e2f89c6077" name="a2dbd5847942495b1b54302e2f89c6077"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2dbd5847942495b1b54302e2f89c6077">&#9670;&#160;</a></span>validate_hdf5() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -815,7 +815,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void uzuki2::validate </td>
+          <td class="memname">void uzuki2::validate_hdf5 </td>
           <td>(</td>
           <td class="paramtype">const H5::Group &amp;&#160;</td>
           <td class="paramname"><em>handle</em>, </td>
@@ -844,7 +844,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification. Any invalid representations will cause an error to be thrown.</p>
+<p >Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification. Any invalid representations will cause an error to be thrown.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handle</td><td>Handle for a HDF5 group corresponding to the list. </td></tr>
@@ -856,8 +856,8 @@ template&lt;class Provisioner , class Externals &gt; </div>
 
 </div>
 </div>
-<a id="a262203b54a9a3a054b0df9cbd8ad6105" name="a262203b54a9a3a054b0df9cbd8ad6105"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a262203b54a9a3a054b0df9cbd8ad6105">&#9670;&#160;</a></span>validate() <span class="overload">[2/2]</span></h2>
+<a id="a54ae51814a1ab943fe7ac7d264e9f094" name="a54ae51814a1ab943fe7ac7d264e9f094"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54ae51814a1ab943fe7ac7d264e9f094">&#9670;&#160;</a></span>validate_hdf5() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -866,7 +866,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void uzuki2::validate </td>
+          <td class="memname">void uzuki2::validate_hdf5 </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>file</em>, </td>
@@ -895,7 +895,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification. Any invalid representations will cause an error to be thrown.</p>
+<p >Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification. Any invalid representations will cause an error to be thrown.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">file</td><td>Path to a HDF5 file. </td></tr>
@@ -940,7 +940,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Validate JSON file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given a path to the file. Any invalid representations will cause an error to be thrown.</p>
+<p >Validate JSON file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given a path to the file. Any invalid representations will cause an error to be thrown.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">file</td><td>Path to a (possible Gzip-compressed) JSON file. </td></tr>
@@ -990,7 +990,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Validate JSON file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> specification, given a buffer containing the file contents. Any invalid representations will cause an error to be thrown.</p>
+<p >Validate JSON file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given a buffer containing the file contents. Any invalid representations will cause an error to be thrown.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed). </td></tr>

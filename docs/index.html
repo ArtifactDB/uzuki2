@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>uzuki2: R lists to HDF5</title>
+<title>uzuki2: R lists to HDF5 or JSON</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectalign">
    <div id="projectname">uzuki2
    </div>
-   <div id="projectbrief">Recovering R lists faithfully from JSON</div>
+   <div id="projectbrief">Recovering R lists faithfully from HDF5 or JSON</div>
   </td>
  </tr>
  </tbody>
@@ -71,20 +71,22 @@ $(function() {
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">R lists to HDF5 </div></div>
+  <div class="headertitle"><div class="title">R lists to HDF5 or JSON </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p ><a class="anchor" id="md__github_workspace_README"></a> <img src="https://github.com/LTLA/uzuki2/actions/workflows/run-tests.yaml/badge.svg" alt="Unit tests" style="pointer-events: none;" class="inline"/> <img src="https://github.com/LTLA/uzuki2/actions/workflows/doxygenate.yaml/badge.svg" alt="Documentation" style="pointer-events: none;" class="inline"/> <a href="https://codecov.io/gh/LTLA/uzuki2"><img src="https://codecov.io/gh/LTLA/uzuki2/branch/master/graph/badge.svg?token=J3dxS3MtT1" alt="codecov" style="pointer-events: none;" class="inline"/></a></p>
 <h1>Overview</h1>
-<p >The <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> repository describes a format for safely serializing basic R lists into HDF5. List elements may be atomic vectors, <code>NULL</code>, or nested lists of such elements. It also supports factors, dates, missing strings, and names on the vectors or lists. Some mechanism is also provided to handle external references to non-serializable objects.</p>
-<p >In the specification below, we use <code>**/</code> to represent a variable name of the group representing any of the supported R objects. It is assumed that <code>**/</code> will be replaced by actual names in implementations, as defined by users (for the top-level group) or by the specification (e.g., as a nested child of a list).</p>
-<h1>Specification</h1>
+<p >The <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> repository describes a format for safely serializing basic R lists into HDF5 or JSON. List elements may be atomic vectors, <code>NULL</code>, or nested lists of such objects. It also supports missing values in the vectors and per-element names on the vectors or lists. Some mechanism is also provided to handle external references to non-serializable objects.</p>
+<p >We support serialization of the list in either HDF5 or JSON. HDF5 supports random access into list components, which can provide optimization opportunities when the list is large and/or contains large atomic vectors. In contrast, JSON is easier to parse and has less storage overhead per list element.</p>
+<h1>HDF5 Specification</h1>
+<p >We use <code>**/</code> to represent a variable name of the group representing any of the supported R objects. It is assumed that <code>**/</code> will be replaced by the actual name of the group in implementations, as defined by users (for the top-level group) or by the specification (e.g., as a nested child of a list).</p>
+<p >All objects should be nested inside an R list.</p>
 <h2>Lists</h2>
 <p >An R list is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
 <li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"list"</code>.</li>
 </ul>
-<p >This group should contain a subgroup <code>**/data</code> that contains the list elements. Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., <code>**/data/0</code> for the first list element. Each list element's group may be any of the objects described in this specifiction, including further nested lists.</p>
+<p >This group should contain a subgroup <code>**/data</code> that contains the list elements. Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., <code>**/data/0</code> for the first list element. Each list element may be any of the objects described in this specifiction, including further nested lists.</p>
 <p >If the list is named, there will additionally be a 1-dimensional <code>**/names</code> string dataset of length equal to <code>uzuki_length</code>.</p>
 <h2>Atomic vectors</h2>
 <p >An atomic vector is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
@@ -119,17 +121,56 @@ $(function() {
 </ul>
 <p >This should contain an <code>**/index</code> scalar dataset, containing an index that identifies this external object uniquely within the entire list. <code>**/index</code> should start at zero and be incremented whenever an external object is encountered.</p>
 <p >By indexing this external metadata, we can restore the object in its appropriate location in the list. The exact mechanism by which this restoration occurs is implementation-defined.</p>
+<h1>JSON Specification</h1>
+<p >All R objects are represented by JSON objects with a <code>type</code> property. Every R object should be nested inside an R list.</p>
+<h2>Lists</h2>
+<p >An R list is represented as a JSON object with the following properties:</p>
+<ul>
+<li><code>type</code>, set to <code>"list"</code>.</li>
+<li><code>values</code>, an array of JSON objects corresponding to nested R objects. Each JSON object may follow any of the formats described in this specification.</li>
+<li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements.</li>
+</ul>
+<h2>Atomic vectors</h2>
+<p >An atomic vector is represented as a JSON object with the following properties:</p>
+<ul>
+<li><code>type</code>, set to one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code>, <code>"date"</code>, <code>"factor"</code> or <code>"ordered"</code>.</li>
+<li><code>values</code>, an array of values for the vector (see below).</li>
+<li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements.</li>
+<li>(for <code>type</code> of <code>"factor"</code> or <code>"ordered"</code>) <code>levels</code>, an array of unique strings containing the levels for the indices in <code>values</code>.</li>
+</ul>
+<p >The contents of <code>values</code> is subject to some constraints:</p>
+<ul>
+<li><code>"integer"</code>: values should be JSON numbers that can fit into a 32-bit signed integer. <code>null</code> is also allowed and represents a missing value.</li>
+<li><code>"boolean"</code>: values should be JSON booleans or <code>null</code> (for missing values).</li>
+<li><code>"factor"</code> or <code>"ordered"</code>: values should be non-negative JSON numbers that can fit into a 32-bit signed integer. They should also be less than the length of <code>levels</code>. <code>null</code> is allowed and represents a missing value.</li>
+<li><code>string</code>: values should be JSON strings. <code>null</code> is also allowed and represents a missing value.</li>
+<li><code>"date"</code>: values should be JSON strings following a <code>YYYY-MM-DD</code> format. <code>null</code> is also allowed and represents a missing value.</li>
+</ul>
+<h2>Nothing</h2>
+<p >A "nothing" (a.k.a., "null", "none") value is represented as a JSON object with the following properties:</p>
+<ul>
+<li><code>type</code>, set to <code>"nothing"</code>.</li>
+</ul>
+<h2>External object</h2>
+<p >Each external object is represented as a JSON object with the following properties:</p>
+<ul>
+<li><code>type</code>, set to <code>"index"</code>.</li>
+<li><code>index</code>, a non-negative JSON number that can fit into a 32-bit signed integer. This identifies this external object uniquely within the entire list. See the equivalent in the HDF5 specification for more details.</li>
+</ul>
 <h1>Validation</h1>
 <h2>Quick start</h2>
-<p >A reference implementation of the validator is provided as a header-only C++ library in <a href="include/uzuki2"><code>include/uzuki2</code></a>. This is useful for portable deployment in different frameworks like R, Python, etc. We can check that a HDF5 file complies with the <b>uzuki</b> specification:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;uzuki2/uzuki2.hpp&quot;</span></div>
-<div class="line"><a class="code hl_function" href="namespaceuzuki2.html#aee7fbf7746e1064f4393cbeea912cc15">uzuki2::validate</a>(file_path, group_name);</div>
-<div class="ttc" id="anamespaceuzuki2_html_aee7fbf7746e1064f4393cbeea912cc15"><div class="ttname"><a href="namespaceuzuki2.html#aee7fbf7746e1064f4393cbeea912cc15">uzuki2::validate</a></div><div class="ttdeci">void validate(const H5::Group &amp;handle, const std::string &amp;name, int num_external=0)</div><div class="ttdef"><b>Definition:</b> validate.hpp:28</div></div>
+<p >A reference implementation of the validator is provided as a header-only C++ library in <a href="include/uzuki2"><code>include/uzuki2</code></a>. This is useful for portable deployment in different frameworks like R, Python, etc. We can check that a JSON/HDF5 file complies with the <b>uzuki</b> specification:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="uzuki2_8hpp.html">uzuki2/uzuki2.hpp</a>&quot;</span></div>
+<div class="line"><a class="code hl_function" href="namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077">uzuki2::validate_hdf5</a>(h5_file_path, h5_group_name);</div>
+<div class="line"><a class="code hl_function" href="namespaceuzuki2.html#a2fe5c875d74ceb2a2bda095a4ef5e771">uzuki2::validate_json</a>(json_file_path);</div>
+<div class="ttc" id="anamespaceuzuki2_html_a2dbd5847942495b1b54302e2f89c6077"><div class="ttname"><a href="namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077">uzuki2::validate_hdf5</a></div><div class="ttdeci">void validate_hdf5(const H5::Group &amp;handle, const std::string &amp;name, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_hdf5.hpp:446</div></div>
+<div class="ttc" id="anamespaceuzuki2_html_a2fe5c875d74ceb2a2bda095a4ef5e771"><div class="ttname"><a href="namespaceuzuki2.html#a2fe5c875d74ceb2a2bda095a4ef5e771">uzuki2::validate_json</a></div><div class="ttdeci">void validate_json(const std::string &amp;file, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:890</div></div>
+<div class="ttc" id="auzuki2_8hpp_html"><div class="ttname"><a href="uzuki2_8hpp.html">uzuki2.hpp</a></div><div class="ttdoc">Umbrella header for the uzuki2 library.</div></div>
 </div><!-- fragment --><p >This will raise an error if any violations of the specification are observed. If a non-zero expected number of external objects is present:</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="namespaceuzuki2.html#aee7fbf7746e1064f4393cbeea912cc15">uzuki2::validate</a>(file_path, group_name, num_externals);</div>
-</div><!-- fragment --><p >Advanced users can also use the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> parser to load the list into memory. This is achieved by calling <code>parse()</code> with custom provisioner and external reference classes. For example, <a href="tests/src/test_subclass.h"><code>tests/src/test_subclass.h</code></a> defines the <code>DefaultProvisioner</code> and <code>DefaultExternals</code> classes, which can be used to load the HDF5 contents into <code>std::vector</code>s for easier downstream operations.</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077">uzuki2::validate_hdf5</a>(h5_file_path, h5_group_name, num_externals);</div>
+</div><!-- fragment --><p >Advanced users can also use the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> parser to load the list into memory. This is achieved by calling <code>parse()</code> with custom provisioner and external reference classes. For example, <a href="tests/src/test_subclass.h"><code>tests/src/test_subclass.h</code></a> defines the <code>DefaultProvisioner</code> and <code>DefaultExternals</code> classes, which can be used to load the HDF5 contents into <code>std::vector</code>s for easier downstream operations.</p>
 <div class="fragment"><div class="line">DefaultExternals ext(nexpected);</div>
-<div class="line"><span class="keyword">auto</span> ptr = uzuki2::parse&lt;DefaultProvisioner&gt;(file_path, group_name, ext);</div>
+<div class="line"><span class="keyword">auto</span> ptr = uzuki2::parse_hdf5&lt;DefaultProvisioner&gt;(file_path, group_name, ext);</div>
 </div><!-- fragment --><p >Also see the <a href="https://ltla.github.io/uzuki2">reference documentation</a> for more details.</p>
 <h2>Building projects</h2>
 <p >If you're using CMake, you just need to add something like this to your <code>CMakeLists.txt</code>:</p>
@@ -142,15 +183,22 @@ $(function() {
 <div class="line">)</div>
 <div class="line"> </div>
 <div class="line">FetchContent_MakeAvailable(uzuki2)</div>
-</div><!-- fragment --><p >Then you can link to <b>uzuki</b> to make the headers available during compilation:</p>
+</div><!-- fragment --><p >Then you can link to <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> to make the headers available during compilation:</p>
 <div class="fragment"><div class="line"># For executables:</div>
 <div class="line">target_link_libraries(myexe uzuki2)</div>
 <div class="line"> </div>
 <div class="line"># For libaries</div>
 <div class="line">target_link_libraries(mylib INTERFACE uzuki2)</div>
+</div><!-- fragment --><p >You will probably also need to link to the HDF5 and/or Zlib libraries, if you haven't done so already. For system installations of both libraries, you can just use <code>find_package()</code>:</p>
+<div class="fragment"><div class="line">find_package(HDF5 REQUIRED COMPONENTS C CXX)</div>
+<div class="line">target_link_libraries(myexe hdf5::hdf5 hdf5::hdf5_cpp)</div>
+<div class="line"> </div>
+<div class="line">find_package(ZLIB)</div>
+<div class="line">target_link_libraries(myexe ZLIB::ZLIB)</div>
 </div><!-- fragment --><h1>Comparison to version 1</h1>
-<p ><b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> involves some major changes from the original <a href="https://github.com/LTLA/uzuki"><b>uzuki</b></a> library. Most obviously, we switched from JSON to HDF5. The latter supports random access without loading the entire list contents into memory, which provides some optimization opportunities for parsers when large vectors are present.</p>
-<p >In addition, arrays and data frames are no longer supported in <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b>. Such objects should instead be represented by external references, under the assumption that any serialization framework using <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 file.">uzuki2</a></b> would already have a separate mechanism for representing arrays and data frames. For example, the <a href="https://github.com/ArtifactDB/alabaster.base"><b>alabaster</b></a> framework has its own staging methods for these objects.</p>
+<p ><b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> involves some major changes from the original <a href="https://github.com/LTLA/uzuki"><b>uzuki</b></a> library. Most obviously, we added support for HDF5 alongside the JSON format. The latter supports random access without loading the entire list contents into memory, which provides some optimization opportunities for parsers when large vectors are present.</p>
+<p >Arrays and data frames are no longer supported in <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b>. Such objects should instead be represented by external references, under the assumption that any serialization framework using <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> would already have a separate mechanism for representing arrays and data frames. For example, the <a href="https://github.com/ArtifactDB/alabaster.base"><b>alabaster</b></a> framework has its own staging methods for these objects.</p>
+<p >In the JSON format, <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> is also more explicit with its serialization of lists. These now have their own dedicated <code>"type": "list"</code>, rather than relying on the implicit interpretation of arrays as unnamed lists and JSON objects as named lists. In particular, treating JSON objects as named lists led to ambiguities when a list element was named <code>"type"</code>; it also failed to preserve the ordering of list elements.</p>
 <p >Just like the original <b>uzuki</b> library, we're just re-using the reference to <a href="https://myanimelist.net/character/70883/Uzuki_Shimamura">Uzuki Shimamura</a> for the name:</p>
 <p ><img src="https://media1.giphy.com/media/7Oy2FDqWV5mak/giphy.gif" alt="Uzuki Shimamura" class="inline"/> </p>
 </div></div><!-- PageDoc -->
