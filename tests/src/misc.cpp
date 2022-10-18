@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
@@ -16,7 +16,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         create_dataset(vhandle, "data", { "foo", "whee", "stuff" });
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);
@@ -31,7 +31,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         create_dataset(vhandle, "data", { "foo-qwerty", "whee", "stuff-asdasd" }, true);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);
@@ -58,7 +58,7 @@ TEST(Hdf5StringTest, MissingValues) {
         ahandle.write(stype, target);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 4);

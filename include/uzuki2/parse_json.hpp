@@ -749,9 +749,9 @@ std::shared_ptr<Base> parse_object(const raw::Base* contents, Externals& ext, co
  * Parse JSON file contents using the **uzuki2** specification.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  *
  * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
  * @param ext Instance of an external reference resolver class.
@@ -774,7 +774,7 @@ std::shared_ptr<Base> parse_json(byteme::Reader& reader, Externals ext) {
  * Parse JSON file contents using the **uzuki2** specification, assuming that there are no external references.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  *
  * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
  *
@@ -793,9 +793,9 @@ std::shared_ptr<Base> parse_json(byteme::Reader& reader) {
  * Parse JSON file contents using the **uzuki2** specification, given the file path.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  *
  * @param file Path to a (possibly Gzip-compressed) JSON file.
  * @param ext Instance of an external reference resolver class.
@@ -816,7 +816,7 @@ std::shared_ptr<Base> parse_json(const std::string& file, Externals ext) {
  * This assumes that there are no external references.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  *
  * @param file Path to a (possibly Gzip-compressed) JSON file.
  *
@@ -835,9 +835,9 @@ std::shared_ptr<Base> parse_json(const std::string& file) {
  * Parse JSON file contents using the **uzuki2** specification, given a buffer containing the file contents.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  *
  * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
  * @param len Length of the buffer in bytes.
@@ -859,7 +859,7 @@ std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, Extern
  * This assumes that there are no external references.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse()` for more details. 
+ * See `parse_hdf5()` for more details. 
  *
  * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
  * @param len Length of the buffer in bytes.

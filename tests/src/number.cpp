@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
@@ -16,7 +16,7 @@ TEST(Hdf5NumberTest, SimpleLoading) {
         create_dataset<double>(vhandle, "data", { -1, 2, 3, 4 }, H5::PredType::NATIVE_DOUBLE);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
         auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
         EXPECT_EQ(bptr->size(), 4);
@@ -38,7 +38,7 @@ TEST(Hdf5NumberTest, MissingValues) {
         create_dataset<double>(vhandle, "data", { 1, 0, std::numeric_limits<double>::quiet_NaN(), 0, 1 }, H5::PredType::NATIVE_DOUBLE);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
         auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
         EXPECT_EQ(bptr->size(), 5);

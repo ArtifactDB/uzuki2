@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
@@ -16,7 +16,7 @@ TEST(Hdf5IntegerTest, SimpleLoading) {
         create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
         auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
         EXPECT_EQ(iptr->size(), 5);
@@ -31,7 +31,7 @@ TEST(Hdf5IntegerTest, SimpleLoading) {
         create_dataset(ghandle, "names", { "A", "B", "C", "D", "E" });
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
 
         auto stuff = static_cast<const DefaultIntegerVector*>(parsed.get());
@@ -51,7 +51,7 @@ TEST(Hdf5IntegerTest, MissingValues) {
         create_dataset<int>(vhandle, "data", { 1, 2, -2147483648, 4, 5 }, H5::PredType::NATIVE_INT);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
         auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
         EXPECT_EQ(iptr->size(), 5);

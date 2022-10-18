@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
@@ -19,7 +19,7 @@ TEST(Hdf5ListTest, SimpleLoading) {
         create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "foo");
+        auto parsed = load_hdf5(path, "foo");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -41,7 +41,7 @@ TEST(Hdf5ListTest, SimpleLoading) {
         create_dataset(ghandle, "names", { "bruce", "alfred" });
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "foo");
+        auto parsed = load_hdf5(path, "foo");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -66,7 +66,7 @@ TEST(Hdf5ListTest, NestedLoading) {
     }
 
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "foo");
+        auto parsed = load_hdf5(path, "foo");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());

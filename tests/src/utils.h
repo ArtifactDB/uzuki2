@@ -11,9 +11,7 @@
 #include <gmock/gmock.h>
 #include "H5Cpp.h"
 
-#include "uzuki2/parse_json.hpp"
-#include "uzuki2/validate.hpp"
-#include "uzuki2/parse_json.hpp"
+#include "uzuki2/uzuki2.hpp"
 
 #include "test_subclass.h"
 
@@ -127,6 +125,10 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
     }
 }
 
+inline std::shared_ptr<uzuki2::Base> load_hdf5(std::string name, std::string group) {
+    return uzuki2::parse_hdf5<DefaultProvisioner>(name, group);
+}
+
 inline std::shared_ptr<uzuki2::Base> load_json(std::string x) {
     return uzuki2::parse_json<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size());
 }
@@ -134,7 +136,7 @@ inline std::shared_ptr<uzuki2::Base> load_json(std::string x) {
 inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {
     EXPECT_ANY_THROW({
         try {
-            uzuki2::validate(file, name);
+            uzuki2::validate_hdf5(file, name);
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;

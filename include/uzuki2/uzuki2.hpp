@@ -3,10 +3,10 @@
 
 /**
  * @namespace uzuki2
- * @brief Parse an R list from a HDF5 file.
+ * @brief Parse an R list from a HDF5 or JSON file.
  */
 
-#include "validate.hpp"
-#include "parse.hpp"
+#include "parse_hdf5.hpp"
+#include "parse_json.hpp"
 
 #endif

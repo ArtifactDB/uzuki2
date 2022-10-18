@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
@@ -16,7 +16,7 @@ TEST(Hdf5DateTest, SimpleLoading) {
         create_dataset(vhandle, "data", { "2077-12-12", "2055-01-01", "2022-05-06" });
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::DATE);
         auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);
@@ -43,7 +43,7 @@ TEST(Hdf5DateTest, MissingValues) {
         ahandle.write(stype, target);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::DATE);
         auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);

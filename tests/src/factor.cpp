@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
@@ -17,7 +17,7 @@ TEST(Hdf5FactorTest, SimpleLoading) {
         create_dataset(vhandle, "levels", { "Albo", "Rudd", "Gillard" });
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
         auto fptr = static_cast<const DefaultFactor*>(parsed.get());
         EXPECT_EQ(fptr->size(), 5);
@@ -44,7 +44,7 @@ TEST(Hdf5FactorTest, OrderedLoading) {
         create_dataset(vhandle, "levels", { "Albo", "Rudd", "Gillard" });
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
         auto fptr = static_cast<const DefaultFactor*>(parsed.get());
         EXPECT_TRUE(fptr->ordered);
@@ -61,7 +61,7 @@ TEST(Hdf5FactorTest, MissingValues) {
         create_dataset(vhandle, "levels", { "Turnbull", "Morrison", "Abbott" });
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
         auto fptr = static_cast<const DefaultFactor*>(parsed.get());
         EXPECT_EQ(fptr->size(), 5);

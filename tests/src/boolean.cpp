@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "uzuki2/parse.hpp"
+#include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
@@ -16,7 +16,7 @@ TEST(Hdf5BooleanTest, SimpleLoading) {
         create_dataset<int>(vhandle, "data", { 1, 0, 1, 0, 0 }, H5::PredType::NATIVE_INT);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
         auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
         EXPECT_EQ(bptr->size(), 5);
@@ -38,7 +38,7 @@ TEST(Hdf5BooleanTest, MissingValues) {
         create_dataset<int>(vhandle, "data", { 1, 0, -2147483648, 0, 1 }, H5::PredType::NATIVE_INT);
     }
     {
-        auto parsed = uzuki2::parse<DefaultProvisioner>(path, "blub");
+        auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
         auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
         EXPECT_EQ(bptr->size(), 5);
