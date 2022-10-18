@@ -5,9 +5,8 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
-TEST(FactorTest, SimpleLoading) {
+TEST(Hdf5FactorTest, SimpleLoading) {
     auto path = "TEST-factor.h5";
 
     // Simple stuff works correctly.
@@ -34,7 +33,7 @@ TEST(FactorTest, SimpleLoading) {
      ********************************************/
 }
 
-TEST(FactorTest, OrderedLoading) {
+TEST(Hdf5FactorTest, OrderedLoading) {
     auto path = "TEST-factor.h5";
 
     // Simple stuff works correctly.
@@ -52,7 +51,7 @@ TEST(FactorTest, OrderedLoading) {
     }
 }
 
-TEST(FactorTest, MissingValues) {
+TEST(Hdf5FactorTest, MissingValues) {
     auto path = "TEST-factor.h5";
 
     {
@@ -71,7 +70,7 @@ TEST(FactorTest, MissingValues) {
     }
 }
 
-TEST(FactorTest, CheckError) {
+TEST(Hdf5FactorTest, CheckError) {
     auto path = "TEST-factor.h5";
 
     {
@@ -80,7 +79,7 @@ TEST(FactorTest, CheckError) {
         create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
         create_dataset(vhandle, "levels", { "Albo", "Rudd" });
     }
-    expect_error(path, "blub", "less than the number of levels");
+    expect_hdf5_error(path, "blub", "less than the number of levels");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -88,7 +87,7 @@ TEST(FactorTest, CheckError) {
         create_dataset<int>(vhandle, "data", { 0, 1, -1, -1, 1 }, H5::PredType::NATIVE_INT);
         create_dataset(vhandle, "levels", { "Albo", "Rudd" });
     }
-    expect_error(path, "blub", "non-negative");
+    expect_hdf5_error(path, "blub", "non-negative");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -96,7 +95,52 @@ TEST(FactorTest, CheckError) {
         create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
         create_dataset(vhandle, "levels", { "Malcolm", "Malcolm", "John" });
     }
-    expect_error(path, "blub", "unique");
+    expect_hdf5_error(path, "blub", "unique");
+
+    /***********************************************
+     *** See integer.cpp for vector error tests. ***
+     ***********************************************/
+}
+
+TEST(JsonFactorTest, SimpleLoading) {
+    auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 0, 1, 1, 0, 2 ], \"levels\": [ \"akari\", \"alice\", \"aika\" ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+
+    auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+    EXPECT_EQ(fptr->size(), 5);
+    EXPECT_EQ(fptr->vbase.values.front(), 0);
+    EXPECT_EQ(fptr->vbase.values.back(), 2);
+
+    EXPECT_EQ(fptr->levels[0], "akari");
+    EXPECT_EQ(fptr->levels[2], "aika");
+
+    /********************************************
+     *** See integer.cpp for tests for names. ***
+     ********************************************/
+}
+
+TEST(JsonFactorTest, OrderedLoading) {
+    auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+    auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+    EXPECT_TRUE(fptr->ordered);
+}
+
+TEST(JsonFactorTest, MissingValues) {
+    auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, null, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+    auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+    EXPECT_EQ(fptr->vbase.values[2], -1); // i.e., the test's missing value placeholder.
+    EXPECT_EQ(fptr->vbase.values[4], -1); 
+}
+
+TEST(JsonFactorTest, CheckError) {
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ true, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "expected a number");
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1.2, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "expected an integer");
+
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 3, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "out of range");
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, -1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "out of range");
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"aria\", \"aria\", \"aria\" ] }", "duplicate string");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

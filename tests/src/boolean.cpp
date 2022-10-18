@@ -5,9 +5,8 @@
 
 #include "test_subclass.h"
 #include "utils.h"
-#include "error.h"
 
-TEST(BooleanTest, SimpleLoading) {
+TEST(Hdf5BooleanTest, SimpleLoading) {
     auto path = "TEST-boolean.h5";
 
     // Simple stuff works correctly.
@@ -30,7 +29,7 @@ TEST(BooleanTest, SimpleLoading) {
      ********************************************/
 }
 
-TEST(BooleanTest, MissingValues) {
+TEST(Hdf5BooleanTest, MissingValues) {
     auto path = "TEST-boolean.h5";
 
     {
@@ -47,7 +46,7 @@ TEST(BooleanTest, MissingValues) {
     }
 }
 
-TEST(BooleanTest, CheckError) {
+TEST(Hdf5BooleanTest, CheckError) {
     auto path = "TEST-boolean.h5";
 
     {
@@ -55,7 +54,36 @@ TEST(BooleanTest, CheckError) {
         auto ghandle = vector_opener(handle, "foo", "boolean");
         create_dataset<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
-    expect_error(path, "foo", "boolean values should be");
+    expect_hdf5_error(path, "foo", "boolean values should be");
+
+    /***********************************************
+     *** See integer.cpp for vector error tests. ***
+     ***********************************************/
+}
+
+TEST(JsonBooleanTest, SimpleLoading) {
+    auto parsed = load_json("{ \"type\": \"boolean\", \"values\": [ true, false, false, true ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
+    auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
+    EXPECT_EQ(bptr->size(), 4);
+    EXPECT_EQ(bptr->base.values[0], 1);
+    EXPECT_EQ(bptr->base.values[1], 0);
+
+    /********************************************
+     *** See integer.cpp for tests for names. ***
+     ********************************************/
+}
+
+TEST(JsonBooleanTest, MissingValues) {
+    auto parsed = load_json("{ \"type\": \"boolean\", \"values\": [ true, null ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
+    auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
+    EXPECT_EQ(bptr->size(), 2);
+    EXPECT_EQ(bptr->base.values.back(), 255);
+}
+
+TEST(JsonBooleanTest, CheckError) {
+    expect_json_error("{\"type\":\"boolean\", \"values\":[true,1,2] }", "expected a boolean");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

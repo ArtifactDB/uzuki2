@@ -10,8 +10,10 @@
 #include <unordered_set>
 
 #include "H5Cpp.h"
+
 #include "interfaces.hpp"
 #include "Dummy.hpp"
+#include "utils.hpp"
 
 namespace uzuki2 {
 
@@ -75,42 +77,6 @@ inline hsize_t check_1d_length(const H5::DataSet& handle, const std::string& pat
     hsize_t dims;
     dspace.getSimpleExtentDims(&dims);
     return dims;
-}
-
-inline bool is_date(const std::string& val) {
-    if (val.size() != 10) {
-        return false;
-    } 
-    
-    for (size_t p = 0; p < val.size(); ++p) {
-        if (p == 4 || p == 7) {
-            if (val[p] != '-') {
-                return false;
-            }
-        } else {
-            if (!std::isdigit(val[p])) {
-                return false;
-            }
-        }
-    }
-
-    if (val[5] == '1') {
-        if (val[6] > '2') {
-            return false;
-        }
-    } else if (val[5] != '0') {
-        return false;
-    }
-
-    if (val[8] == '3') {
-        if (val[6] > '1') {
-            return false;
-        }
-    } else if (val[8] > '3') {
-        return false;
-    }
-
-    return true;
 }
 
 template<class Host, class Function>
@@ -349,23 +315,6 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
     return output;
 }
-
-template<class CustomExternals>
-struct ExternalTracker {
-    ExternalTracker(CustomExternals e) : getter(std::move(e)) {}
-
-    void* get(size_t i) {
-        indices.push_back(i);
-        return getter.get(i);
-    };
-
-    size_t size() const {
-        return getter.size();
-    }
-
-    CustomExternals getter;
-    std::vector<size_t> indices;
-};
 /**
  * @endcond
  */
@@ -411,20 +360,7 @@ template<class Provisioner, class Externals>
 std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name, Externals ext) {
     ExternalTracker etrack(std::move(ext));
     auto ptr = parse_inner<Provisioner>(handle, etrack, name);
-
-    // Checking that the external indices match up.
-    auto& other_indices = etrack.indices;
-    if (other_indices.size() != etrack.getter.size()) {
-        throw std::runtime_error("fewer instances of type \"external\" than expected from 'ext'");
-    }
-
-    std::sort(other_indices.begin(), other_indices.end());
-    for (int i = 0; i < static_cast<int>(other_indices.size()); ++i) {
-        if (i != other_indices[i]) {
-            throw std::runtime_error("set of \"index\" values for type \"external\" should be consecutive starting from zero");
-        }
-    }
-
+    etrack.validate();
     return ptr;
 }
 
