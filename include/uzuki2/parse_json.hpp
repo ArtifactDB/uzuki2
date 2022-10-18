@@ -42,6 +42,7 @@ enum JsonType {
 
 struct Base {
     virtual JsonType type() const = 0;
+    virtual ~Base() {}
 };
 
 struct Number : public Base {
