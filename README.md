@@ -6,12 +6,13 @@
 
 ## Overview
 
-The **uzuki2** repository describes a format for safely serializing basic R lists into HDF5 or JSON.
+The **uzuki2** repository describes a language-agnostic file format for serializing basic [R](https://r-project.org) lists.
 List elements may be atomic vectors, `NULL`, or nested lists of such objects.
 It also supports missing values in the vectors and per-element names on the vectors or lists.
-Some mechanism is also provided to handle external references to non-serializable objects.
+A mechanism is also provided to handle external references to more complex objects (e.g., S4 classes) that cannot be directly saved into the format.
 
-We support serialization of the list in either HDF5 or JSON.
+We support serialization in either [HDF5](https://www.hdfgroup.org/) or (possibly Gzip-compressed) [JSON](https://json.org).
+Both of these are widely used formats and have complementary strengths for list representation.
 HDF5 supports random access into list components, which can provide optimization opportunities when the list is large and/or contains large atomic vectors.
 In contrast, JSON is easier to parse and has less storage overhead per list element.
 
