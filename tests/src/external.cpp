@@ -66,6 +66,20 @@ TEST(Hdf5ExternalTest, CheckErrors) {
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
+        create_dataset<int>(ghandle, "index", { 0, 1 }, H5::PredType::NATIVE_INT);
+    }
+    expect_hdf5_external_error(path, "foo", "expected scalar", 1);
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = external_opener(handle, "foo");
+        write_scalar(ghandle, "index", 0, H5::PredType::NATIVE_DOUBLE);
+    }
+    expect_hdf5_external_error(path, "foo", "expected integer", 1);
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = external_opener(handle, "foo");
         write_scalar(ghandle, "index", 1, H5::PredType::NATIVE_INT);
     }
     expect_hdf5_external_error(path, "foo", "out of range", 1);

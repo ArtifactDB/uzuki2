@@ -86,11 +86,29 @@ inline hsize_t check_1d_length(const H5::DataSet& handle, const std::string& pat
     return dims;
 }
 
+inline void forbid_large_integers(const H5::DataSet& handle, const std::string& path) {
+    H5::IntType itype(handle);
+
+    bool failed = false;
+    if (itype.getSign() == H5T_SGN_NONE) {
+        if (itype.getPrecision() >= 32) {
+            failed = true;
+        }
+    } else if (itype.getPrecision() > 32) {
+        failed = true;
+    }
+
+    if (failed) {
+        throw std::runtime_error("data type is potentially out of range of a 32-bit signed integer for '" + path + "'");
+    }
+}
+
 template<class Host, class Function>
-void parse_integer_like(H5::DataSet handle, Host* ptr, const std::string& path, Function check) {
+void parse_integer_like(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check) {
     if (handle.getDataType().getClass() != H5T_INTEGER) {
         throw std::runtime_error("expected an integer dataset at '" + path + "'");
     }
+    forbid_large_integers(handle, path);
 
     size_t len = ptr->size();
 
@@ -111,7 +129,7 @@ void parse_integer_like(H5::DataSet handle, Host* ptr, const std::string& path, 
 }
 
 template<class Host, class Function>
-void parse_string_like(H5::DataSet handle, Host* ptr, const std::string& path, Function check) {
+void parse_string_like(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check) {
     auto dtype = handle.getDataType();
     if (dtype.getClass() != H5T_STRING) {
         throw std::runtime_error("expected a string dataset at '" + path + "'");
@@ -136,9 +154,14 @@ void parse_string_like(H5::DataSet handle, Host* ptr, const std::string& path, F
 }
 
 template<class Host, class Function>
-void parse_numbers(H5::DataSet handle, Host* ptr, const std::string& path, Function check) {
+void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check) {
     if (handle.getDataType().getClass() != H5T_FLOAT) {
         throw std::runtime_error("expected a float dataset at '" + path + "'");
+    }
+
+    H5::FloatType ftype(handle);
+    if (ftype.getPrecision() > 64) {
+        throw std::runtime_error("data type is potentially out of range for a double at '" + path + "'");
     }
 
     size_t len = ptr->size();
@@ -155,7 +178,7 @@ void parse_numbers(H5::DataSet handle, Host* ptr, const std::string& path, Funct
 }
 
 template<class Host>
-void parse_names(H5::Group handle, Host* ptr, const std::string& path, const std::string& dpath) {
+void parse_names(const H5::Group& handle, Host* ptr, const std::string& path, const std::string& dpath) {
     if (handle.exists("names")) {
         auto npath = path + "/names";
         if (handle.childObjType("names") != H5O_TYPE_DATASET) {
@@ -300,7 +323,12 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         if (!handle.exists("index") || handle.childObjType("index") != H5O_TYPE_DATASET) {
             throw std::runtime_error("expected a dataset at '" + ipath + "'");
         }
+
         auto ihandle = handle.openDataSet("index");
+        if (ihandle.getDataType().getClass() != H5T_INTEGER) {
+            throw std::runtime_error("expected integer dataset at '" + ipath + "'");
+        }
+        forbid_large_integers(ihandle, ipath);
 
         auto ispace = ihandle.getSpace();
         int idims = ispace.getSimpleExtentNdims();

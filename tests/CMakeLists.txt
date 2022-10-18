@@ -36,7 +36,7 @@ find_package(HDF5 REQUIRED COMPONENTS C CXX)
 target_link_libraries(libtest hdf5::hdf5 hdf5::hdf5_cpp)
 
 find_package(ZLIB)
-target_link_libraries(uzuki2 INTERFACE ZLIB::ZLIB)
+target_link_libraries(libtest ZLIB::ZLIB)
 
 set(CODE_COVERAGE OFF CACHE BOOL "Enable coverage testing")
 if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
