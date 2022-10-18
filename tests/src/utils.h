@@ -154,4 +154,3 @@ inline void expect_json_error(std::string json, std::string msg) {
 }
 
 #endif
-

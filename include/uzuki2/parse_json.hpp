@@ -311,7 +311,7 @@ double extract_number(CurrentBuffer& buffer, Reader& reader) {
         } else if (val == '-') {
             negative_exponent = true;
         } else {
-            throw std::runtime_error("'e/E' must be followed by at least one digit in number at position " + std::to_string(start));
+            throw std::runtime_error("'e/E' must be followed by a sign in number at position " + std::to_string(start));
         }
 
         buffer.advance();
@@ -570,7 +570,7 @@ void extract_names(const std::unordered_map<std::string, std::shared_ptr<raw::Ba
 
     const auto& names = static_cast<const raw::Array*>(name_ptr.get())->values;
     if (names.size() != dest->size()) {
-        throw std::runtime_error("length of names and values should be the same in '" + path + "'"); 
+        throw std::runtime_error("length of 'names' and 'values' should be the same in '" + path + "'"); 
     }
     dest->use_names();
 
