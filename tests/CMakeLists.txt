@@ -22,7 +22,6 @@ add_executable(
     src/date.cpp
     src/external.cpp
     src/misc.cpp
-    src/json.cpp
 )
 
 target_link_libraries(

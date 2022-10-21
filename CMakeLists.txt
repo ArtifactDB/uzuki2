@@ -13,7 +13,7 @@ target_include_directories(uzuki2 INTERFACE include)
 
 add_subdirectory(extern)
 
-target_link_libraries(uzuki2 INTERFACE byteme)
+target_link_libraries(uzuki2 INTERFACE byteme millijson)
 
 # Building the test-related machinery, if we are compiling this library directly.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
