@@ -293,162 +293,199 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
  */
 
 /**
- * Parse JSON file contents using the **uzuki2** specification.
+ * @brief Parse JSON file contents using the **uzuki2** specification.
  *
- * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse_hdf5()` for more details. 
- * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
- * See `parse_hdf5()` for more details. 
- *
- * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
- * @param ext Instance of an external reference resolver class.
- *
- * @return Pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
- *
- * Any invalid representations in `reader` will cause an error to be thrown.
+ * JSON provides an alternative to the HDF5 format that is handled by `parse_hdf5()`.
+ * JSON is simpler to parse and has less formatting-related overhead.
+ * However, it does not support random access and discards some precision for floating-point numbers.
  */
-template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_json(byteme::Reader& reader, Externals ext) {
-    byteme::PerByte bytestream(reader);
-    auto contents = millijson::parse(bytestream);
-    ExternalTracker etrack(std::move(ext));
-    auto output = json::parse_object<Provisioner>(contents.get(), etrack, "");
-    etrack.validate();
-    return output;
-}
+class JsonParser {
+public:
+    /**
+     * Whether parsing should be done in parallel to file I/O.
+     * If true, an extra thread is used to avoid blocking I/O operations.
+     */
+    bool parallel = false;
 
-/**
- * Parse JSON file contents using the **uzuki2** specification, assuming that there are no external references.
- *
- * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse_hdf5()` for more details. 
- *
- * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
- *
- * @return Pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
- *
- * Any invalid representations in `reader` will cause an error to be thrown.
- */
-template<class Provisioner>
-std::shared_ptr<Base> parse_json(byteme::Reader& reader) {
-    DummyExternals ext(0);
-    return parse_json<Provisioner>(reader, std::move(ext));
-}
+    /**
+     * Parse JSON file contents using the **uzuki2** specification, given an arbitrary input source of bytes.
+     *
+     * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+     * See `parse_hdf5()` for more details. 
+     * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
+     * See `parse_hdf5()` for more details. 
+     *
+     * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
+     * @param ext Instance of an external reference resolver class.
+     *
+     * @return Pointer to the root `Base` object.
+     * Depending on `Provisioner`, this may contain references to all nested objects.
+     *
+     * Any invalid representations in `reader` will cause an error to be thrown.
+     */
+    template<class Provisioner, class Externals>
+    std::shared_ptr<Base> parse(byteme::Reader& reader, Externals ext) {
+        std::shared_ptr<millijson::Base> contents;
+        if (parallel) {
+            byteme::PerByte bytestream(reader);
+            contents = millijson::parse(bytestream);
+        } else {
+            byteme::PerByteParallel bytestream(reader);
+            contents = millijson::parse(bytestream);
+        }
 
-/**
- * Parse JSON file contents using the **uzuki2** specification, given the file path.
- *
- * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse_hdf5()` for more details. 
- * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
- * See `parse_hdf5()` for more details. 
- *
- * @param file Path to a (possibly Gzip-compressed) JSON file.
- * @param ext Instance of an external reference resolver class.
- *
- * @return Pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
- *
- * Any invalid representations in `reader` will cause an error to be thrown.
- */
-template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_json(const std::string& file, Externals ext) {
-    byteme::SomeFileReader reader(file.c_str());
-    return parse_json<Provisioner>(reader, std::move(ext));
-}
+        ExternalTracker etrack(std::move(ext));
+        auto output = json::parse_object<Provisioner>(contents.get(), etrack, "");
+        etrack.validate();
+        return output;
+    }
 
-/**
- * Parse JSON file contents using the **uzuki2** specification, given the file path.
- * This assumes that there are no external references.
- *
- * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse_hdf5()` for more details. 
- *
- * @param file Path to a (possibly Gzip-compressed) JSON file.
- *
- * @return Pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
- *
- * Any invalid representations in `reader` will cause an error to be thrown.
- */
-template<class Provisioner>
-std::shared_ptr<Base> parse_json(const std::string& file) {
-    DummyExternals ext(0);
-    return parse_json<Provisioner>(file, std::move(ext));
-}
+    /**
+     * Overload of `parse()` assuming that there are no external references.
+     *
+     * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+     * See `parse_hdf5()` for more details. 
+     *
+     * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
+     *
+     * @return Pointer to the root `Base` object.
+     * Depending on `Provisioner`, this may contain references to all nested objects.
+     *
+     * Any invalid representations in `reader` will cause an error to be thrown.
+     */
+    template<class Provisioner>
+    std::shared_ptr<Base> parse(byteme::Reader& reader) {
+        DummyExternals ext(0);
+        return parse<Provisioner>(reader, std::move(ext));
+    }
 
-/**
- * Parse JSON file contents using the **uzuki2** specification, given a buffer containing the file contents.
- *
- * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse_hdf5()` for more details. 
- * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
- * See `parse_hdf5()` for more details. 
- *
- * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
- * @param len Length of the buffer in bytes.
- * @param ext Instance of an external reference resolver class.
- *
- * @return Pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
- *
- * Any invalid representations in `reader` will cause an error to be thrown.
- */
-template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len, Externals ext) {
-    byteme::SomeBufferReader reader(buffer, len);
-    return parse_json<Provisioner>(reader, std::move(ext));
-}
+public:
+    /**
+     * Parse JSON file contents using the **uzuki2** specification, given the file path.
+     *
+     * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+     * See `parse_hdf5()` for more details. 
+     * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
+     * See `parse_hdf5()` for more details. 
+     *
+     * @param file Path to a (possibly Gzip-compressed) JSON file.
+     * @param ext Instance of an external reference resolver class.
+     *
+     * @return Pointer to the root `Base` object.
+     * Depending on `Provisioner`, this may contain references to all nested objects.
+     *
+     * Any invalid representations in `reader` will cause an error to be thrown.
+     */
+    template<class Provisioner, class Externals>
+    std::shared_ptr<Base> parse_file(const std::string& file, Externals ext) {
+        byteme::SomeFileReader reader(file.c_str());
+        return parse<Provisioner>(reader, std::move(ext));
+    }
 
-/**
- * Parse JSON file contents using the **uzuki2** specification, given a buffer containing the file contents.
- * This assumes that there are no external references.
- *
- * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
- * See `parse_hdf5()` for more details. 
- *
- * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
- * @param len Length of the buffer in bytes.
- *
- * @return Pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
- *
- * Any invalid representations in `reader` will cause an error to be thrown.
- */
-template<class Provisioner>
-std::shared_ptr<Base> parse_json(const unsigned char* buffer, size_t len) {
-    DummyExternals ext(0);
-    return parse_json<Provisioner>(buffer, len, std::move(ext));
-}
+    /**
+     * Overload of `parse_file()` assuming that there are no external references.
+     *
+     * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+     * See `parse_hdf5()` for more details. 
+     *
+     * @param file Path to a (possibly Gzip-compressed) JSON file.
+     *
+     * @return Pointer to the root `Base` object.
+     * Depending on `Provisioner`, this may contain references to all nested objects.
+     *
+     * Any invalid representations in `reader` will cause an error to be thrown.
+     */
+    template<class Provisioner>
+    std::shared_ptr<Base> parse_file(const std::string& file) {
+        DummyExternals ext(0);
+        return parse_file<Provisioner>(file, std::move(ext));
+    }
 
-/**
- * Validate JSON file contents against the **uzuki2** specification, given a path to the file.
- * Any invalid representations will cause an error to be thrown.
- *
- * @param file Path to a (possible Gzip-compressed) JSON file.
- * @param num_external Expected number of external references. 
- */
-inline void validate_json(const std::string& file, int num_external = 0) {
-    DummyExternals ext(num_external);
-    parse_json<DummyProvisioner>(file, std::move(ext));
-    return;
-}
+public:
+    /**
+     * Parse a buffer containing JSON file contents using the **uzuki2** specification. 
+     *
+     * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+     * See `parse_hdf5()` for more details. 
+     * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
+     * See `parse_hdf5()` for more details. 
+     *
+     * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
+     * @param len Length of the buffer in bytes.
+     * @param ext Instance of an external reference resolver class.
+     *
+     * @return Pointer to the root `Base` object.
+     * Depending on `Provisioner`, this may contain references to all nested objects.
+     *
+     * Any invalid representations in `reader` will cause an error to be thrown.
+     */
+    template<class Provisioner, class Externals>
+    std::shared_ptr<Base> parse_buffer(const unsigned char* buffer, size_t len, Externals ext) {
+        byteme::SomeBufferReader reader(buffer, len);
+        return parse<Provisioner>(reader, std::move(ext));
+    }
 
-/**
- * Validate JSON file contents against the **uzuki2** specification, given a buffer containing the file contents.
- * Any invalid representations will cause an error to be thrown.
- *
- * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
- * @param len Length of the buffer in bytes.
- * @param num_external Expected number of external references. 
- */
-inline void validate_json(const unsigned char* buffer, size_t len, int num_external = 0) {
-    DummyExternals ext(num_external);
-    parse_json<DummyProvisioner>(buffer, len, std::move(ext));
-    return;
-}
+    /**
+     * Overload of `parse_buffer()` assuming that there are no external references.
+     *
+     * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
+     * See `parse_hdf5()` for more details. 
+     *
+     * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
+     * @param len Length of the buffer in bytes.
+     *
+     * @return Pointer to the root `Base` object.
+     * Depending on `Provisioner`, this may contain references to all nested objects.
+     *
+     * Any invalid representations in `reader` will cause an error to be thrown.
+     */
+    template<class Provisioner>
+    std::shared_ptr<Base> parse_buffer(const unsigned char* buffer, size_t len) {
+        DummyExternals ext(0);
+        return parse_buffer<Provisioner>(buffer, len, std::move(ext));
+    }
+
+public:
+    /**
+     * Validate JSON file contents against the **uzuki2** specification, given a source of bytes.
+     * Any invalid representations will cause an error to be thrown.
+     *
+     * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
+     * @param num_external Expected number of external references. 
+     */
+    void validate(byteme::Reader& reader, int num_external = 0) {
+        DummyExternals ext(num_external);
+        parse<DummyProvisioner>(reader, std::move(ext));
+        return;
+    }
+
+    /**
+     * Validate JSON file contents against the **uzuki2** specification, given a path to the file.
+     * Any invalid representations will cause an error to be thrown.
+     *
+     * @param file Path to a (possible Gzip-compressed) JSON file.
+     * @param num_external Expected number of external references. 
+     */
+    void validate_file(const std::string& file, int num_external = 0) {
+        DummyExternals ext(num_external);
+        parse_file<DummyProvisioner>(file, std::move(ext));
+        return;
+    }
+
+    /**
+     * Validate JSON file contents against the **uzuki2** specification, given a buffer containing the file contents.
+     * Any invalid representations will cause an error to be thrown.
+     *
+     * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
+     * @param len Length of the buffer in bytes.
+     * @param num_external Expected number of external references. 
+     */
+    void validate_buffer(const unsigned char* buffer, size_t len, int num_external = 0) {
+        DummyExternals ext(num_external);
+        parse_buffer<DummyProvisioner>(buffer, len, std::move(ext));
+        return;
+    }
+};
 
 }
 

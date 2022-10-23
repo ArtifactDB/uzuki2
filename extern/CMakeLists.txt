@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
   byteme
   GIT_REPOSITORY https://github.com/LTLA/byteme
-  GIT_TAG 76521683c544ae61e502b07fc9f124e11c48681e
+  GIT_TAG 9ae37144bb943c5d66e3c9b15d71257e6281adce
 )
 
 FetchContent_MakeAvailable(byteme)
@@ -13,7 +13,7 @@ FetchContent_MakeAvailable(byteme)
 FetchContent_Declare(
   millijson 
   GIT_REPOSITORY https://github.com/LTLA/millijson
-  GIT_TAG ac5698b30f87f61902becb4acd5ba4b771ba511b
+  GIT_TAG dbd19272ff84d9b7f65d84472870f27a5b426a2b
 )
 
 FetchContent_MakeAvailable(millijson)

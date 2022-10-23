@@ -105,7 +105,7 @@ TEST(Hdf5ExternalTest, CheckErrors) {
 
 std::shared_ptr<uzuki2::Base> load_json_with_externals(std::string x, int num_externals) {
     DefaultExternals ext(num_externals);
-    return uzuki2::parse_json<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), ext);
+    return uzuki2::JsonParser().parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), ext);
 }
 
 TEST(JsonExternalTest, SimpleLoading) {
@@ -134,7 +134,7 @@ TEST(JsonExternalTest, SimpleLoading) {
 void expect_json_external_error(std::string x, std::string msg, int num_expected) {
     EXPECT_ANY_THROW({
         try {
-            uzuki2::validate_json(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), num_expected);
+            uzuki2::JsonParser().validate_buffer(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), num_expected);
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;

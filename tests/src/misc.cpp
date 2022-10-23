@@ -70,23 +70,24 @@ TEST(Hdf5IntegerTypeTest, Forbidden) {
     EXPECT_EQ(iptr->base.values[4], 5);
 }
 
-class JsonFileTest : public ::testing::TestWithParam<int> {};
+class JsonFileTest : public ::testing::TestWithParam<std::tuple<int, bool> > {};
 
 TEST_P(JsonFileTest, Chunking) {
     auto path = "TEST.json";
-    size_t block_size = GetParam();
+    auto param = GetParam();
+    size_t block_size = std::get<0>(param);
+    uzuki2::JsonParser parser;
+    parser.parallel = std::get<1>(param);
 
-    // Checking we can make a read with different block types.
     {
         std::ofstream ohandle(path);
         ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ], \n\t\"names\": [ \"X\", \"Y\" ] }";
     }
-    EXPECT_NO_THROW(uzuki2::validate_json(path));
 
-    // Checking parsing is fine.
+    // Checking parsing is fine with different block types.
     {
         byteme::SomeFileReader reader(path, block_size);
-        auto parsed = uzuki2::parse_json<DefaultProvisioner>(reader);
+        auto parsed = parser.parse<DefaultProvisioner>(reader);
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -104,17 +105,22 @@ TEST_P(JsonFileTest, Chunking) {
         EXPECT_EQ(stuff->names[1], "Y");
     }
 
+    // Checking that validation works fine.
+    {
+        byteme::SomeFileReader reader(path, block_size);
+        EXPECT_NO_THROW(parser.validate(reader));
+    }
+
     // Checking that the overload works with external references.
     {
         std::ofstream ohandle(path);
         ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"external\", \"index\": 0 }, { \"type\": \"external\", \"index\": 1 } ] }";
     }
-    EXPECT_NO_THROW(uzuki2::validate_json(path, 2));
 
     {
         byteme::SomeFileReader reader(path, block_size);
         DefaultExternals ext(2);
-        auto parsed = uzuki2::parse_json<DefaultProvisioner>(reader, std::move(ext));
+        auto parsed = parser.parse<DefaultProvisioner>(reader, std::move(ext));
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -125,10 +131,46 @@ TEST_P(JsonFileTest, Chunking) {
         EXPECT_EQ(stuff->values[1]->type(), uzuki2::EXTERNAL);
         EXPECT_EQ(reinterpret_cast<uintptr_t>(static_cast<const DefaultExternal*>(stuff->values[1].get())->ptr), 2);
     }
+
+    // Checking that validation works fine.
+    {
+        byteme::SomeFileReader reader(path, block_size);
+        EXPECT_NO_THROW(parser.validate(reader, 2));
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(
     JsonFile,
     JsonFileTest,
-    ::testing::Values(3, 7, 13, 17, 29)
+    ::testing::Combine(
+        ::testing::Values(3, 7, 13, 17, 29), // block size per read.
+        ::testing::Values(false, true)  // whether or not it's parallelized.
+    )
 );
+
+TEST(JsonFileTest, CheckMethods) {
+    std::string path = "TEST.json";
+    uzuki2::JsonParser parser;
+
+    // Making sure the parse_file methods work correctly.
+    {
+        std::ofstream ohandle(path);
+        ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ], \n\t\"names\": [ \"X\", \"Y\" ] }";
+    }
+    {
+        auto parsed = parser.parse_file<DefaultProvisioner>(path);
+        EXPECT_EQ(parsed->type(), uzuki2::LIST);
+        EXPECT_NO_THROW(parser.validate_file(path));
+    }
+
+    // Again, with some externals.
+    {
+        std::ofstream ohandle(path);
+        ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"external\", \"index\": 0 }, { \"type\": \"external\", \"index\": 1 } ] }";
+    }
+    {
+        auto parsed = parser.parse_file<DefaultProvisioner>(path, DefaultExternals(2));
+        EXPECT_EQ(parsed->type(), uzuki2::LIST);
+        EXPECT_NO_THROW(parser.validate_file(path, 2));
+    }
+}

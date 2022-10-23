@@ -129,8 +129,10 @@ inline std::shared_ptr<uzuki2::Base> load_hdf5(std::string name, std::string gro
     return uzuki2::parse_hdf5<DefaultProvisioner>(name, group);
 }
 
-inline std::shared_ptr<uzuki2::Base> load_json(std::string x) {
-    return uzuki2::parse_json<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size());
+inline std::shared_ptr<uzuki2::Base> load_json(std::string x, bool parallel = false) {
+    uzuki2::JsonParser parser;
+    parser.parallel = parallel;
+    return parser.parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size());
 }
 
 inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {
@@ -147,7 +149,7 @@ inline void expect_hdf5_error(std::string file, std::string name, std::string ms
 inline void expect_json_error(std::string json, std::string msg) {
     EXPECT_ANY_THROW({
         try {
-            uzuki2::validate_json(reinterpret_cast<const unsigned char*>(json.c_str()), json.size());
+            uzuki2::JsonParser().validate_buffer(reinterpret_cast<const unsigned char*>(json.c_str()), json.size());
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
