@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['set_0',['set',['../structuzuki2_1_1TypedVector.html#ac098971c1d36112d2aadfc63d144c2f4',1,'uzuki2::TypedVector::set()'],['../structuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f',1,'uzuki2::Factor::set()'],['../structuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82',1,'uzuki2::List::set()']]],
-  ['set_5flevel_1',['set_level',['../structuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740',1,'uzuki2::Factor']]],
-  ['set_5fmissing_2',['set_missing',['../structuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41',1,'uzuki2::Vector']]],
-  ['set_5fname_3',['set_name',['../structuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f',1,'uzuki2::Vector::set_name()'],['../structuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff',1,'uzuki2::List::set_name()']]],
-  ['size_4',['size',['../structuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2',1,'uzuki2::Vector::size()'],['../structuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba',1,'uzuki2::List::size()']]],
-  ['stringvector_5',['StringVector',['../namespaceuzuki2.html#a7f2b28d113b4a458fb91c458dcc4b985',1,'uzuki2']]]
+  ['parallel_0',['parallel',['../classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d',1,'uzuki2::JsonParser']]],
+  ['parse_1',['parse',['../classuzuki2_1_1Hdf5Parser.html#aff580b8cbbdb1840d8aa97d9f2617a44',1,'uzuki2::Hdf5Parser::parse(const H5::Group &amp;handle, const std::string &amp;name, Externals ext)'],['../classuzuki2_1_1Hdf5Parser.html#a86d855b29a6edb6d8b6df796a8ef749e',1,'uzuki2::Hdf5Parser::parse(const H5::Group &amp;handle, const std::string &amp;name)'],['../classuzuki2_1_1Hdf5Parser.html#a4c85975efa5fe039651af392f0e06af2',1,'uzuki2::Hdf5Parser::parse(const std::string &amp;file, const std::string &amp;name, Externals ext)'],['../classuzuki2_1_1Hdf5Parser.html#ad75c7dbfd791b0f6e0cef5c9b4c3b954',1,'uzuki2::Hdf5Parser::parse(const std::string &amp;file, const std::string &amp;name)'],['../classuzuki2_1_1JsonParser.html#a86b7a31d345d2dce67ea0e1844fc5ee6',1,'uzuki2::JsonParser::parse(byteme::Reader &amp;reader, Externals ext)'],['../classuzuki2_1_1JsonParser.html#a747953ecc8f37d0ada2eb1eaedc8ddae',1,'uzuki2::JsonParser::parse(byteme::Reader &amp;reader)']]],
+  ['parse_5fbuffer_2',['parse_buffer',['../classuzuki2_1_1JsonParser.html#a6da59a4155037dbb5e559f0c295f490f',1,'uzuki2::JsonParser::parse_buffer(const unsigned char *buffer, size_t len, Externals ext)'],['../classuzuki2_1_1JsonParser.html#ae21ca6df71a03dd7d92c8eac2eb39fa8',1,'uzuki2::JsonParser::parse_buffer(const unsigned char *buffer, size_t len)']]],
+  ['parse_5ffile_3',['parse_file',['../classuzuki2_1_1JsonParser.html#ac8ff83b541273da0c4e233131a58f945',1,'uzuki2::JsonParser::parse_file(const std::string &amp;file, Externals ext)'],['../classuzuki2_1_1JsonParser.html#a2935fc582ae3ec736b119e9b92dfabb1',1,'uzuki2::JsonParser::parse_file(const std::string &amp;file)']]],
+  ['parse_5fhdf5_2ehpp_4',['parse_hdf5.hpp',['../parse__hdf5_8hpp.html',1,'']]],
+  ['parse_5fjson_2ehpp_5',['parse_json.hpp',['../parse__json_8hpp.html',1,'']]]
 ];

@@ -161,13 +161,11 @@ $(function() {
 <h2>Quick start</h2>
 <p >A reference implementation of the validator is provided as a header-only C++ library in <a href="include/uzuki2"><code>include/uzuki2</code></a>. This is useful for portable deployment in different frameworks like R, Python, etc. We can check that a JSON/HDF5 file complies with the <b>uzuki</b> specification:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="uzuki2_8hpp.html">uzuki2/uzuki2.hpp</a>&quot;</span></div>
-<div class="line"><a class="code hl_function" href="namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077">uzuki2::validate_hdf5</a>(h5_file_path, h5_group_name);</div>
-<div class="line"><a class="code hl_function" href="namespaceuzuki2.html#a2fe5c875d74ceb2a2bda095a4ef5e771">uzuki2::validate_json</a>(json_file_path);</div>
-<div class="ttc" id="anamespaceuzuki2_html_a2dbd5847942495b1b54302e2f89c6077"><div class="ttname"><a href="namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077">uzuki2::validate_hdf5</a></div><div class="ttdeci">void validate_hdf5(const H5::Group &amp;handle, const std::string &amp;name, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_hdf5.hpp:474</div></div>
-<div class="ttc" id="anamespaceuzuki2_html_a2fe5c875d74ceb2a2bda095a4ef5e771"><div class="ttname"><a href="namespaceuzuki2.html#a2fe5c875d74ceb2a2bda095a4ef5e771">uzuki2::validate_json</a></div><div class="ttdeci">void validate_json(const std::string &amp;file, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:433</div></div>
+<div class="line">uzuki2::validate_hdf5(h5_file_path, h5_group_name);</div>
+<div class="line">uzuki2::validate_json(json_file_path);</div>
 <div class="ttc" id="auzuki2_8hpp_html"><div class="ttname"><a href="uzuki2_8hpp.html">uzuki2.hpp</a></div><div class="ttdoc">Umbrella header for the uzuki2 library.</div></div>
 </div><!-- fragment --><p >This will raise an error if any violations of the specification are observed. If a non-zero expected number of external objects is present:</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077">uzuki2::validate_hdf5</a>(h5_file_path, h5_group_name, num_externals);</div>
+<div class="fragment"><div class="line">uzuki2::validate_hdf5(h5_file_path, h5_group_name, num_externals);</div>
 </div><!-- fragment --><p >Advanced users can also use the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> parser to load the list into memory. This is achieved by calling <code>parse()</code> with custom provisioner and external reference classes. For example, <a href="tests/src/test_subclass.h"><code>tests/src/test_subclass.h</code></a> defines the <code>DefaultProvisioner</code> and <code>DefaultExternals</code> classes, which can be used to load the HDF5 contents into <code>std::vector</code>s for easier downstream operations.</p>
 <div class="fragment"><div class="line">DefaultExternals ext(nexpected);</div>
 <div class="line"><span class="keyword">auto</span> ptr = uzuki2::parse_hdf5&lt;DefaultProvisioner&gt;(file_path, group_name, ext);</div>

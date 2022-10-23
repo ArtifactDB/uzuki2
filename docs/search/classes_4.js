@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nothing_0',['Nothing',['../structuzuki2_1_1Nothing.html',1,'uzuki2']]]
+  ['jsonparser_0',['JsonParser',['../classuzuki2_1_1JsonParser.html',1,'uzuki2']]]
 ];

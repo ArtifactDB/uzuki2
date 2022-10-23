@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['validate_5fhdf5_0',['validate_hdf5',['../namespaceuzuki2.html#a2dbd5847942495b1b54302e2f89c6077',1,'uzuki2::validate_hdf5(const H5::Group &amp;handle, const std::string &amp;name, int num_external=0)'],['../namespaceuzuki2.html#a54ae51814a1ab943fe7ac7d264e9f094',1,'uzuki2::validate_hdf5(const std::string &amp;file, const std::string &amp;name, int num_external=0)']]],
-  ['validate_5fjson_1',['validate_json',['../namespaceuzuki2.html#a2fe5c875d74ceb2a2bda095a4ef5e771',1,'uzuki2::validate_json(const std::string &amp;file, int num_external=0)'],['../namespaceuzuki2.html#a6693da2cc6e89cd49711a915b23751c0',1,'uzuki2::validate_json(const unsigned char *buffer, size_t len, int num_external=0)']]],
-  ['vector_2',['Vector',['../structuzuki2_1_1Vector.html',1,'uzuki2']]]
+  ['type_0',['type',['../structuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8',1,'uzuki2::Base::type()'],['../structuzuki2_1_1TypedVector.html#ac0eb1796bab5b7e0afe5d3fdddcac472',1,'uzuki2::TypedVector::type()'],['../structuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476',1,'uzuki2::Factor::type()'],['../structuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439',1,'uzuki2::Nothing::type()'],['../structuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095',1,'uzuki2::External::type()'],['../structuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181',1,'uzuki2::List::type()']]],
+  ['type_1',['Type',['../namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736',1,'uzuki2']]],
+  ['typedvector_2',['TypedVector',['../structuzuki2_1_1TypedVector.html',1,'uzuki2']]]
 ];
