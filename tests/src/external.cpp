@@ -17,7 +17,7 @@ TEST(Hdf5ExternalTest, SimpleLoading) {
     }
     {
         DefaultExternals ext(1);
-        auto parsed = uzuki2::parse_hdf5<DefaultProvisioner>(path, "foo", ext);
+        auto parsed = uzuki2::Hdf5Parser().parse<DefaultProvisioner>(path, "foo", ext);
         EXPECT_EQ(parsed->type(), uzuki2::EXTERNAL);
 
         auto stuff = static_cast<const DefaultExternal*>(parsed.get());
@@ -36,7 +36,7 @@ TEST(Hdf5ExternalTest, SimpleLoading) {
     }
     {
         DefaultExternals ext(2);
-        auto parsed = uzuki2::parse_hdf5<DefaultProvisioner>(path, "foo", ext);
+        auto parsed = uzuki2::Hdf5Parser().parse<DefaultProvisioner>(path, "foo", ext);
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
         auto list = static_cast<const DefaultList*>(parsed.get());
 
@@ -52,7 +52,7 @@ void expect_hdf5_external_error(std::string path, std::string name, std::string 
     H5::H5File file(path, H5F_ACC_RDONLY); 
     EXPECT_ANY_THROW({
         try {
-            uzuki2::validate_hdf5(file.openGroup(name), name, num_expected);
+            uzuki2::Hdf5Parser().validate(file.openGroup(name), name, num_expected);
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;

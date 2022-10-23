@@ -295,7 +295,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
 /**
  * @brief Parse JSON file contents using the **uzuki2** specification.
  *
- * JSON provides an alternative to the HDF5 format that is handled by `parse_hdf5()`.
+ * JSON provides an alternative to the HDF5 format that is handled by `Hdf5Parser`.
  * JSON is simpler to parse and has less formatting-related overhead.
  * However, it does not support random access and discards some precision for floating-point numbers.
  */
@@ -311,9 +311,9 @@ public:
      * Parse JSON file contents using the **uzuki2** specification, given an arbitrary input source of bytes.
      *
      * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      *
      * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
      * @param ext Instance of an external reference resolver class.
@@ -344,7 +344,7 @@ public:
      * Overload of `parse()` assuming that there are no external references.
      *
      * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      *
      * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
      *
@@ -364,9 +364,9 @@ public:
      * Parse JSON file contents using the **uzuki2** specification, given the file path.
      *
      * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      *
      * @param file Path to a (possibly Gzip-compressed) JSON file.
      * @param ext Instance of an external reference resolver class.
@@ -386,7 +386,7 @@ public:
      * Overload of `parse_file()` assuming that there are no external references.
      *
      * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      *
      * @param file Path to a (possibly Gzip-compressed) JSON file.
      *
@@ -406,9 +406,9 @@ public:
      * Parse a buffer containing JSON file contents using the **uzuki2** specification. 
      *
      * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      *
      * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
      * @param len Length of the buffer in bytes.
@@ -429,7 +429,7 @@ public:
      * Overload of `parse_buffer()` assuming that there are no external references.
      *
      * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
-     * See `parse_hdf5()` for more details. 
+     * See `Hdf5Parser::parse()` for more details. 
      *
      * @param[in] buffer Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed).
      * @param len Length of the buffer in bytes.

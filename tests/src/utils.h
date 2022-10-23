@@ -126,7 +126,7 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
 }
 
 inline std::shared_ptr<uzuki2::Base> load_hdf5(std::string name, std::string group) {
-    return uzuki2::parse_hdf5<DefaultProvisioner>(name, group);
+    return uzuki2::Hdf5Parser().parse<DefaultProvisioner>(name, group);
 }
 
 inline std::shared_ptr<uzuki2::Base> load_json(std::string x, bool parallel = false) {
@@ -138,7 +138,7 @@ inline std::shared_ptr<uzuki2::Base> load_json(std::string x, bool parallel = fa
 inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {
     EXPECT_ANY_THROW({
         try {
-            uzuki2::validate_hdf5(file, name);
+            uzuki2::Hdf5Parser().validate(file, name);
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
