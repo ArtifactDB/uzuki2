@@ -86,8 +86,18 @@ TEST(JsonStringTest, SimpleLoading) {
     EXPECT_EQ(parsed->type(), uzuki2::STRING);
     auto bptr = static_cast<const DefaultStringVector*>(parsed.get());
     EXPECT_EQ(bptr->size(), 3);
+    EXPECT_FALSE(bptr->scalar);
     EXPECT_EQ(bptr->base.values.front(), "alpha");
     EXPECT_EQ(bptr->base.values.back(), "charlie");
+
+    // Works with scalars.
+    {
+        auto parsed = load_json("{ \"type\": \"string\", \"values\": \"foo\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_TRUE(stuff->scalar);
+        EXPECT_EQ(stuff->base.values[0], "foo");
+    }
 
     /********************************************
      *** See integer.cpp for tests for names. ***

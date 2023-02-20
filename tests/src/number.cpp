@@ -66,8 +66,18 @@ TEST(JsonNumberTest, SimpleLoading) {
     EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
     auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
     EXPECT_EQ(bptr->size(), 4);
+    EXPECT_FALSE(bptr->scalar);
     EXPECT_EQ(bptr->base.values.front(), 1.2);
     EXPECT_EQ(bptr->base.values.back(), 134.3);
+
+    // Works with scalars.
+    {
+        auto parsed = load_json("{ \"type\": \"number\", \"values\": 12.34 }");
+        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+        auto stuff = static_cast<const DefaultNumberVector*>(parsed.get());
+        EXPECT_TRUE(stuff->scalar);
+        EXPECT_EQ(stuff->base.values[0], 12.34);
+    }
 
     /********************************************
      *** See integer.cpp for tests for names. ***

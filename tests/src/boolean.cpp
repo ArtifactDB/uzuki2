@@ -66,8 +66,18 @@ TEST(JsonBooleanTest, SimpleLoading) {
     EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
     auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
     EXPECT_EQ(bptr->size(), 4);
+    EXPECT_FALSE(bptr->scalar);
     EXPECT_EQ(bptr->base.values[0], 1);
     EXPECT_EQ(bptr->base.values[1], 0);
+
+    // Works with scalars.
+    {
+        auto parsed = load_json("{ \"type\": \"boolean\", \"values\": true }");
+        EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
+        auto stuff = static_cast<const DefaultBooleanVector*>(parsed.get());
+        EXPECT_TRUE(stuff->scalar);
+        EXPECT_TRUE(stuff->base.values[0]);
+    }
 
     /********************************************
      *** See integer.cpp for tests for names. ***

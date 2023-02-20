@@ -99,6 +99,7 @@ TEST(JsonIntegerTest, SimpleLoading) {
         EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
         auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
         EXPECT_EQ(iptr->size(), 5);
+        EXPECT_FALSE(iptr->scalar);
         EXPECT_EQ(iptr->base.values[0], 0);
         EXPECT_EQ(iptr->base.values[1], 1000);
         EXPECT_EQ(iptr->base.values[2], -1);
@@ -115,6 +116,15 @@ TEST(JsonIntegerTest, SimpleLoading) {
         EXPECT_EQ(stuff->base.names.front(), "a");
         EXPECT_EQ(stuff->base.names.back(), "eeeee");
     }
+
+    // Works with scalars.
+    {
+        auto parsed = load_json("{ \"type\": \"integer\", \"values\": 1234 }");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto stuff = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_TRUE(stuff->scalar);
+        EXPECT_EQ(stuff->base.values[0], 1234);
+    }
 }
 
 TEST(JsonIntegerTest, MissingValues) {
@@ -127,7 +137,7 @@ TEST(JsonIntegerTest, MissingValues) {
 
 TEST(JsonIntegerTest, CheckError) {
     expect_json_error("{ \"type\": \"integer\" }", "expected 'values' property");
-    expect_json_error("{ \"type\": \"integer\", \"values\": 1}", "expected an array");
+    expect_json_error("{ \"type\": \"integer\", \"values\": \"foo\"}", "expected a number");
 
     expect_json_error("{ \"type\": \"integer\", \"values\": [true]}", "expected a number");
     expect_json_error("{ \"type\": \"integer\", \"values\": [1.2]}", "expected an integer");
