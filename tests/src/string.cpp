@@ -22,6 +22,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "foo");
         EXPECT_EQ(sptr->base.values.back(), "stuff");
+        EXPECT_FALSE(sptr->scalar);
     }
 
     // Variable stuff works correctly.
@@ -37,6 +38,21 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "foo-qwerty");
         EXPECT_EQ(sptr->base.values.back(), "stuff-asdasd");
+    }
+
+    // Scalars work correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        write_string(vhandle, "data", "antony");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_EQ(sptr->size(), 1);
+        EXPECT_EQ(sptr->base.values.front(), "antony");
+        EXPECT_TRUE(sptr->scalar);
     }
 
     /********************************************

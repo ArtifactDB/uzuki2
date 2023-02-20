@@ -22,6 +22,7 @@ TEST(Hdf5IntegerTest, SimpleLoading) {
         EXPECT_EQ(iptr->size(), 5);
         EXPECT_EQ(iptr->base.values.front(), 1);
         EXPECT_EQ(iptr->base.values.back(), 5);
+        EXPECT_FALSE(iptr->scalar);
     }
 
     // Works with names.
@@ -38,6 +39,21 @@ TEST(Hdf5IntegerTest, SimpleLoading) {
         EXPECT_TRUE(stuff->base.has_names);
         EXPECT_EQ(stuff->base.names.front(), "A");
         EXPECT_EQ(stuff->base.names.back(), "E");
+    }
+
+    // Scalars work correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "integer");
+        write_scalar(vhandle, "data", 999, H5::PredType::NATIVE_INT);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->size(), 1);
+        EXPECT_EQ(iptr->base.values.front(), 999);
+        EXPECT_TRUE(iptr->scalar);
     }
 }
 
@@ -75,13 +91,6 @@ TEST(Hdf5IntegerTest, CheckError) {
         create_dataset<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_DOUBLE);
     }
     expect_hdf5_error(path, "foo", "expected an integer dataset at 'foo/data'");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto ghandle = vector_opener(handle, "foo", "integer");
-        write_scalar(ghandle, "data", 1, H5::PredType::NATIVE_DOUBLE);
-    }
-    expect_hdf5_error(path, "foo", "1-dimensional");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);

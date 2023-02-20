@@ -22,6 +22,22 @@ TEST(Hdf5DateTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
         EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
+        EXPECT_FALSE(sptr->scalar);
+    }
+
+    // Scalars work correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "date");
+        write_string(vhandle, "data", "2022-05-09");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::DATE);
+        auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(sptr->size(), 1);
+        EXPECT_EQ(sptr->base.values.front(), "2022-05-09");
+        EXPECT_TRUE(sptr->scalar);
     }
 
     /********************************************
