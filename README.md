@@ -40,7 +40,7 @@ If the list is named, there will additionally be a 1-dimensional `**/names` stri
 
 An atomic vector is represented as a HDF5 group (`**/`) with the following attributes:
 
-- `uzuki_object`, a scalar string dataset containing the value `"atomic"`.
+- `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"`, `"string"` or `"date"`.
 
 The group should contain an 1-dimensional dataset at `**/data`.
@@ -68,7 +68,7 @@ The atomic vector's group may also contain `**/names`, a 1-dimensional string da
 
 A factor is represented as a HDF5 group (`**/`) with the following attributes:
 
-- `uzuki_object`, a scalar string dataset containing the value `"atomic"`.
+- `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing one of `"factor"` or `"ordered"`.
 
 The group should contain an 1-dimensional dataset at `**/data`.
