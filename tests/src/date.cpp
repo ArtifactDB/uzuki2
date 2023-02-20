@@ -22,6 +22,22 @@ TEST(Hdf5DateTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
         EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
+        EXPECT_FALSE(sptr->scalar);
+    }
+
+    // Scalars work correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "date");
+        write_string(vhandle, "data", "2022-05-09");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::DATE);
+        auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(sptr->size(), 1);
+        EXPECT_EQ(sptr->base.values.front(), "2022-05-09");
+        EXPECT_TRUE(sptr->scalar);
     }
 
     /********************************************
@@ -121,8 +137,18 @@ TEST(JsonDateTest, SimpleLoading) {
     EXPECT_EQ(parsed->type(), uzuki2::DATE);
     auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
     EXPECT_EQ(dptr->size(), 2);
+    EXPECT_FALSE(dptr->scalar);
     EXPECT_EQ(dptr->base.values[0], "2022-01-22");
     EXPECT_EQ(dptr->base.values[1], "1990-06-30");
+
+    // Works with scalars.
+    {
+        auto parsed = load_json("{ \"type\": \"date\", \"values\": \"2023-02-19\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::DATE);
+        auto stuff = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_TRUE(stuff->scalar);
+        EXPECT_EQ(stuff->base.values[0], "2023-02-19");
+    }
 
     /********************************************
      *** See integer.cpp for tests for names. ***

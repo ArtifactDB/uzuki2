@@ -92,7 +92,12 @@ struct DefaultTypedVector : public uzuki2::TypedVector<T, tt> {
         return;
     }
 
+    void is_scalar() {
+        scalar = true;
+    }
+
     DefaultVectorBase<T> base;
+    bool scalar = false;
 };
 
 typedef DefaultTypedVector<int32_t, uzuki2::INTEGER> DefaultIntegerVector; 

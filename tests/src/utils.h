@@ -67,7 +67,14 @@ H5::DataSet write_scalar(const H5::Group& parent, const std::string& name, T val
     } else {
         throw std::runtime_error("unknown type!");
     }
+    return dhandle;
+}
 
+inline H5::DataSet write_string(const H5::Group& parent, const std::string& name, const std::string& value) {
+    H5::DataSpace dspace;
+    H5::StrType stype(0, value.size());
+    auto dhandle = parent.createDataSet(name, stype, dspace);
+    dhandle.write(value.c_str(), stype);
     return dhandle;
 }
 
