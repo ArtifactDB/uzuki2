@@ -91,7 +91,7 @@ $(function() {
 <h2>Atomic vectors</h2>
 <p>An atomic vector is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
-<li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"atomic"</code>.</li>
+<li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"vector"</code>.</li>
 <li><code>uzuki_type</code>, a scalar string dataset containing one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code> or <code>"date"</code>.</li>
 </ul>
 <p>The group should contain an 1-dimensional dataset at <code>**/data</code>. Vectors of length 1 may also be represented as a scalar dataset. (While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.) The allowed HDF5 datatype depends on <code>uzuki_type</code>:</p>
@@ -111,7 +111,7 @@ $(function() {
 <h2>Factors</h2>
 <p>A factor is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
-<li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"atomic"</code>.</li>
+<li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"vector"</code>.</li>
 <li><code>uzuki_type</code>, a scalar string dataset containing one of <code>"factor"</code> or <code>"ordered"</code>.</li>
 </ul>
 <p>The group should contain an 1-dimensional dataset at <code>**/data</code>. This should be type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer. Missing values are represented by -2147483648.</p>
