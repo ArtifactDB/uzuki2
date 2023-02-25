@@ -125,7 +125,7 @@ An atomic vector is represented as a JSON object with the following properties:
 The contents of `values` is subject to some constraints:
 
 - `"integer"`: values should be JSON numbers that can fit into a 32-bit signed integer.
-  `null` is also allowed and represents a missing value.
+  Missing values may be represented by `null` or the special value -2147483648.
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
@@ -143,7 +143,7 @@ A factor is represented as a JSON object with the following properties:
 - `values`, an array of integer indices for the factor.
   These should be non-negative JSON numbers that can fit into a 32-bit signed integer.
   They should also be less than the length of `levels`.
-  `null` is allowed and represents a missing value.
+  Missing values may be represented by `null` or the special value -2147483648.
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
 

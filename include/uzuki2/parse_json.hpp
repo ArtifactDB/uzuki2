@@ -94,6 +94,11 @@ void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& valu
         }
 
         int32_t ival = val;
+        if (val == -2147483648) {
+            dest->set_missing(i);
+            continue;
+        }
+
         check(ival);
         dest->set(i, ival);
     }

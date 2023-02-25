@@ -142,6 +142,16 @@ TEST(JsonIntegerTest, MissingValues) {
     auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
     EXPECT_EQ(iptr->size(), 5);
     EXPECT_EQ(iptr->base.values[3], -123456789); // i.e., the test's missing value placeholder.
+
+    // Same for our special value.
+    {
+        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -2147483648, null, -2e+4 ] }");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->size(), 5);
+        EXPECT_EQ(iptr->base.values[2], -123456789); 
+        EXPECT_EQ(iptr->base.values[3], -123456789);
+    }
 }
 
 TEST(JsonIntegerTest, CheckError) {
