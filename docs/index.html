@@ -147,7 +147,7 @@ $(function() {
 </ul>
 <p>The contents of <code>values</code> is subject to some constraints:</p>
 <ul>
-<li><code>"integer"</code>: values should be JSON numbers that can fit into a 32-bit signed integer. <code>null</code> is also allowed and represents a missing value.</li>
+<li><code>"integer"</code>: values should be JSON numbers that can fit into a 32-bit signed integer. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
 <li><code>"boolean"</code>: values should be JSON booleans or <code>null</code> (for missing values).</li>
 <li><code>string</code>: values should be JSON strings. <code>null</code> is also allowed and represents a missing value.</li>
 <li><code>"date"</code>: values should be JSON strings following a <code>YYYY-MM-DD</code> format. <code>null</code> is also allowed and represents a missing value.</li>
@@ -157,7 +157,7 @@ $(function() {
 <p>A factor is represented as a JSON object with the following properties:</p>
 <ul>
 <li><code>type</code>, set to one of <code>"factor"</code> or <code>"ordered"</code>.</li>
-<li><code>values</code>, an array of integer indices for the factor. These should be non-negative JSON numbers that can fit into a 32-bit signed integer. They should also be less than the length of <code>levels</code>. <code>null</code> is allowed and represents a missing value.</li>
+<li><code>values</code>, an array of integer indices for the factor. These should be non-negative JSON numbers that can fit into a 32-bit signed integer. They should also be less than the length of <code>levels</code>. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
 <li><code>levels</code>, an array of unique strings containing the levels for the indices in <code>values</code>.</li>
 <li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements.</li>
 </ul>
