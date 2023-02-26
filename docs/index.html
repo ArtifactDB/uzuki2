@@ -86,7 +86,7 @@ $(function() {
 <ul>
 <li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"list"</code>.</li>
 </ul>
-<p>This group should contain a subgroup <code>**/data</code> that contains the list elements. Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., <code>**/data/0</code> for the first list element. Each list element may be any of the objects described in this specifiction, including further nested lists.</p>
+<p>This group should contain a subgroup <code>**/data</code> that contains the list elements. Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., <code>**/data/0</code> for the first list element. Each list element may be any of the objects described in this specification, including further nested lists.</p>
 <p>If the list is named, there will additionally be a 1-dimensional <code>**/names</code> string dataset of length equal to <code>uzuki_length</code>.</p>
 <h2>Atomic vectors</h2>
 <p>An atomic vector is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
@@ -107,7 +107,7 @@ $(function() {
 <li><code>string</code>: the <code>**/data</code> dataset may contain a <code>"missing-value-placeholder"</code> attribute. If present, this should be a string scalar dataset that specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing.</li>
 <li><code>"date"</code>: like <code>"string"</code>, the <code>**/data</code> dataset may contain a <code>missing-value-placeholder</code> attribute. The <code>**/data</code> dataset should only contain <code>YYYY-MM-DD</code> dates or the placeholder value.</li>
 </ul>
-<p>The atomic vector's group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to <code>data</code>.</p>
+<p>The atomic vector's group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to that of <code>**/data</code>. If <code>**/data</code> is a scalar, <code>**/names</code> should have length 1.</p>
 <h2>Factors</h2>
 <p>A factor is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
@@ -143,7 +143,7 @@ $(function() {
 <ul>
 <li><code>type</code>, set to one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code> or <code>"date"</code>.</li>
 <li><code>values</code>, an array of values for the vector (see below). This may also be a scalar of the same type as the array contents.</li>
-<li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements.</li>
+<li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements. If <code>values</code> is a scalar, <code>names</code> should have length 1.</li>
 </ul>
 <p>The contents of <code>values</code> is subject to some constraints:</p>
 <ul>
@@ -172,6 +172,9 @@ $(function() {
 <li><code>type</code>, set to <code>"index"</code>.</li>
 <li><code>index</code>, a non-negative JSON number that can fit into a 32-bit signed integer. This identifies this external object uniquely within the entire list. See the equivalent in the HDF5 specification for more details.</li>
 </ul>
+<h1>Comments on names</h1>
+<p>Both HDF5 and JSON support naming of the vector elements, typically via the <code>names</code> group/property. If <code>names</code> are supplied, their contents should always be non-missing (e.g., not <code>null</code> in JSON, no <code>missing-value-placeholder</code> in HDF5). Each name is allowed to be any string, including an empty string.</p>
+<p>It is technically permitted to provide duplicate names in <code>names</code>, consistent with how R itself supports duplicate names in its lists and vectors. However, this is not recommended as other frameworks may wish to use representations that assume unique names, e.g., using Python dictionaries to represent named lists. By providing unique names, users can improve interoperability with native data structures in other frameworks.</p>
 <h1>Validation</h1>
 <h2>Quick start</h2>
 <p>A reference implementation of the validator is provided as a header-only C++ library in <a href="include/uzuki2"><code>include/uzuki2</code></a>. This is useful for portable deployment in different frameworks like R, Python, etc. We can check that a JSON/HDF5 file complies with the <b>uzuki</b> specification:</p>
