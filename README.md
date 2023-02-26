@@ -32,7 +32,7 @@ An R list is represented as a HDF5 group (`**/`) with the following attributes:
 
 This group should contain a subgroup `**/data` that contains the list elements.
 Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., `**/data/0` for the first list element.
-Each list element may be any of the objects described in this specifiction, including further nested lists.
+Each list element may be any of the objects described in this specification, including further nested lists.
 
 If the list is named, there will additionally be a 1-dimensional `**/names` string dataset of length equal to `uzuki_length`.
 
@@ -62,7 +62,8 @@ For some `uzuki_type`, further considerations may be applicable:
 - `"date"`: like `"string"`, the `**/data` dataset may contain a `missing-value-placeholder` attribute.
   The `**/data` dataset should only contain `YYYY-MM-DD` dates or the placeholder value.
 
-The atomic vector's group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
+The atomic vector's group may also contain `**/names`, a 1-dimensional string dataset of length equal to that of `**/data`.
+If `**/data` is a scalar, `**/names` should have length 1.
 
 ### Factors
 
@@ -121,6 +122,7 @@ An atomic vector is represented as a JSON object with the following properties:
 - `values`, an array of values for the vector (see below).
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
+  If `values` is a scalar, `names` should have length 1.
 
 The contents of `values` is subject to some constraints:
 
@@ -161,6 +163,16 @@ Each external object is represented as a JSON object with the following properti
 - `index`, a non-negative JSON number that can fit into a 32-bit signed integer.
   This identifies this external object uniquely within the entire list.
   See the equivalent in the HDF5 specification for more details.
+
+## Comments on names
+
+Both HDF5 and JSON support naming of the vector elements, typically via the `names` group/property.
+If `names` are supplied, their contents should always be non-missing (e.g., not `null` in JSON, no `missing-value-placeholder` in HDF5).
+Each name is allowed to be any string, including an empty string.
+
+It is technically permitted to provide duplicate names in `names`, consistent with how R itself supports duplicate names in its lists and vectors.
+However, this is not recommended as other frameworks may wish to use representations that assume unique names, e.g., using Python dictionaries to represent named lists.
+By providing unique names, users can improve interoperability with native data structures in other frameworks.
 
 ## Validation
 
