@@ -106,6 +106,7 @@ $(function() {
 <li><code>"boolean"</code>: values in <code>**/data</code> should be one of 0 (false), 1 (true), or -2147483648 (missing).</li>
 <li><code>string</code>: the <code>**/data</code> dataset may contain a <code>"missing-value-placeholder"</code> attribute. If present, this should be a string scalar dataset that specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing.</li>
 <li><code>"date"</code>: like <code>"string"</code>, the <code>**/data</code> dataset may contain a <code>missing-value-placeholder</code> attribute. The <code>**/data</code> dataset should only contain <code>YYYY-MM-DD</code> dates or the placeholder value.</li>
+<li><code>"date-time"</code>: like <code>"string"</code>, the <code>**/data</code> dataset may contain a <code>missing-value-placeholder</code> attribute. The <code>**/data</code> dataset should only contain date-times in the Internet Date/Time format (<a href="https://www.rfc-editor.org/rfc/rfc3339#section-5.6">RFC 3339, Section 5.6</a>) or the placeholder value.</li>
 </ul>
 <p>The atomic vector's group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to that of <code>**/data</code>. If <code>**/data</code> is a scalar, <code>**/names</code> should have length 1.</p>
 <h2>Factors</h2>
@@ -151,6 +152,7 @@ $(function() {
 <li><code>"boolean"</code>: values should be JSON booleans or <code>null</code> (for missing values).</li>
 <li><code>string</code>: values should be JSON strings. <code>null</code> is also allowed and represents a missing value.</li>
 <li><code>"date"</code>: values should be JSON strings following a <code>YYYY-MM-DD</code> format. <code>null</code> is also allowed and represents a missing value.</li>
+<li><code>"date-time"</code>: values should be JSON strings following the Internet Date/Time format. <code>null</code> is also allowed and represents a missing value.</li>
 </ul>
 <p>Vectors of length 1 may also be represented as scalars of the appropriate type. While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.</p>
 <h2>Factors</h2>

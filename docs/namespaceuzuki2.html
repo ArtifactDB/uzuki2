@@ -125,6 +125,8 @@ Typedefs</h2></td></tr>
 <tr class="separator:a73bdb90ee3e3487bf4c9a6b38b60ddfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1cc497d1c24bacb9b560426a57a4979"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="structuzuki2_1_1TypedVector.html">TypedVector</a>&lt; std::string, DATE &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#ad1cc497d1c24bacb9b560426a57a4979">DateVector</a></td></tr>
 <tr class="separator:ad1cc497d1c24bacb9b560426a57a4979"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84fd2adf03a7d3b07214d3343dde8bad"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="structuzuki2_1_1TypedVector.html">TypedVector</a>&lt; std::string, DATETIME &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html#a84fd2adf03a7d3b07214d3343dde8bad">DateTimeVector</a></td></tr>
+<tr class="separator:a84fd2adf03a7d3b07214d3343dde8bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -136,10 +138,11 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<b>FACTOR</b>
 , <b>DATE</b>
+, <b>DATETIME</b>
 , <b>LIST</b>
-, <b>NOTHING</b>
 , <br />
-&#160;&#160;<b>EXTERNAL</b>
+&#160;&#160;<b>NOTHING</b>
+, <b>EXTERNAL</b>
 <br />
  }</td></tr>
 <tr class="separator:a20eb2837279aae2ade751f07c62b3736"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,6 +167,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Interface for a boolean vector. </p>
+
+</div>
+</div>
+<a id="a84fd2adf03a7d3b07214d3343dde8bad" name="a84fd2adf03a7d3b07214d3343dde8bad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84fd2adf03a7d3b07214d3343dde8bad">&#9670;&#160;</a></span>DateTimeVector</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="structuzuki2_1_1TypedVector.html">TypedVector</a>&lt;std::string, DATETIME&gt; <a class="el" href="namespaceuzuki2.html#a84fd2adf03a7d3b07214d3343dde8bad">uzuki2::DateTimeVector</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Interface for a RFC3339 date/time-formatted vector. </p>
 
 </div>
 </div>
@@ -246,6 +264,7 @@ Functions</h2></td></tr>
 <li><code>STRING</code>: vector of strings.</li>
 <li><code>BOOLEAN</code>: vector of booleans.</li>
 <li><code>DATE</code>: vector of date strings in <code>YYYY-MM-DD</code> format.</li>
+<li><code>DATETIME</code>: vector of date-time strings in Internet Date/Time format (see RFC 3339, section 5.6).</li>
 <li><code>FACTOR</code>: factor containing integer indices to unique levels.</li>
 <li><code>LIST</code>: a list containing nested objects.</li>
 <li><code>NOTHING</code>: equivalent to R's <code>NULL</code>.</li>
