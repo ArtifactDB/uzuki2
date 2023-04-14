@@ -307,6 +307,17 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
             return ptr;
         });
 
+    } else if (type == "date-time") {
+        const auto& vals = extract_array(map, "values", path);
+        auto ptr = Provisioner::new_DateTime(vals.size());
+        output.reset(ptr);
+        extract_strings(vals, ptr, [&](const std::string& x) -> void {
+            if (!is_rfc3339(x)) {
+                 throw std::runtime_error("date-times should follow the Internet Date/Time format in '" + path + ".values'");
+            }
+        }, path);
+        extract_names(map, ptr, path);
+
     } else if (type == "list") {
         const auto& vals = extract_array(map, "values", path);
         auto ptr = Provisioner::new_List(vals.size());

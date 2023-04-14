@@ -20,6 +20,7 @@ add_executable(
     src/number.cpp
     src/string.cpp
     src/date.cpp
+    src/datetime.cpp
     src/external.cpp
     src/misc.cpp
 )

@@ -61,6 +61,8 @@ For some `uzuki_type`, further considerations may be applicable:
   Any value of `**/data` that is equal to this placeholder should be treated as missing.
 - `"date"`: like `"string"`, the `**/data` dataset may contain a `missing-value-placeholder` attribute.
   The `**/data` dataset should only contain `YYYY-MM-DD` dates or the placeholder value.
+- `"date-time"`: like `"string"`, the `**/data` dataset may contain a `missing-value-placeholder` attribute.
+  The `**/data` dataset should only contain date-times in the Internet Date/Time format ([RFC 3339, Section 5.6](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)) or the placeholder value.
 
 The atomic vector's group may also contain `**/names`, a 1-dimensional string dataset of length equal to that of `**/data`.
 If `**/data` is a scalar, `**/names` should have length 1.
@@ -132,6 +134,8 @@ The contents of `values` is subject to some constraints:
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
 - `"date"`: values should be JSON strings following a `YYYY-MM-DD` format.
+  `null` is also allowed and represents a missing value.
+- `"date-time"`: values should be JSON strings following the Internet Date/Time format.
   `null` is also allowed and represents a missing value.
 
 Vectors of length 1 may also be represented as scalars of the appropriate type.

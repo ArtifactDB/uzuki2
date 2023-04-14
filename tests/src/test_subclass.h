@@ -105,6 +105,7 @@ typedef DefaultTypedVector<double, uzuki2::NUMBER> DefaultNumberVector;
 typedef DefaultTypedVector<std::string, uzuki2::STRING> DefaultStringVector;
 typedef DefaultTypedVector<unsigned char, uzuki2::BOOLEAN> DefaultBooleanVector;
 typedef DefaultTypedVector<std::string, uzuki2::DATE> DefaultDateVector;
+typedef DefaultTypedVector<std::string, uzuki2::DATETIME> DefaultDateTimeVector;
 
 struct DefaultFactor : public uzuki2::Factor {
     DefaultFactor(size_t l, size_t ll) : vbase(l), levels(ll) {}
@@ -203,6 +204,8 @@ struct DefaultProvisioner {
     static uzuki2::BooleanVector* new_Boolean(size_t l) { return (new DefaultBooleanVector(l)); }
 
     static uzuki2::DateVector* new_Date(size_t l) { return (new DefaultDateVector(l)); }
+
+    static uzuki2::DateTimeVector* new_DateTime(size_t l) { return (new DefaultDateTimeVector(l)); }
 
     static uzuki2::Factor* new_Factor(size_t l, size_t ll) { return (new DefaultFactor(l, ll)); }
 };
