@@ -41,7 +41,7 @@ If the list is named, there will additionally be a 1-dimensional `**/names` stri
 An atomic vector is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
-- `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"`, `"string"` or `"date"`.
+- `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"`, `"string"`, `"date"` or `"date-time"`.
 
 The group should contain an 1-dimensional dataset at `**/data`.
 Vectors of length 1 may also be represented as a scalar dataset.
@@ -49,8 +49,9 @@ Vectors of length 1 may also be represented as a scalar dataset.
 The allowed HDF5 datatype depends on `uzuki_type`:
 
 - `"integer"`, `"boolean"`: any type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
+  Note that the converse is not required, i.e., the storage type does not need to be 32-bit if no such values are present in the dataset.
 - `"number"`: any type of `H5T_FLOAT` that can be represented by a double-precision float.
-- `"string"` or `"date"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
+- `"string"`, `"date"` or `"date-time"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
 
 For some `uzuki_type`, further considerations may be applicable:
 
