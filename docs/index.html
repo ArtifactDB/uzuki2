@@ -92,13 +92,13 @@ $(function() {
 <p>An atomic vector is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
 <li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"vector"</code>.</li>
-<li><code>uzuki_type</code>, a scalar string dataset containing one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code> or <code>"date"</code>.</li>
+<li><code>uzuki_type</code>, a scalar string dataset containing one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code>, <code>"date"</code> or <code>"date-time"</code>.</li>
 </ul>
 <p>The group should contain an 1-dimensional dataset at <code>**/data</code>. Vectors of length 1 may also be represented as a scalar dataset. (While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.) The allowed HDF5 datatype depends on <code>uzuki_type</code>:</p>
 <ul>
-<li><code>"integer"</code>, <code>"boolean"</code>: any type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer.</li>
+<li><code>"integer"</code>, <code>"boolean"</code>: any type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer. Note that the converse is not required, i.e., the storage type does not need to be 32-bit if no such values are present in the dataset.</li>
 <li><code>"number"</code>: any type of <code>H5T_FLOAT</code> that can be represented by a double-precision float.</li>
-<li><code>"string"</code> or <code>"date"</code>: any type of <code>H5T_STRING</code> that can be represented by a UTF-8 encoded string.</li>
+<li><code>"string"</code>, <code>"date"</code> or <code>"date-time"</code>: any type of <code>H5T_STRING</code> that can be represented by a UTF-8 encoded string.</li>
 </ul>
 <p>For some <code>uzuki_type</code>, further considerations may be applicable:</p>
 <ul>

@@ -1,7 +1,7 @@
 <map id="uzuki2/interfaces.hpp" name="uzuki2/interfaces.hpp">
-<area shape="rect" id="node1" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="90,5,234,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,79,60,104"/>
-<area shape="rect" id="node3" title=" " alt="" coords="84,79,152,104"/>
-<area shape="rect" id="node4" title=" " alt="" coords="177,79,235,104"/>
-<area shape="rect" id="node5" title=" " alt="" coords="259,79,321,104"/>
+<area shape="rect" id="node1" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="87,5,230,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,79,59,105"/>
+<area shape="rect" id="node3" title=" " alt="" coords="82,79,150,105"/>
+<area shape="rect" id="node4" title=" " alt="" coords="174,79,231,105"/>
+<area shape="rect" id="node5" title=" " alt="" coords="255,79,316,105"/>
 </map>
