@@ -1,8 +1,8 @@
 # R lists to HDF5 or JSON
 
-![Unit tests](https://github.com/LTLA/uzuki2/actions/workflows/run-tests.yaml/badge.svg)
-![Documentation](https://github.com/LTLA/uzuki2/actions/workflows/doxygenate.yaml/badge.svg)
-[![codecov](https://codecov.io/gh/LTLA/uzuki2/branch/master/graph/badge.svg?token=J3dxS3MtT1)](https://codecov.io/gh/LTLA/uzuki2)
+![Unit tests](https://github.com/ArtifactDB/uzuki2/actions/workflows/run-tests.yaml/badge.svg)
+![Documentation](https://github.com/ArtifactDB/uzuki2/actions/workflows/doxygenate.yaml/badge.svg)
+[![codecov](https://codecov.io/gh/ArtifactDB/uzuki2/branch/master/graph/badge.svg?token=J3dxS3MtT1)](https://codecov.io/gh/ArtifactDB/uzuki2)
 
 ## Overview
 
