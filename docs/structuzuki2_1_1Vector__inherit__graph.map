@@ -1,6 +1,9 @@
 <map id="uzuki2::Vector" name="uzuki2::Vector">
-<area shape="rect" id="node1" title="Interface for vector&#45;like objects." alt="" coords="77,79,179,105"/>
-<area shape="rect" id="node3" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="5,160,107,186"/>
-<area shape="rect" id="node4" href="$structuzuki2_1_1TypedVector.html" title="Interface for atomic vectors." alt="" coords="131,153,269,193"/>
-<area shape="rect" id="node2" href="$structuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="81,5,175,31"/>
+<area shape="rect" id="Node000001" title="Interface for vector&#45;like objects." alt="" coords="77,79,179,105"/>
+<area shape="rect" id="Node000003" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="5,160,107,186"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="109,117,69,161,65,158,105,114"/>
+<area shape="rect" id="Node000004" href="$structuzuki2_1_1TypedVector.html" title="Interface for atomic vectors." alt="" coords="131,153,269,193"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="151,114,184,150,180,154,147,117"/>
+<area shape="rect" id="Node000002" href="$structuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="81,5,175,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,46,131,79,125,79,125,46"/>
 </map>
