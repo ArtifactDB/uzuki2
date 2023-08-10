@@ -1,15 +1,9 @@
 <map id="uzuki2::Base" name="uzuki2::Base">
-<area shape="rect" id="Node000001" title="Base interface for all R objects." alt="" coords="196,5,290,31"/>
-<area shape="rect" id="Node000002" href="$structuzuki2_1_1External.html" title="Interface for unsupported objects." alt="" coords="5,79,116,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,39,93,81,91,76,198,34"/>
-<area shape="rect" id="Node000003" href="$structuzuki2_1_1List.html" title="Interface for lists." alt="" coords="140,79,226,105"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="226,44,195,80,191,77,222,41"/>
-<area shape="rect" id="Node000004" href="$structuzuki2_1_1Nothing.html" title="Representation of R&#39;s NULL." alt="" coords="250,79,359,105"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="265,41,296,77,292,80,261,44"/>
-<area shape="rect" id="Node000005" href="$structuzuki2_1_1Vector.html" title="Interface for vector&#45;like objects." alt="" coords="383,79,485,105"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="290,34,402,76,400,81,288,39"/>
-<area shape="rect" id="Node000006" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="311,160,413,186"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="415,117,375,161,371,158,411,114"/>
-<area shape="rect" id="Node000007" href="$structuzuki2_1_1TypedVector.html" title="Interface for atomic vectors." alt="" coords="437,153,575,193"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="456,114,490,150,486,154,453,117"/>
+<area shape="rect" id="node1" title="Base interface for all R objects." alt="" coords="197,5,292,31"/>
+<area shape="rect" id="node2" href="$structuzuki2_1_1External.html" title="Interface for unsupported objects." alt="" coords="5,79,116,104"/>
+<area shape="rect" id="node3" href="$structuzuki2_1_1List.html" title="Interface for lists." alt="" coords="140,79,227,104"/>
+<area shape="rect" id="node4" href="$structuzuki2_1_1Nothing.html" title="Representation of R&#39;s NULL." alt="" coords="251,79,361,104"/>
+<area shape="rect" id="node5" href="$structuzuki2_1_1Vector.html" title="Interface for vector&#45;like objects." alt="" coords="385,79,488,104"/>
+<area shape="rect" id="node6" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="312,159,415,185"/>
+<area shape="rect" id="node7" href="$structuzuki2_1_1TypedVector.html" title="Interface for atomic vectors." alt="" coords="439,152,578,192"/>
 </map>

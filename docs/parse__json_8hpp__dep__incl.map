@@ -1,5 +1,4 @@
 <map id="uzuki2/parse_json.hpp" name="uzuki2/parse_json.hpp">
-<area shape="rect" id="Node000001" title="Parsing methods for JSON files." alt="" coords="5,5,155,31"/>
-<area shape="rect" id="Node000002" href="$uzuki2_8hpp.html" title="Umbrella header for the uzuki2 library." alt="" coords="18,79,142,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,46,83,79,77,79,77,46"/>
+<area shape="rect" id="node1" title="Parsing methods for JSON files." alt="" coords="5,5,156,31"/>
+<area shape="rect" id="node2" href="$uzuki2_8hpp.html" title="Umbrella header for the uzuki2 library." alt="" coords="19,79,143,104"/>
 </map>

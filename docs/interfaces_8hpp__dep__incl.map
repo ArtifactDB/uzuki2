@@ -1,10 +1,6 @@
 <map id="uzuki2/interfaces.hpp" name="uzuki2/interfaces.hpp">
-<area shape="rect" id="Node000001" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="96,5,239,31"/>
-<area shape="rect" id="Node000002" href="$parse__hdf5_8hpp.html" title="Parsing methods for HDF5 files." alt="" coords="5,79,156,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,43,97,81,93,77,140,39"/>
-<area shape="rect" id="Node000004" href="$parse__json_8hpp.html" title="Parsing methods for JSON files." alt="" coords="179,79,329,105"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="195,39,241,77,238,81,191,43"/>
-<area shape="rect" id="Node000003" href="$uzuki2_8hpp.html" title="Umbrella header for the uzuki2 library." alt="" coords="106,153,229,178"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="108,112,154,150,151,154,105,116"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="230,116,183,154,180,150,226,112"/>
+<area shape="rect" id="node1" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="95,5,239,31"/>
+<area shape="rect" id="node2" href="$parse__hdf5_8hpp.html" title="Parsing methods for HDF5 files." alt="" coords="5,79,156,104"/>
+<area shape="rect" id="node4" href="$parse__json_8hpp.html" title="Parsing methods for JSON files." alt="" coords="180,79,331,104"/>
+<area shape="rect" id="node3" href="$uzuki2_8hpp.html" title="Umbrella header for the uzuki2 library." alt="" coords="105,152,229,177"/>
 </map>
