@@ -24,6 +24,10 @@ as defined by users (for the top-level group) or by the specification (e.g., as 
 
 All objects should be nested inside an R list.
 
+The top-level group may have a `uzuki2_version` attribute, describing the version of the **uzuki2** specification that it uses.
+This should be a scalar string dataset of the form `X.Y` for non-negative integers `X` and `Y`.
+If not provided, it is assumed to be "1.0".
+
 ### Lists
 
 An R list is represented as a HDF5 group (`**/`) with the following attributes:
@@ -41,7 +45,7 @@ If the list is named, there will additionally be a 1-dimensional `**/names` stri
 An atomic vector is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
-- `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"`, `"string"`, `"date"` or `"date-time"`.
+- `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"` or `"string"`.
 
 The group should contain an 1-dimensional dataset at `**/data`.
 Vectors of length 1 may also be represented as a scalar dataset.
@@ -51,7 +55,7 @@ The allowed HDF5 datatype depends on `uzuki_type`:
 - `"integer"`, `"boolean"`: any type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
   Note that the converse is not required, i.e., the storage type does not need to be 32-bit if no such values are present in the dataset.
 - `"number"`: any type of `H5T_FLOAT` that can be represented by a double-precision float.
-- `"string"`, `"date"` or `"date-time"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
+- `"string"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
 
 For some `uzuki_type`, further considerations may be applicable:
 
@@ -60,22 +64,29 @@ For some `uzuki_type`, further considerations may be applicable:
 - `string`: the `**/data` dataset may contain a `"missing-value-placeholder"` attribute.
   If present, this should be a string scalar dataset that specifies the placeholder for missing values.
   Any value of `**/data` that is equal to this placeholder should be treated as missing.
-- `"date"`: like `"string"`, the `**/data` dataset may contain a `missing-value-placeholder` attribute.
-  The `**/data` dataset should only contain `YYYY-MM-DD` dates or the placeholder value.
-- `"date-time"`: like `"string"`, the `**/data` dataset may contain a `missing-value-placeholder` attribute.
-  The `**/data` dataset should only contain date-times in the Internet Date/Time format ([RFC 3339, Section 5.6](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)) or the placeholder value.
+
+For `string` types, the group may also contain the `uzuki_format` attribute to constrain the string values in `**/data`:
+
+- `"date"`: strings should be `YYYY-MM-DD` dates or the placeholder value.
+- `"date-time"`: strings should be in the Internet Date/Time format ([RFC 3339, Section 5.6](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)) or the placeholder value.
 
 The atomic vector's group may also contain `**/names`, a 1-dimensional string dataset of length equal to that of `**/data`.
 If `**/data` is a scalar, `**/names` should have length 1.
+
+<details>
+<summary>Changes from previous versions</summary>
+In version 1.0, it was possible to have `uzuki_type` set to `"date"` or `"date-time"`.
+This is the same as `uzuki_type` of `"string"` with `format` set to `"date"` or `"date-time"`.
+</details>
 
 ### Factors
 
 A factor is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
-- `uzuki_type`, a scalar string dataset containing one of `"factor"` or `"ordered"`.
+- `uzuki_type`, a scalar string dataset containing `"factor"`.
 
-The group should contain an 1-dimensional dataset at `**/data`.
+The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
 This should be type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
 Missing values are represented by -2147483648.
 
@@ -84,6 +95,15 @@ Values in `**/levels` should be unique.
 Values in `**/data` should be non-negative (missing values excepted) and less than the length of `**/levels`.
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
+
+The group may also have an `uzuki_ordered` attribute, containing a scalar integer dataset.
+This is to be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.
+
+<details>
+<summary>Changes from previous versions</summary>
+In version 1.0, it was possible to have `uzuki_type` set to `"ordered"`.
+This is the same as `uzuki_type` of `"factor"` with the `ordered` dataset set to a truthy value.
+</details>
 
 ### Nothing
 
@@ -108,6 +128,9 @@ The exact mechanism by which this restoration occurs is implementation-defined.
 All R objects are represented by JSON objects with a `type` property.
 Every R object should be nested inside an R list.
 
+The top-level object may have a `version` property that contains the **uzuki2** specification version as a `"X.Y"` string for non-negative integers `X` and `Y`.
+If missing, the version can be assumed to be "1.0".
+
 ### Lists
 
 An R list is represented as a JSON object with the following properties:
@@ -121,7 +144,7 @@ An R list is represented as a JSON object with the following properties:
 
 An atomic vector is represented as a JSON object with the following properties:
 
-- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, `"string"` or `"date"`.
+- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, `"string"`.
 - `values`, an array of values for the vector (see below).
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
@@ -129,11 +152,16 @@ An atomic vector is represented as a JSON object with the following properties:
 
 The contents of `values` is subject to some constraints:
 
-- `"integer"`: values should be JSON numbers that can fit into a 32-bit signed integer.
+- `"number"`: values should be JSON numbers. 
+  Missing values are represented by `null`.
+- `"integer"`: values should be JSON numbers that can be represented by a 32-bit signed integer.
   Missing values may be represented by `null` or the special value -2147483648.
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
+
+For `type` of `"string"`, the object may optionally have a `format` property that constrains the `values`:
+  
 - `"date"`: values should be JSON strings following a `YYYY-MM-DD` format.
   `null` is also allowed and represents a missing value.
 - `"date-time"`: values should be JSON strings following the Internet Date/Time format.
@@ -142,17 +170,30 @@ The contents of `values` is subject to some constraints:
 Vectors of length 1 may also be represented as scalars of the appropriate type.
 While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
 
+<details>
+<summary>Changes from previous versions</summary>
+In version 1.0, it was possible to have `type` set to `"date"` or `"date-time"`.
+This is the same as `"type": "string"` with `format` set to `"date"` or `"date-time"`.
+</details>
+
 ### Factors
 
 A factor is represented as a JSON object with the following properties:
 
-- `type`, set to one of `"factor"` or `"ordered"`.
-- `values`, an array of integer indices for the factor.
+- `type`, set to `"factor"`. 
+- `values`, an array of 0-based integer indices for the factor.
   These should be non-negative JSON numbers that can fit into a 32-bit signed integer.
   They should also be less than the length of `levels`.
   Missing values may be represented by `null` or the special value -2147483648.
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
+- `ordered`, a boolean indicating whether to assume that the levels are ordered.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
+
+<details>
+<summary>Changes from previous versions</summary>
+In version 1.0, it was possible to have `"type": "ordered"`.
+This is the same as `"type": "factor"` with `"ordered": true`. 
+</details>
 
 ### Nothing
 
