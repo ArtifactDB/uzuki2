@@ -202,21 +202,20 @@ inline double legacy_missing_double() {
     double missing_value = 0;
     auto missing_ptr = reinterpret_cast<unsigned char*>(&missing_value);
 
-    int start = 0;
     int step = 1;
     if (tmp_ptr[0] == 1) { // little-endian. 
-        start = 7;
+        missing_ptr += sizeof(double) - 1;
         step = -1;
     }
 
-    missing_ptr[start] = 0x7f;
-    missing_ptr[start += step] = 0xf0;
-    missing_ptr[start += step] = 0x00;
-    missing_ptr[start += step] = 0x00;
-    missing_ptr[start += step] = 0x00;
-    missing_ptr[start += step] = 0x00;
-    missing_ptr[start += step] = 0x07;
-    missing_ptr[start += step] = 0xa2;
+    *missing_ptr = 0x7f;
+    *(missing_ptr += step) = 0xf0;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x07;
+    *(missing_ptr += step) = 0xa2;
 
     return missing_value;
 }
