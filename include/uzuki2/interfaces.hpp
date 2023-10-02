@@ -73,7 +73,7 @@ struct Vector : public Base {
 
     /**
      * Set the name of a vector element.
-     * This method should only be called if `use_names()` has previously been called.
+     * This method should only be called if the `Vector` instance was constructed with support for names.
      *
      * @param i Index of a vector element.
      * @param n Name for the vector element.
@@ -86,12 +86,6 @@ struct Vector : public Base {
      * @param i Index of a vector element to be marked as missing.
      */
     virtual void set_missing(size_t i) = 0;
-
-    /**
-     * Specify that the vector contains names.
-     * If not called, it is assumed that the vector is unnamed.
-     */
-    virtual void use_names() = 0;
 };
 
 /**
@@ -109,12 +103,6 @@ struct IntegerVector : public Vector {
      * @param v Value of the vector element.
      */
     virtual void set(size_t i, int32_t v) = 0;
-
-    /**
-     * Specify that a length-1 vector is represented as a scalar in the file.
-     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
-     */
-    virtual void is_scalar() = 0;
 };
 
 /**
@@ -132,12 +120,6 @@ struct NumberVector : public Vector {
      * @param v Value of the vector element.
      */
     virtual void set(size_t i, double v) = 0;
-
-    /**
-     * Specify that a length-1 vector is represented as a scalar in the file.
-     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
-     */
-    virtual void is_scalar() = 0;
 };
 
 /**
@@ -155,12 +137,6 @@ struct StringVector : public Vector {
      * @param v Value of the vector element.
      */
     virtual void set(size_t i, std::string v) = 0;
-
-    /**
-     * Specify that a length-1 vector is represented as a scalar in the file.
-     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
-     */
-    virtual void is_scalar() = 0;
 
     /**
      * Format constraints to apply to the strings.
@@ -191,12 +167,6 @@ struct BooleanVector : public Vector {
      * @param v Value of the vector element.
      */
     virtual void set(size_t i, bool v) = 0;
-
-    /**
-     * Specify that a length-1 vector is represented as a scalar in the file.
-     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
-     */
-    virtual void is_scalar() = 0;
 };
 
 /**
@@ -225,12 +195,6 @@ struct Factor : public Vector {
      * @param vl Value of the level element.
      */
     virtual void set_level(size_t il, std::string vl) = 0;
-
-    /**
-     * Indicate that the factor levels are ordered.
-     * If not called, it is assumed that the levels are unordered by default.
-     */
-    virtual void is_ordered() = 0;
 };
 
 /**
@@ -275,13 +239,8 @@ struct List : public Base {
     virtual void set(size_t i, std::shared_ptr<Base> v) = 0;
 
     /**
-     * Indicate that the elements of the list are named.
-     * If not called, it is assumed that the list is unnamed.
-     */
-    virtual void use_names() = 0;
-
-    /**
      * Set the name of an element of the list.
+     * This should only be called if this `List` instance was constructed with support for names.
      *
      * @param i Index of a list element.
      * @param n Name for the list element.

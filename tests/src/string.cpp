@@ -22,7 +22,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "foo");
         EXPECT_EQ(sptr->base.values.back(), "stuff");
-        EXPECT_FALSE(sptr->scalar);
+        EXPECT_FALSE(sptr->base.scalar);
         EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
     }
 
@@ -54,7 +54,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 1);
         EXPECT_EQ(sptr->base.values.front(), "antony");
-        EXPECT_TRUE(sptr->scalar);
+        EXPECT_TRUE(sptr->base.scalar);
         EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
     }
 
@@ -121,7 +121,7 @@ TEST(JsonStringTest, SimpleLoading) {
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto bptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(bptr->size(), 3);
-        EXPECT_FALSE(bptr->scalar);
+        EXPECT_FALSE(bptr->base.scalar);
         EXPECT_EQ(bptr->base.values.front(), "alpha");
         EXPECT_EQ(bptr->base.values.back(), "charlie");
         EXPECT_EQ(bptr->format, uzuki2::StringVector::NONE);
@@ -132,7 +132,7 @@ TEST(JsonStringTest, SimpleLoading) {
         auto parsed = load_json("{ \"type\": \"string\", \"values\": \"foo\" }");
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_TRUE(stuff->scalar);
+        EXPECT_TRUE(stuff->base.scalar);
         EXPECT_EQ(stuff->base.values[0], "foo");
         EXPECT_EQ(stuff->format, uzuki2::StringVector::NONE);
     }

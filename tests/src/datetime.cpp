@@ -182,7 +182,7 @@ TEST(JsonDateTimeTest, SimpleLoading) {
         auto parsed = load_json("{ \"type\": \"string\", \"format\":\"date-time\", \"values\": \"2023-02-19T12:34:56-09:00\", \"version\":\"1.1\" }");
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_TRUE(stuff->scalar);
+        EXPECT_TRUE(stuff->base.scalar);
         EXPECT_EQ(stuff->base.values[0], "2023-02-19T12:34:56-09:00");
         EXPECT_EQ(stuff->format, uzuki2::StringVector::DATETIME);
     }

@@ -272,28 +272,25 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path
 }
 
 template<class Host>
-void parse_names(const H5::Group& handle, Host* ptr, const std::string& path, const std::string& dpath) {
-    if (handle.exists("names")) {
-        auto npath = path + "/names";
-        if (handle.childObjType("names") != H5O_TYPE_DATASET) {
-            throw std::runtime_error("expected a dataset at '" + npath + "'");
-        }
-        ptr->use_names();
-
-        auto nhandle = handle.openDataSet("names");
-        auto dtype = nhandle.getDataType();
-        if (dtype.getClass() != H5T_STRING) {
-            throw std::runtime_error("expected a string dataset at '" + npath + "'");
-        }
-
-        auto len = ptr->size();
-        auto nlen = check_1d_length(nhandle, npath, false);
-        if (nlen != len) {
-            throw std::runtime_error("length of '" + npath + "' should be equal to length of '" + dpath + "'");
-        }
-
-        load_string_dataset(nhandle, nlen, [&](size_t i, std::string x) -> void { ptr->set_name(i, x); });
+void extract_names(const H5::Group& handle, Host* ptr, const std::string& path, const std::string& dpath) {
+    auto npath = path + "/names";
+    if (handle.childObjType("names") != H5O_TYPE_DATASET) {
+        throw std::runtime_error("expected a dataset at '" + npath + "'");
     }
+
+    auto nhandle = handle.openDataSet("names");
+    auto dtype = nhandle.getDataType();
+    if (dtype.getClass() != H5T_STRING) {
+        throw std::runtime_error("expected a string dataset at '" + npath + "'");
+    }
+
+    auto len = ptr->size();
+    auto nlen = check_1d_length(nhandle, npath, false);
+    if (nlen != len) {
+        throw std::runtime_error("length of '" + npath + "' should be equal to length of '" + dpath + "'");
+    }
+
+    load_string_dataset(nhandle, nlen, [&](size_t i, std::string x) -> void { ptr->set_name(i, x); });
 }
 
 template<class Provisioner, class Externals>
@@ -309,7 +306,9 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         }
         auto dhandle = handle.openGroup("data");
         size_t len = dhandle.getNumObjs();
-        auto lptr = Provisioner::new_List(len);
+
+        bool named = handle.exists("names");
+        auto lptr = Provisioner::new_List(len, named);
         output.reset(lptr);
 
         for (size_t i = 0; i < len; ++i) {
@@ -322,7 +321,9 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             lptr->set(i, parse_inner<Provisioner>(lhandle, ext, ipath, version));
         }
 
-        parse_names(handle, lptr, path, dpath);
+        if (named) {
+            extract_names(handle, lptr, path, dpath);
+        }
 
     } else if (object_type == "vector") {
         auto vector_type = load_string_attribute(handle, "uzuki_type", path);
@@ -339,28 +340,23 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             len = 1;
         }
 
+        bool named = handle.exists("names");
+
         if (vector_type == "integer") {
-            auto iptr = Provisioner::new_Integer(len);
+            auto iptr = Provisioner::new_Integer(len, named, is_scalar);
             output.reset(iptr);
             parse_integer_like(dhandle, iptr, dpath, [](int32_t) -> void {}, version);
-            if (is_scalar) {
-                iptr->is_scalar();
-            }
 
         } else if (vector_type == "boolean") {
-            auto bptr = Provisioner::new_Boolean(len);
+            auto bptr = Provisioner::new_Boolean(len, named, is_scalar);
             output.reset(bptr);
             parse_integer_like(dhandle, bptr, dpath, [&](int32_t x) -> void { 
                 if (x != 0 && x != 1) {
                      throw std::runtime_error("boolean values should be 0 or 1 in '" + dpath + "'");
                 }
             }, version);
-            if (is_scalar) {
-                bptr->is_scalar();
-            }
 
         } else if (vector_type == "factor" || (version.equals(1, 0) && vector_type == "ordered")) {
-            // First we need to figure out the number of levels.
             auto levpath = path + "/levels";
             if (!handle.exists("levels") || handle.childObjType("levels") != H5O_TYPE_DATASET) {
                 throw std::runtime_error("expected a dataset at '" + levpath + "'");
@@ -372,21 +368,18 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             }
             int32_t levlen = check_1d_length(levhandle, levpath, false); // use int-32 for comparison with the integer codes.
 
-            // Then we can initialize the interface.
-            auto fptr = Provisioner::new_Factor(len, levlen);
-            output.reset(fptr);
-
+            bool ordered = false;
             if (vector_type == "ordered") {
-                fptr->is_ordered();
+                ordered = true;
             } else if (handle.exists("ordered")) {
                 auto ohandle = get_scalar_dataset(handle, "ordered", H5T_INTEGER, path);
-                int ordered = 0;
-                ohandle.read(&ordered, H5::PredType::NATIVE_INT);
-                if (ordered) {
-                    fptr->is_ordered();
-                }
+                int tmp_ordered = 0;
+                ohandle.read(&tmp_ordered, H5::PredType::NATIVE_INT);
+                ordered = tmp_ordered > 0;
             }
 
+            auto fptr = Provisioner::new_Factor(len, named, is_scalar, levlen, ordered);
+            output.reset(fptr);
             parse_integer_like(dhandle, fptr, dpath, [&](int32_t x) -> void { 
                 if (x < 0 || x >= levlen) {
                      throw std::runtime_error("factor codes should be non-negative and less than the number of levels in '" + dpath + "'");
@@ -423,12 +416,8 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 });
             }
 
-            auto sptr = Provisioner::new_String(len, format);
+            auto sptr = Provisioner::new_String(len, named, is_scalar, format);
             output.reset(sptr);
-            if (is_scalar) {
-                sptr->is_scalar();
-            }
-
             if (format == StringVector::NONE) {
                 parse_string_like(dhandle, sptr, dpath, [](const std::string&) -> void {});
             } else if (format == StringVector::DATE) {
@@ -446,19 +435,18 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             }
 
         } else if (vector_type == "number") {
-            auto dptr = Provisioner::new_Number(len);
+            auto dptr = Provisioner::new_Number(len, named, is_scalar);
             output.reset(dptr);
             parse_numbers(dhandle, dptr, dpath, [](double) -> void {}, version);
-            if (is_scalar) {
-                dptr->is_scalar();
-            }
 
         } else {
             throw std::runtime_error("unknown vector type '" + vector_type + "' for '" + path + "'");
         }
 
-        auto vptr = static_cast<Vector*>(output.get());
-        parse_names(handle, vptr, path, dpath);
+        if (named) {
+            auto vptr = static_cast<Vector*>(output.get());
+            extract_names(handle, vptr, path, dpath);
+        }
 
     } else if (object_type == "nothing") {
         output.reset(Provisioner::new_Nothing());
@@ -530,12 +518,24 @@ public:
      * - `Nothing* new_Nothing()`, which returns a new instance of a `Nothing` subclass.
      * - `Other* new_Other(void* p)`, which returns a new instance of a `Other` subclass.
      *   `p` is a pointer to an "external" object, generated by calling `ext.get()` (see below).
-     * - `List* new_List(size_t l)`, which returns a new instance of a `List` with length `l`.
-     * - `IntegerVector* new_Integer(size_t l)`, which returns a new instance of an `IntegerVector` subclass of length `l`.
-     * - `NumberVector* new_Number(size_t l)`, which returns a new instance of a `NumberVector` subclass of length `l`.
-     * - `StringVector* new_String(size_t l, StringVector::Format f)`, which returns a new instance of a `StringVector` subclass of length `l` with format `f`.
-     * - `BooleanVector* new_Boolean(size_t l)`, which returns a new instance of a `BooleanVector` subclass of length `l`.
-     * - `Factor* new_Factor(size_t l, size_t ll)`, which returns a new instance of a `Factor` subclass of length `l` and with `ll` unique levels.
+     * - `List* new_List(size_t l, bool n)`, which returns a new instance of a `List` with length `l`.
+     *   If `n = true`, names are present and will be added via `List::set_name()`.
+     * - `IntegerVector* new_Integer(size_t l, bool n, bool s)`, which returns a new instance of an `IntegerVector` subclass of length `l`.
+     *   If `n = true`, names are present and will be added via `Vector::set_name()`.
+     *   If `s = true` and `l = 1`, the value was represented on file as a scalar integer.
+     * - `NumberVector* new_Number(size_t l, bool n, bool s)`, which returns a new instance of a `NumberVector` subclass of length `l`.
+     *   If `n = true`, names are present and will be added via `Vector::set_name()`.
+     *   If `s = true` and `l = 1`, the value was represented on file as a scalar float.
+     * - `StringVector* new_String(size_t l, bool n, bool s, StringVector::Format f)`, which returns a new instance of a `StringVector` subclass of length `l` with format `f`.
+     *   If `n = true`, names are present and will be added via `Vector::set_name()`.
+     *   If `s = true` and `l = 1`, the value was represented on file as a scalar string.
+     * - `BooleanVector* new_Boolean(size_t l, bool n, bool s)`, which returns a new instance of a `BooleanVector` subclass of length `l`.
+     *   If `n = true`, names are present and will be added via `Vector::set_name()`.
+     *   If `s = true` and `l = 1`, the value was represented on file as a scalar boolean.
+     * - `Factor* new_Factor(size_t l, bool n, bool s, size_t ll, bool o)`, which returns a new instance of a `Factor` subclass of length `l` and with `ll` unique levels.
+     *   If `n = true`, names are present and will be added via `Vector::set_name()`.
+     *   If `s = true` and `l = 1`, the lone index was represented on file as a scalar integer.
+     *   If `o = true`, the levels should be assumed to be sorted.
      *
      * @section external-contract Externals requirements
      * The `Externals` class is expected to provide the following `const` methods:
