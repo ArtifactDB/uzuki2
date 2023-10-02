@@ -155,6 +155,7 @@ The contents of `values` is subject to some constraints:
 
 - `"number"`: values should be JSON numbers. 
   Missing values are represented by `null`.
+  IEEE special values can be represented by strings, i.e., `NaN`, `Inf`, `-Inf`.
 - `"integer"`: values should be JSON numbers that can be represented by a 32-bit signed integer.
   Missing values may be represented by `null` or the special value -2147483648.
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
