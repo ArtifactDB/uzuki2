@@ -248,15 +248,15 @@ We can check that a JSON/HDF5 file complies with the **uzuki** specification:
 
 ```cpp
 #include "uzuki2/uzuki2.hpp"
-uzuki2::validate_hdf5(h5_file_path, h5_group_name);
-uzuki2::validate_json(json_file_path);
+uzuki2::hdf5::validate(h5_file_path, h5_group_name);
+uzuki2::json::validate(json_file_path);
 ```
 
 This will raise an error if any violations of the specification are observed.
 If a non-zero expected number of external objects is present:
 
 ```cpp
-uzuki2::validate_hdf5(h5_file_path, h5_group_name, num_externals);
+uzuki2::hdf5::validate(h5_file_path, h5_group_name, num_externals);
 ```
 
 Advanced users can also use the **uzuki2** parser to load the list into memory.
@@ -266,10 +266,10 @@ which can be used to load the HDF5 contents into `std::vector`s for easier downs
 
 ```cpp
 DefaultExternals ext(nexpected);
-auto ptr = uzuki2::parse_hdf5<DefaultProvisioner>(file_path, group_name, ext);
+auto ptr = uzuki2::hdf5::parse<DefaultProvisioner>(file_path, group_name, ext);
 ```
 
-Also see the [reference documentation](https://ltla.github.io/uzuki2) for more details.
+Also see the [reference documentation](https://artifactdb.github.io/uzuki2) for more details.
 
 ### Building projects
 
@@ -291,7 +291,7 @@ FetchContent_MakeAvailable(uzuki2)
 
 Then you can link to **uzuki2** to make the headers available during compilation:
 
-```
+```cmake
 # For executables:
 target_link_libraries(myexe uzuki2)
 

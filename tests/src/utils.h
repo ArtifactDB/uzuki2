@@ -139,19 +139,19 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
 }
 
 inline auto load_hdf5(std::string name, std::string group) {
-    return uzuki2::Hdf5Parser().parse<DefaultProvisioner>(name, group);
+    return uzuki2::hdf5::parse<DefaultProvisioner>(name, group);
 }
 
 inline auto load_json(std::string x, bool parallel = false) {
-    uzuki2::JsonParser parser;
-    parser.parallel = parallel;
-    return parser.parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size());
+    uzuki2::json::Options opt;
+    opt.parallel = parallel;
+    return uzuki2::json::parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), opt);
 }
 
 inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {
     EXPECT_ANY_THROW({
         try {
-            uzuki2::Hdf5Parser().validate(file, name);
+            uzuki2::hdf5::validate(file, name);
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
@@ -162,7 +162,7 @@ inline void expect_hdf5_error(std::string file, std::string name, std::string ms
 inline void expect_json_error(std::string json, std::string msg) {
     EXPECT_ANY_THROW({
         try {
-            uzuki2::JsonParser().validate_buffer(reinterpret_cast<const unsigned char*>(json.c_str()), json.size());
+            uzuki2::json::validate_buffer(reinterpret_cast<const unsigned char*>(json.c_str()), json.size());
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
