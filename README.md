@@ -257,14 +257,16 @@ Also see the [reference documentation](https://ltla.github.io/uzuki2) for more d
 
 ### Building projects
 
+#### CMake with `FetchContent`
+
 If you're using CMake, you just need to add something like this to your `CMakeLists.txt`:
 
-```
+```cmake
 include(FetchContent)
 
 FetchContent_Declare(
   uzuki2 
-  GIT_REPOSITORY https://github.com/LTLA/uzuki2
+  GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
   GIT_TAG master # or any version of interest
 )
 
@@ -281,16 +283,29 @@ target_link_libraries(myexe uzuki2)
 target_link_libraries(mylib INTERFACE uzuki2)
 ```
 
-You will probably also need to link to the HDF5 and/or Zlib libraries, if you haven't done so already.
-For system installations of both libraries, you can just use `find_package()`: 
+#### CMake with `find_package()`
 
-```
-find_package(HDF5 REQUIRED COMPONENTS C CXX)
-target_link_libraries(myexe hdf5::hdf5 hdf5::hdf5_cpp)
+You can install the library by cloning a suitable version of this repository and running the following commands:
 
-find_package(ZLIB)
-target_link_libraries(myexe ZLIB::ZLIB)
+```sh
+mkdir build && cd build
+cmake .. -DUZUKI2_TESTS=OFF
+cmake --build . --target install
 ```
+
+Then you can use `find_package()` as usual:
+
+```cmake
+find_package(artifactdb_uzuki2 CONFIG REQUIRED)
+target_link_libraries(mylib INTERFACE artifactdb::uzuki2)
+```
+
+#### Manual
+
+If you're not using CMake, the simple approach is to just copy the files in the `include/` subdirectory - 
+either directly or with Git submodules - and include their path during compilation with, e.g., GCC's `-I`.
+You will also need to link to the dependencies listed in the [`extern/CMakeLists.txt`](extern/CMakeLists.txt) directory,
+along with the HDF5 and Zlib libraries.
 
 ## Comparison to version 1
 
