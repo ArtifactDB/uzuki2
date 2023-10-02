@@ -49,7 +49,6 @@ TEST(Hdf5NumberTest, MissingValues) {
     auto path = "TEST-number.h5";
 
     auto missing = uzuki2::hdf5::legacy_missing_double();
-    std::cout << missing << std::endl;
     EXPECT_TRUE(std::isnan(missing));
 
     // Old version used the missing R value.
