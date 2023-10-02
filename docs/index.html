@@ -81,6 +81,7 @@ $(function() {
 <h1>HDF5 Specification</h1>
 <p >We use <code>**/</code> to represent a variable name of the group representing any of the supported R objects. It is assumed that <code>**/</code> will be replaced by the actual name of the group in implementations, as defined by users (for the top-level group) or by the specification (e.g., as a nested child of a list).</p>
 <p >All objects should be nested inside an R list.</p>
+<p >The top-level group may have a <code>uzuki2_version</code> attribute, describing the version of the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification that it uses. This should be a scalar string dataset of the form <code>X.Y</code> for non-negative integers <code>X</code> and <code>Y</code>. If not provided, it is assumed to be "1.0".</p>
 <h2>Lists</h2>
 <p >An R list is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
@@ -92,32 +93,42 @@ $(function() {
 <p >An atomic vector is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
 <li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"vector"</code>.</li>
-<li><code>uzuki_type</code>, a scalar string dataset containing one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code>, <code>"date"</code> or <code>"date-time"</code>.</li>
+<li><code>uzuki_type</code>, a scalar string dataset containing one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code> or <code>"string"</code>.</li>
 </ul>
 <p >The group should contain an 1-dimensional dataset at <code>**/data</code>. Vectors of length 1 may also be represented as a scalar dataset. (While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.) The allowed HDF5 datatype depends on <code>uzuki_type</code>:</p>
 <ul>
 <li><code>"integer"</code>, <code>"boolean"</code>: any type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer. Note that the converse is not required, i.e., the storage type does not need to be 32-bit if no such values are present in the dataset.</li>
 <li><code>"number"</code>: any type of <code>H5T_FLOAT</code> that can be represented by a double-precision float.</li>
-<li><code>"string"</code>, <code>"date"</code> or <code>"date-time"</code>: any type of <code>H5T_STRING</code> that can be represented by a UTF-8 encoded string.</li>
+<li><code>"string"</code>: any type of <code>H5T_STRING</code> that can be represented by a UTF-8 encoded string.</li>
 </ul>
 <p >For some <code>uzuki_type</code>, further considerations may be applicable:</p>
 <ul>
 <li><code>"integer"</code>: values of <code>**/data</code> that are equal to -2147483648 should be treated as missing.</li>
 <li><code>"boolean"</code>: values in <code>**/data</code> should be one of 0 (false), 1 (true), or -2147483648 (missing).</li>
 <li><code>string</code>: the <code>**/data</code> dataset may contain a <code>"missing-value-placeholder"</code> attribute. If present, this should be a string scalar dataset that specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing.</li>
-<li><code>"date"</code>: like <code>"string"</code>, the <code>**/data</code> dataset may contain a <code>missing-value-placeholder</code> attribute. The <code>**/data</code> dataset should only contain <code>YYYY-MM-DD</code> dates or the placeholder value.</li>
-<li><code>"date-time"</code>: like <code>"string"</code>, the <code>**/data</code> dataset may contain a <code>missing-value-placeholder</code> attribute. The <code>**/data</code> dataset should only contain date-times in the Internet Date/Time format (<a href="https://www.rfc-editor.org/rfc/rfc3339#section-5.6">RFC 3339, Section 5.6</a>) or the placeholder value.</li>
+</ul>
+<p >For <code>string</code> types, the group may optionally contain the <code>**/format</code> dataset. This should be a scalar string dataset that specifies constraints to the format of the values in <code>**/data</code>:</p>
+<ul>
+<li><code>"date"</code>: strings should be <code>YYYY-MM-DD</code> dates or the placeholder value.</li>
+<li><code>"date-time"</code>: strings should be in the Internet Date/Time format (<a href="https://www.rfc-editor.org/rfc/rfc3339#section-5.6">RFC 3339, Section 5.6</a>) or the placeholder value.</li>
 </ul>
 <p >The atomic vector's group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to that of <code>**/data</code>. If <code>**/data</code> is a scalar, <code>**/names</code> should have length 1.</p>
+<details >
+<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>uzuki_type</code> of <code>"string"</code> with <code>**/format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
+</details>
 <h2>Factors</h2>
 <p >A factor is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
 <li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"vector"</code>.</li>
-<li><code>uzuki_type</code>, a scalar string dataset containing one of <code>"factor"</code> or <code>"ordered"</code>.</li>
+<li><code>uzuki_type</code>, a scalar string dataset containing <code>"factor"</code>.</li>
 </ul>
-<p >The group should contain an 1-dimensional dataset at <code>**/data</code>. This should be type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer. Missing values are represented by -2147483648.</p>
+<p >The group should contain an 1-dimensional dataset at <code>**/data</code>, containing 0-based indices into the levels. This should be type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer. Missing values are represented by -2147483648.</p>
 <p >The group should also contain <code>**/levels</code>, a 1-dimensional string dataset that contains the levels for the indices in <code>data</code>. Values in <code>**/levels</code> should be unique. Values in <code>**/data</code> should be non-negative (missing values excepted) and less than the length of <code>**/levels</code>.</p>
 <p >The group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to <code>data</code>.</p>
+<p >The group may optionally contain <code>**/ordered</code>, a scalar integer dataset. This should be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.</p>
+<details >
+<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"ordered"</code>. This is the same as <code>uzuki_type</code> of <code>"factor"</code> with the <code>**/ordered</code> dataset set to a truthy value. </p>
+</details>
 <h2>Nothing</h2>
 <p >A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:</p>
 <ul>
@@ -132,6 +143,7 @@ $(function() {
 <p >By indexing this external metadata, we can restore the object in its appropriate location in the list. The exact mechanism by which this restoration occurs is implementation-defined.</p>
 <h1>JSON Specification</h1>
 <p >All R objects are represented by JSON objects with a <code>type</code> property. Every R object should be nested inside an R list.</p>
+<p >The top-level object may have a <code>version</code> property that contains the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification version as a <code>"X.Y"</code> string for non-negative integers <code>X</code> and <code>Y</code>. If missing, the version can be assumed to be "1.0".</p>
 <h2>Lists</h2>
 <p >An R list is represented as a JSON object with the following properties:</p>
 <ul>
@@ -142,27 +154,38 @@ $(function() {
 <h2>Atomic vectors</h2>
 <p >An atomic vector is represented as a JSON object with the following properties:</p>
 <ul>
-<li><code>type</code>, set to one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code> or <code>"date"</code>.</li>
+<li><code>type</code>, set to one of <code>"integer"</code>, <code>"boolean"</code>, <code>"number"</code>, <code>"string"</code>.</li>
 <li><code>values</code>, an array of values for the vector (see below). This may also be a scalar of the same type as the array contents.</li>
 <li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements. If <code>values</code> is a scalar, <code>names</code> should have length 1.</li>
 </ul>
 <p >The contents of <code>values</code> is subject to some constraints:</p>
 <ul>
-<li><code>"integer"</code>: values should be JSON numbers that can fit into a 32-bit signed integer. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
+<li><code>"number"</code>: values should be JSON numbers. Missing values are represented by <code>null</code>.</li>
+<li><code>"integer"</code>: values should be JSON numbers that can be represented by a 32-bit signed integer. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
 <li><code>"boolean"</code>: values should be JSON booleans or <code>null</code> (for missing values).</li>
 <li><code>string</code>: values should be JSON strings. <code>null</code> is also allowed and represents a missing value.</li>
+</ul>
+<p >For <code>type</code> of <code>"string"</code>, the object may optionally have a <code>format</code> property that constrains the <code>values</code>:</p>
+<ul>
 <li><code>"date"</code>: values should be JSON strings following a <code>YYYY-MM-DD</code> format. <code>null</code> is also allowed and represents a missing value.</li>
 <li><code>"date-time"</code>: values should be JSON strings following the Internet Date/Time format. <code>null</code> is also allowed and represents a missing value.</li>
 </ul>
 <p >Vectors of length 1 may also be represented as scalars of the appropriate type. While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.</p>
+<details >
+<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>"type": "string"</code> with <code>format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
+</details>
 <h2>Factors</h2>
 <p >A factor is represented as a JSON object with the following properties:</p>
 <ul>
-<li><code>type</code>, set to one of <code>"factor"</code> or <code>"ordered"</code>.</li>
-<li><code>values</code>, an array of integer indices for the factor. These should be non-negative JSON numbers that can fit into a 32-bit signed integer. They should also be less than the length of <code>levels</code>. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
+<li><code>type</code>, set to <code>"factor"</code>.</li>
+<li><code>values</code>, an array of 0-based integer indices for the factor. These should be non-negative JSON numbers that can fit into a 32-bit signed integer. They should also be less than the length of <code>levels</code>. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
 <li><code>levels</code>, an array of unique strings containing the levels for the indices in <code>values</code>.</li>
+<li>(optional) <code>ordered</code>, a boolean indicating whether to assume that the levels are ordered. If absent, levels are assumed to be non-ordered.</li>
 <li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements.</li>
 </ul>
+<details >
+<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>"type": "ordered"</code>. This is the same as <code>"type": "factor"</code> with <code>"ordered": true</code>. </p>
+</details>
 <h2>Nothing</h2>
 <p >A "nothing" (a.k.a., "null", "none") value is represented as a JSON object with the following properties:</p>
 <ul>
