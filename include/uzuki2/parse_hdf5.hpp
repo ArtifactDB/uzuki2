@@ -25,7 +25,7 @@
 namespace uzuki2 {
 
 /**
- * @namespace hdf5
+ * @namespace uzuki2::hdf5
  * @brief Parse an R list from a HDF5 file.
  *
  * The hierarchical nature of HDF5 allows it to naturally store nested list structures.

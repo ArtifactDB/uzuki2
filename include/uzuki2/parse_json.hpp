@@ -29,7 +29,7 @@
 namespace uzuki2 {
 
 /**
- * @namespace json
+ * @namespace uzuki2::json
  * @brief Parse an R list from a JSON file.
  *
  * JSON provides an alternative to the HDF5 format handled by `hdf5::parse()` and friends.
@@ -446,7 +446,7 @@ ParsedList parse(byteme::Reader& reader, Externals ext, Options options = Option
 }
 
 /**
- * Overload of `parse()` assuming that there are no external references.
+ * Overload of `json::parse()` assuming that there are no external references.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
  * See `hdf5::parse()` for more details. 
@@ -489,7 +489,7 @@ ParsedList parse_file(const std::string& file, Externals ext, Options options = 
 }
 
 /**
- * Overload of `parse_file()` assuming that there are no external references.
+ * Overload of `json::parse_file()` assuming that there are no external references.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
  * See `hdf5::parse()` for more details. 
@@ -533,7 +533,7 @@ ParsedList parse_buffer(const unsigned char* buffer, size_t len, Externals ext, 
 }
 
 /**
- * Overload of `parse_buffer()` assuming that there are no external references.
+ * Overload of `json::parse_buffer()` assuming that there are no external references.
  *
  * @tparam Provisioner A class namespace defining static methods for creating new `Base` objects.
  * See `hdf5::parse()` for more details. 
