@@ -118,6 +118,38 @@ TEST(Hdf5FactorTest, MissingValues) {
         EXPECT_EQ(fptr->vbase.values[2], -1); // i.e., the test's missing value placeholder.
         EXPECT_EQ(fptr->vbase.values[4], -1); 
     }
+
+    // Placeholder is ignored in later versions.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+        create_dataset<int>(vhandle, "data", { 1, 2, -2147483648, 0, -2147483648 }, H5::PredType::NATIVE_INT);
+        create_dataset(vhandle, "levels", { "Turnbull", "Morrison", "Abbott" });
+    }
+    expect_hdf5_error(path, "blub", "non-negative");
+
+    // We can instead set our own placeholder.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+
+        auto dhandle = create_dataset<int>(vhandle, "data", { 1, 2, -2147483648, 0, -2147483648 }, H5::PredType::NATIVE_INT);
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT, H5S_SCALAR);
+        int placeholder = -2147483648;
+        ahandle.write(H5::PredType::NATIVE_INT, &placeholder);
+
+        create_dataset(vhandle, "levels", { "Turnbull", "Morrison", "Abbott" });
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto iptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_EQ(iptr->size(), 5);
+        EXPECT_EQ(iptr->vbase.values[2], -1); 
+        EXPECT_EQ(iptr->vbase.values[4], -1); 
+    }
 }
 
 TEST(Hdf5FactorTest, CheckError) {
@@ -239,11 +271,24 @@ TEST(JsonFactorTest, OrderedLoading) {
 }
 
 TEST(JsonFactorTest, MissingValues) {
-    auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, null, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-    auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-    EXPECT_EQ(fptr->vbase.values[2], -1); // i.e., the test's missing value placeholder.
-    EXPECT_EQ(fptr->vbase.values[4], -1); 
+    {
+        auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, -2147483648, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_EQ(fptr->vbase.values[2], -1); // i.e., the test's missing value placeholder.
+        EXPECT_EQ(fptr->vbase.values[4], -1); 
+    }
+
+    // Special value doesn't work in the latest version.
+   expect_json_error("{ \"type\": \"factor\", \"values\": [ 2, 1, -2147483648, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\":\"1.1\" }", "out of range");
+
+    {
+        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, null, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_EQ(fptr->vbase.values[2], -1); // i.e., the test's missing value placeholder.
+        EXPECT_EQ(fptr->vbase.values[4], -1); 
+    }
 }
 
 TEST(JsonFactorTest, CheckError) {

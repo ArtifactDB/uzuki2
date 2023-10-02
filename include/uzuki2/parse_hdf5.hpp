@@ -196,6 +196,12 @@ void parse_string_like(const H5::DataSet& handle, Host* ptr, const std::string& 
 inline double legacy_missing_double() {
     uint32_t tmp_value = 1;
     auto tmp_ptr = reinterpret_cast<unsigned char*>(&tmp_value);
+
+    // Mimic R's generation of these values, but we can't use type punning as
+    // this is not legal in C++, and we don't have bit_cast yet.
+    double missing_value = 0;
+    auto missing_ptr = reinterpret_cast<unsigned char*>(&missing_value);
+
     int start = 0;
     int step = 1;
     if (tmp_ptr[0] == 1) { // little-endian. 
@@ -203,18 +209,14 @@ inline double legacy_missing_double() {
         step = -1;
     }
 
-    // Mimic R's generation of these values, but we can't use type punning as
-    // this is not legal in C++, and we don't have bit_cast yet.
-    double missing_value = 0;
-    auto missing_ptr = reinterpret_cast<unsigned char*>(&missing_value);
     missing_ptr[start] = 0x7f;
-    missing_ptr[start + step] = 0xf0;
-    missing_ptr[start + step] = 0x00;
-    missing_ptr[start + step] = 0x00;
-    missing_ptr[start + step] = 0x00;
-    missing_ptr[start + step] = 0x00;
-    missing_ptr[start + step] = 0x07;
-    missing_ptr[start + step] = 0xa2;
+    missing_ptr[start += step] = 0xf0;
+    missing_ptr[start += step] = 0x00;
+    missing_ptr[start += step] = 0x00;
+    missing_ptr[start += step] = 0x00;
+    missing_ptr[start += step] = 0x00;
+    missing_ptr[start += step] = 0x07;
+    missing_ptr[start += step] = 0xa2;
 
     return missing_value;
 }
@@ -252,7 +254,7 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path
         // Can't compare directly as missing_value or val might be NaN,
         // so instead we need to do the comparison byte-by-byte.
         auto candidate_ptr = reinterpret_cast<unsigned char*>(&val);
-        return std::memcmp(candidate_ptr, missing_ptr, 8);
+        return std::memcmp(candidate_ptr, missing_ptr, sizeof(double)) == 0;
     };
 
     // TODO: loop in chunks to reduce memory usage.
