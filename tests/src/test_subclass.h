@@ -64,15 +64,119 @@ struct DefaultVectorBase {
     std::vector<std::string> names;
 };
 
-template<typename T, uzuki2::Type tt>
-struct DefaultTypedVector : public uzuki2::TypedVector<T, tt> {
-    DefaultTypedVector(size_t n) : base(n) {}
+struct DefaultIntegerVector : public uzuki2::IntegerVector {
+    DefaultIntegerVector(size_t n) : base(n) {}
 
     size_t size() const { 
         return base.size();
     }
 
-    void set(size_t i, T val) {
+    void set(size_t i, int32_t val) {
+        base.set(i, val);
+        return;
+    }
+
+    void use_names() {
+        base.use_names();
+        return;
+    }
+
+    void set_missing(size_t i) {
+        base.set_missing(i);
+        return;
+    }
+
+    void set_name(size_t i, std::string name) {
+        base.set_name(i, std::move(name));
+        return;
+    }
+
+    void is_scalar() {
+        scalar = true;
+    }
+
+    DefaultVectorBase<int32_t> base;
+    bool scalar = false;
+};
+
+struct DefaultNumberVector : public uzuki2::NumberVector {
+    DefaultNumberVector(size_t n) : base(n) {}
+
+    size_t size() const { 
+        return base.size();
+    }
+
+    void set(size_t i, double val) {
+        base.set(i, val);
+        return;
+    }
+
+    void use_names() {
+        base.use_names();
+        return;
+    }
+
+    void set_missing(size_t i) {
+        base.set_missing(i);
+        return;
+    }
+
+    void set_name(size_t i, std::string name) {
+        base.set_name(i, std::move(name));
+        return;
+    }
+
+    void is_scalar() {
+        scalar = true;
+    }
+
+    DefaultVectorBase<double> base;
+    bool scalar = false;
+};
+
+struct DefaultBooleanVector : public uzuki2::BooleanVector {
+    DefaultBooleanVector(size_t n) : base(n) {}
+
+    size_t size() const { 
+        return base.size();
+    }
+
+    void set(size_t i, bool val) {
+        base.set(i, val);
+        return;
+    }
+
+    void use_names() {
+        base.use_names();
+        return;
+    }
+
+    void set_missing(size_t i) {
+        base.set_missing(i);
+        return;
+    }
+
+    void set_name(size_t i, std::string name) {
+        base.set_name(i, std::move(name));
+        return;
+    }
+
+    void is_scalar() {
+        scalar = true;
+    }
+
+    DefaultVectorBase<uint8_t> base;
+    bool scalar = false;
+};
+
+struct DefaultStringVector : public uzuki2::StringVector {
+    DefaultStringVector(size_t n, uzuki2::StringVector::Format f) : base(n), format(f) {}
+
+    size_t size() const { 
+        return base.size();
+    }
+
+    void set(size_t i, std::string val) {
         base.set(i, std::move(val));
         return;
     }
@@ -96,16 +200,10 @@ struct DefaultTypedVector : public uzuki2::TypedVector<T, tt> {
         scalar = true;
     }
 
-    DefaultVectorBase<T> base;
+    DefaultVectorBase<std::string> base;
+    StringVector::Format format;
     bool scalar = false;
 };
-
-typedef DefaultTypedVector<int32_t, uzuki2::INTEGER> DefaultIntegerVector; 
-typedef DefaultTypedVector<double, uzuki2::NUMBER> DefaultNumberVector;
-typedef DefaultTypedVector<std::string, uzuki2::STRING> DefaultStringVector;
-typedef DefaultTypedVector<unsigned char, uzuki2::BOOLEAN> DefaultBooleanVector;
-typedef DefaultTypedVector<std::string, uzuki2::DATE> DefaultDateVector;
-typedef DefaultTypedVector<std::string, uzuki2::DATETIME> DefaultDateTimeVector;
 
 struct DefaultFactor : public uzuki2::Factor {
     DefaultFactor(size_t l, size_t ll) : vbase(l), levels(ll) {}
@@ -199,13 +297,9 @@ struct DefaultProvisioner {
 
     static uzuki2::NumberVector* new_Number(size_t l) { return (new DefaultNumberVector(l)); }
 
-    static uzuki2::StringVector* new_String(size_t l) { return (new DefaultStringVector(l)); }
+    static uzuki2::StringVector* new_String(size_t l, uzuki2::StringVector::Format f) { return (new DefaultStringVector(l, f)); }
 
     static uzuki2::BooleanVector* new_Boolean(size_t l) { return (new DefaultBooleanVector(l)); }
-
-    static uzuki2::DateVector* new_Date(size_t l) { return (new DefaultDateVector(l)); }
-
-    static uzuki2::DateTimeVector* new_DateTime(size_t l) { return (new DefaultDateTimeVector(l)); }
 
     static uzuki2::Factor* new_Factor(size_t l, size_t ll) { return (new DefaultFactor(l, ll)); }
 };

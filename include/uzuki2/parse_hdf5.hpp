@@ -336,48 +336,44 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             });
 
         } else if (vector_type == "string" || (version.equals(1, 0) && (vector_type == "date" || vector_type == "date-time"))) {
-            std::string format;
+            StringVector::Format format = StringVector::NONE;
             if (version.equals(1, 0)) {
-                if (vector_type == "date" || vector_type == "date-time") {
-                    format = vector_type;
+                if (vector_type == "date") {
+                    format = StringVector::DATE;
+                } else if (vector_type == "date-time") {
+                    format = StringVector::DATETIME;
                 }
             } else if (handle.exists("format")) {
                 auto fhandle = get_scalar_dataset(handle, "format", H5T_STRING, path);
                 load_string_dataset(fhandle, 1, [&](size_t, std::string x) -> void {
-                    format = std::move(x);
-                });
-
-                if (format != "date" && format != "date-time") {
-                    throw std::runtime_error("unsupported format '" + format + "' at '" + path + "/format'");
-                }
-            }
-
-            if (format == "") {
-                auto sptr = Provisioner::new_String(len);
-                output.reset(sptr);
-                parse_string_like(dhandle, sptr, dpath, [](const std::string&) -> void {});
-                if (is_scalar) {
-                    sptr->is_scalar();
-                }
-
-            } else if (format == "date") {
-                auto dptr = Provisioner::new_Date(len);
-                output.reset(dptr);
-                parse_string_like(dhandle, dptr, dpath, [&](const std::string& x) -> void {
-                    if (!is_date(x)) {
-                         throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + dpath + "'");
+                    if (x == "date") {
+                        format = StringVector::DATE;
+                    } else if (x == "date-time") {
+                        format = StringVector::DATETIME;
+                    } else {
+                        throw std::runtime_error("unsupported format '" + x + "' at '" + path + "/format'");
                     }
                 });
-                if (is_scalar) {
-                    dptr->is_scalar();
-                }
+            }
 
-            } else if (format == "date-time") {
-                auto dptr = Provisioner::new_DateTime(len);
-                output.reset(dptr);
-                parse_string_like(dhandle, dptr, dpath, [&](const std::string& x) -> void {
+            auto sptr = Provisioner::new_String(len, format);
+            output.reset(sptr);
+            if (is_scalar) {
+                sptr->is_scalar();
+            }
+
+            if (format == StringVector::NONE) {
+                parse_string_like(dhandle, sptr, dpath, [](const std::string&) -> void {});
+            } else if (format == StringVector::DATE) {
+                parse_string_like(dhandle, sptr, dpath, [&](const std::string& x) -> void {
+                    if (!is_date(x)) {
+                         throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
+                    }
+                });
+            } else if (format == StringVector::DATETIME) {
+                parse_string_like(dhandle, sptr, dpath, [&](const std::string& x) -> void {
                     if (!is_rfc3339(x)) {
-                         throw std::runtime_error("dates should follow the Internet Date/Time format in '" + dpath + "'");
+                         throw std::runtime_error("date-times should follow the Internet Date/Time format in '" + path + ".values'");
                     }
                 });
             }
@@ -470,10 +466,8 @@ public:
      * - `List* new_List(size_t l)`, which returns a new instance of a `List` with length `l`.
      * - `IntegerVector* new_Integer(size_t l)`, which returns a new instance of an `IntegerVector` subclass of length `l`.
      * - `NumberVector* new_Number(size_t l)`, which returns a new instance of a `NumberVector` subclass of length `l`.
-     * - `StringVector* new_String(size_t l)`, which returns a new instance of a `StringVector` subclass of length `l`.
+     * - `StringVector* new_String(size_t l, StringVector::Format f)`, which returns a new instance of a `StringVector` subclass of length `l` with format `f`.
      * - `BooleanVector* new_Boolean(size_t l)`, which returns a new instance of a `BooleanVector` subclass of length `l`.
-     * - `DateVector* new_Date(size_t l)`, which returns a new instance of a `DateVector` subclass of length `l`.
-     * - `DateTimeVector* new_DateTime(size_t l)`, which returns a new instance of a `DateTimeVector` subclass of length `l`.
      * - `Factor* new_Factor(size_t l, size_t ll)`, which returns a new instance of a `Factor` subclass of length `l` and with `ll` unique levels.
      *
      * @section external-contract Externals requirements

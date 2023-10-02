@@ -298,10 +298,12 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
         });
 
     } else if (type == "string" || (version.equals(1, 0) && (type == "date" || type == "date-time"))) {
-        std::string format;
+        StringVector::Format format = StringVector::NONE;
         if (version.equals(1, 0)) {
-            if (type == "date" || type == "date-time") {
-                format = type;
+            if (type == "date") {
+                format = StringVector::DATE;
+            } else if (type == "date-time") {
+                format = StringVector::DATETIME;
             }
         } else {
             auto fIt = map.find("format");
@@ -310,49 +312,39 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
                     throw std::runtime_error("expected a string at '" + path + ".format'");
                 }
                 auto fptr = static_cast<const millijson::String*>(fIt->second.get());
-                if (fptr->value == "date" || fptr->value == "date-time") {
-                    format = fptr->value;
+                if (fptr->value == "date") {
+                    format = StringVector::DATE;
+                } else if (fptr->value == "date-time") {
+                    format = StringVector::DATETIME;
                 } else {
                     throw std::runtime_error("unsupported format '" + fptr->value + "' at '" + path + ".format'");
                 }
             }
         }
 
-        if (format == "") {
-            process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
-                auto ptr = Provisioner::new_String(vals.size());
-                output.reset(ptr);
-                extract_strings(vals, ptr, [](const std::string&) -> void {}, path);
-                extract_names(map, ptr, path);
-                return ptr;
-            });
+        process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
+            auto ptr = Provisioner::new_String(vals.size(), format);
+            output.reset(ptr);
 
-        } else if (format == "date") {
-            process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
-                auto ptr = Provisioner::new_Date(vals.size());
-                output.reset(ptr);
+            if (format == StringVector::NONE) {
+                extract_strings(vals, ptr, [](const std::string&) -> void {}, path);
+            } else if (format == StringVector::DATE) {
                 extract_strings(vals, ptr, [&](const std::string& x) -> void {
                     if (!is_date(x)) {
                          throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
                     }
                 }, path);
-                extract_names(map, ptr, path);
-                return ptr;
-            });
-
-        } else if (format == "date-time") {
-            process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
-                auto ptr = Provisioner::new_DateTime(vals.size());
-                output.reset(ptr);
+            } else if (format == StringVector::DATETIME) {
                 extract_strings(vals, ptr, [&](const std::string& x) -> void {
                     if (!is_rfc3339(x)) {
                          throw std::runtime_error("date-times should follow the Internet Date/Time format in '" + path + ".values'");
                     }
                 }, path);
-                extract_names(map, ptr, path);
-                return ptr;
-            });
-        }
+            }
+
+            extract_names(map, ptr, path);
+            return ptr;
+        });
 
     } else if (type == "list") {
         const auto& vals = extract_array(map, "values", path);

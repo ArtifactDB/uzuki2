@@ -20,8 +20,6 @@ namespace uzuki2 {
  * - `NUMBER`: double-precision vector.
  * - `STRING`: vector of strings.
  * - `BOOLEAN`: vector of booleans.
- * - `DATE`: vector of date strings in `YYYY-MM-DD` format.
- * - `DATETIME`: vector of date-time strings in Internet Date/Time format (see RFC 3339, section 5.6).
  * - `FACTOR`: factor containing integer indices to unique levels.
  * - `LIST`: a list containing nested objects.
  * - `NOTHING`: equivalent to R's `NULL`.
@@ -33,9 +31,6 @@ enum Type {
     STRING,
     BOOLEAN,
     FACTOR,
-    DATE,
-    DATETIME,
-
     LIST,
     NOTHING,
     EXTERNAL
@@ -77,12 +72,6 @@ struct Vector : public Base {
     virtual size_t size () const = 0;
 
     /**
-     * Indicate that the elements of the vector are named.
-     * If not called, it is assumed that the vector is unnamed.
-     */
-    virtual void use_names() = 0;
-
-    /**
      * Set the name of a vector element.
      * This method should only be called if `use_names()` has previously been called.
      *
@@ -97,66 +86,124 @@ struct Vector : public Base {
      * @param i Index of a vector element to be marked as missing.
      */
     virtual void set_missing(size_t i) = 0;
+
+    /**
+     * Specify that the vector contains names.
+     * If not called, it is assumed that the vector is unnamed.
+     */
+    virtual void use_names() = 0;
 };
 
 /**
- * @brief Interface for atomic vectors.
- *
- * @tparam T Data type of the vector elements.
- * @tparam tt `Type` of the vector.
+ * @brief Interface for integer vectors.
  */
-template<typename T, Type tt>
-struct TypedVector : public Vector {
+struct IntegerVector : public Vector {
     Type type() const {
-        return tt;
+        return INTEGER;
     }
 
     /**
-     * Set the value of a vector element.
+     * Set a vector element.
      *
      * @param i Index of a vector element.
      * @param v Value of the vector element.
      */
-    virtual void set(size_t i, T v) = 0;
+    virtual void set(size_t i, int32_t v) = 0;
 
     /**
-     * Indicate that a length-1 vector should be treated as a scalar.
+     * Specify that a length-1 vector is represented as a scalar in the file.
+     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
      */
     virtual void is_scalar() = 0;
 };
 
 /**
- * Interface for an integer vector.
+ * @brief Interface for a double-precision vector.
  */
-typedef TypedVector<int32_t, INTEGER> IntegerVector; 
+struct NumberVector : public Vector {
+    Type type() const {
+        return NUMBER;
+    }
+
+    /**
+     * Set a vector element.
+     *
+     * @param i Index of a vector element.
+     * @param v Value of the vector element.
+     */
+    virtual void set(size_t i, double v) = 0;
+
+    /**
+     * Specify that a length-1 vector is represented as a scalar in the file.
+     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
+     */
+    virtual void is_scalar() = 0;
+};
 
 /**
- * Interface for a double-precision vector.
+ * @brief Interface for a string vector.
  */
-typedef TypedVector<double, NUMBER> NumberVector;
+struct StringVector : public Vector {
+    Type type() const {
+        return STRING;
+    }
+
+    /**
+     * Set a vector element.
+     *
+     * @param i Index of a vector element.
+     * @param v Value of the vector element.
+     */
+    virtual void set(size_t i, std::string v) = 0;
+
+    /**
+     * Specify that a length-1 vector is represented as a scalar in the file.
+     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
+     */
+    virtual void is_scalar() = 0;
+
+    /**
+     * Format constraints to apply to the strings.
+     *
+     * - `NONE`: no constraints.
+     * - `DATE`: strings should be in `YYYY-MM-DD` format.
+     * - `DATETIME`: strings should be in Internet Date/Time format (see RFC 3339, section 5.6).
+     */
+    enum Format {
+        NONE,
+        DATE,
+        DATETIME
+    };
+};
 
 /**
- * Interface for a string vector.
+ * @brief Interface for a boolean vector.
  */
-typedef TypedVector<std::string, STRING> StringVector;
+struct BooleanVector : public Vector {
+    Type type() const {
+        return BOOLEAN;
+    }
 
-/**
- * Interface for a boolean vector.
- */
-typedef TypedVector<unsigned char, BOOLEAN> BooleanVector;
+    /**
+     * Set a vector element.
+     *
+     * @param i Index of a vector element.
+     * @param v Value of the vector element.
+     */
+    virtual void set(size_t i, bool v) = 0;
 
-/**
- * Interface for a date-formatted vector.
- */
-typedef TypedVector<std::string, DATE> DateVector;
-
-/**
- * Interface for a RFC3339 date/time-formatted vector.
- */
-typedef TypedVector<std::string, DATETIME> DateTimeVector;
+    /**
+     * Specify that a length-1 vector is represented as a scalar in the file.
+     * If not called, it is assumed that length-1 vectors are actually represented as vectors in the file.
+     */
+    virtual void is_scalar() = 0;
+};
 
 /**
  * @brief Interface for a factor.
+ *
+ * This is considered a "vector" in terms of its indices, not its levels.
+ * So, settings like `Vector::use_names()` and `Vector::is_scalar()` refer to the underlying integer indices.
  */
 struct Factor : public Vector {
     Type type() const {

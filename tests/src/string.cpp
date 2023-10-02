@@ -23,6 +23,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_EQ(sptr->base.values.front(), "foo");
         EXPECT_EQ(sptr->base.values.back(), "stuff");
         EXPECT_FALSE(sptr->scalar);
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
     }
 
     // Variable stuff works correctly.
@@ -38,6 +39,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "foo-qwerty");
         EXPECT_EQ(sptr->base.values.back(), "stuff-asdasd");
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
     }
 
     // Scalars work correctly.
@@ -53,6 +55,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 1);
         EXPECT_EQ(sptr->base.values.front(), "antony");
         EXPECT_TRUE(sptr->scalar);
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
     }
 
     // Works with recent versions.
@@ -67,6 +70,7 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
     }
 
     /********************************************
@@ -120,6 +124,7 @@ TEST(JsonStringTest, SimpleLoading) {
         EXPECT_FALSE(bptr->scalar);
         EXPECT_EQ(bptr->base.values.front(), "alpha");
         EXPECT_EQ(bptr->base.values.back(), "charlie");
+        EXPECT_EQ(bptr->format, uzuki2::StringVector::NONE);
     }
 
     // Works with scalars.
@@ -129,6 +134,7 @@ TEST(JsonStringTest, SimpleLoading) {
         auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_TRUE(stuff->scalar);
         EXPECT_EQ(stuff->base.values[0], "foo");
+        EXPECT_EQ(stuff->format, uzuki2::StringVector::NONE);
     }
 
     // Works with recent versions.
@@ -137,6 +143,7 @@ TEST(JsonStringTest, SimpleLoading) {
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto bptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(bptr->size(), 3);
+        EXPECT_EQ(bptr->format, uzuki2::StringVector::NONE);
     }
 
     /********************************************

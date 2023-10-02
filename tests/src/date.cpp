@@ -17,11 +17,12 @@ TEST(Hdf5DateTest, SimpleLoading) {
     }
     {
         auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::DATE);
-        auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
         EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
         EXPECT_FALSE(sptr->scalar);
     }
 
@@ -33,11 +34,12 @@ TEST(Hdf5DateTest, SimpleLoading) {
     }
     {
         auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::DATE);
-        auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 1);
         EXPECT_EQ(sptr->base.values.front(), "2022-05-09");
         EXPECT_TRUE(sptr->scalar);
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
     }
 
     // Latest version works correctly.
@@ -51,12 +53,13 @@ TEST(Hdf5DateTest, SimpleLoading) {
     }
     {
         auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::DATE);
-        auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
         EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
         EXPECT_FALSE(sptr->scalar);
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
     }
 
     /********************************************
@@ -79,10 +82,11 @@ TEST(Hdf5DateTest, MissingValues) {
     }
     {
         auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::DATE);
-        auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values[2], "ich bin missing"); // i.e., the test's missing value placeholder.
+        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
     }
 }
 
@@ -145,6 +149,16 @@ TEST(Hdf5DateTest, CheckError) {
     }
     expect_hdf5_error(path, "foo", "dates should follow");
 
+    // Tests for the most recent version.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "string");
+        add_version(vhandle, "1.1");
+        write_string(vhandle, "format", "date");
+        create_dataset(vhandle, "data", { "harry", "ron", "hermoine" });
+    }
+    expect_hdf5_error(path, "foo", "dates should follow");
+
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date");
@@ -161,32 +175,35 @@ TEST(Hdf5DateTest, CheckError) {
 TEST(JsonDateTest, SimpleLoading) {
     {
         auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::DATE);
-        auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(dptr->size(), 2);
         EXPECT_FALSE(dptr->scalar);
         EXPECT_EQ(dptr->base.values[0], "2022-01-22");
         EXPECT_EQ(dptr->base.values[1], "1990-06-30");
+        EXPECT_EQ(dptr->format, uzuki2::StringVector::DATE);
     }
 
     // Works with later versions.
     {
         auto parsed = load_json("{ \"type\": \"string\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ], \"format\": \"date\", \"version\": \"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::DATE);
-        auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(dptr->size(), 2);
         EXPECT_FALSE(dptr->scalar);
         EXPECT_EQ(dptr->base.values[0], "2022-01-22");
         EXPECT_EQ(dptr->base.values[1], "1990-06-30");
+        EXPECT_EQ(dptr->format, uzuki2::StringVector::DATE);
     }
 
     // Works with scalars.
     {
         auto parsed = load_json("{ \"type\": \"string\", \"values\": \"2023-02-19\", \"format\":\"date\", \"version\":\"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::DATE);
-        auto stuff = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_TRUE(stuff->scalar);
         EXPECT_EQ(stuff->base.values[0], "2023-02-19");
+        EXPECT_EQ(stuff->format, uzuki2::StringVector::DATE);
     }
 
     expect_json_error("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ], \"version\": \"1.1\" }", "unknown object type");
@@ -198,10 +215,11 @@ TEST(JsonDateTest, SimpleLoading) {
 
 TEST(JsonDateTest, MissingValues) {
     auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", null ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::DATE);
-    auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
     EXPECT_EQ(dptr->size(), 2);
     EXPECT_EQ(dptr->base.values.back(), "ich bin missing");
+    EXPECT_EQ(dptr->format, uzuki2::StringVector::DATE);
 }
 
 TEST(JsonDateTest, CheckError) {
