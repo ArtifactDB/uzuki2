@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nothing_0',['Nothing',['../structuzuki2_1_1Nothing.html',1,'uzuki2']]]
+  ['list_0',['List',['../structuzuki2_1_1List.html',1,'uzuki2']]]
 ];

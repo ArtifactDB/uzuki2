@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['type_0',['Type',['../namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736',1,'uzuki2']]]
+  ['format_0',['Format',['../structuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6',1,'uzuki2::StringVector']]]
 ];

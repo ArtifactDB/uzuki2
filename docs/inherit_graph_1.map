@@ -4,6 +4,9 @@
 <area shape="rect" id="node3" href="$structuzuki2_1_1List.html" title="Interface for lists." alt="" coords="160,55,247,80"/>
 <area shape="rect" id="node4" href="$structuzuki2_1_1Nothing.html" title="Representation of R&#39;s NULL." alt="" coords="148,104,259,129"/>
 <area shape="rect" id="node5" href="$structuzuki2_1_1Vector.html" title="Interface for vector&#45;like objects." alt="" coords="152,153,255,179"/>
-<area shape="rect" id="node6" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="325,124,427,149"/>
-<area shape="rect" id="node7" href="$structuzuki2_1_1TypedVector.html" title="Interface for atomic vectors." alt="" coords="307,174,445,214"/>
+<area shape="rect" id="node6" href="$structuzuki2_1_1BooleanVector.html" title="Interface for a boolean vector." alt="" coords="307,55,457,80"/>
+<area shape="rect" id="node7" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="331,104,433,129"/>
+<area shape="rect" id="node8" href="$structuzuki2_1_1IntegerVector.html" title="Interface for integer vectors." alt="" coords="311,153,453,179"/>
+<area shape="rect" id="node9" href="$structuzuki2_1_1NumberVector.html" title="Interface for a double&#45;precision vector." alt="" coords="307,203,457,228"/>
+<area shape="rect" id="node10" href="$structuzuki2_1_1StringVector.html" title="Interface for a string vector." alt="" coords="313,252,451,277"/>
 </map>

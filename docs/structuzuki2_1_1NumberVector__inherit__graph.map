@@ -1,0 +1,5 @@
+<map id="uzuki2::NumberVector" name="uzuki2::NumberVector">
+<area shape="rect" id="node1" title="Interface for a double&#45;precision vector." alt="" coords="5,152,155,177"/>
+<area shape="rect" id="node2" href="$structuzuki2_1_1Vector.html" title="Interface for vector&#45;like objects." alt="" coords="29,79,131,104"/>
+<area shape="rect" id="node3" href="$structuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="33,5,127,31"/>
+</map>

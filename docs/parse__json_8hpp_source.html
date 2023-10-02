@@ -370,182 +370,175 @@ $(function() {
 <div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>        });</div>
 <div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
 <div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (type == <span class="stringliteral">&quot;string&quot;</span> || (version.equals(1, 0) &amp;&amp; (type == <span class="stringliteral">&quot;date&quot;</span> || type == <span class="stringliteral">&quot;date-time&quot;</span>))) {</div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>        std::string format;</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>        <a class="code hl_enumeration" href="structuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">StringVector::Format</a> format = StringVector::NONE;</div>
 <div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>        <span class="keywordflow">if</span> (version.equals(1, 0)) {</div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>            <span class="keywordflow">if</span> (type == <span class="stringliteral">&quot;date&quot;</span> || type == <span class="stringliteral">&quot;date-time&quot;</span>) {</div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>                format = type;</div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>            }</div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>            <span class="keyword">auto</span> fIt = map.find(<span class="stringliteral">&quot;format&quot;</span>);</div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>            <span class="keywordflow">if</span> (fIt != map.end()) {</div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>                <span class="keywordflow">if</span> (fIt-&gt;second-&gt;type() != millijson::STRING) {</div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;expected a string at &#39;&quot;</span> + path + <span class="stringliteral">&quot;.format&#39;&quot;</span>);</div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                }</div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>                <span class="keyword">auto</span> fptr = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>millijson::String*<span class="keyword">&gt;</span>(fIt-&gt;second.get());</div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>                <span class="keywordflow">if</span> (fptr-&gt;value == <span class="stringliteral">&quot;date&quot;</span> || fptr-&gt;value == <span class="stringliteral">&quot;date-time&quot;</span>) {</div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                    format = fptr-&gt;value;</div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>                } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;unsupported format &#39;&quot;</span> + fptr-&gt;value + <span class="stringliteral">&quot;&#39; at &#39;&quot;</span> + path + <span class="stringliteral">&quot;.format&#39;&quot;</span>);</div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>                }</div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>            }</div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>        }</div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span> </div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>        <span class="keywordflow">if</span> (format == <span class="stringliteral">&quot;&quot;</span>) {</div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>            process_array_or_scalar_values(map, path, [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; vals) -&gt; <span class="keyword">auto</span> {</div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>                <span class="keyword">auto</span> ptr = Provisioner::new_String(vals.size());</div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>                output.reset(ptr);</div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>                extract_strings(vals, ptr, [](<span class="keyword">const</span> std::string&amp;) -&gt; <span class="keywordtype">void</span> {}, path);</div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>                extract_names(map, ptr, path);</div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>                <span class="keywordflow">return</span> ptr;</div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>            });</div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span> </div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (format == <span class="stringliteral">&quot;date&quot;</span>) {</div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>            process_array_or_scalar_values(map, path, [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; vals) -&gt; <span class="keyword">auto</span> {</div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>                <span class="keyword">auto</span> ptr = Provisioner::new_Date(vals.size());</div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>                output.reset(ptr);</div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>                extract_strings(vals, ptr, [&amp;](<span class="keyword">const</span> std::string&amp; x) -&gt; <span class="keywordtype">void</span> {</div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>                    <span class="keywordflow">if</span> (!is_date(x)) {</div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>                         <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;dates should follow YYYY-MM-DD formatting in &#39;&quot;</span> + path + <span class="stringliteral">&quot;.values&#39;&quot;</span>);</div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>                    }</div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>                }, path);</div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>                extract_names(map, ptr, path);</div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>                <span class="keywordflow">return</span> ptr;</div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>            });</div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span> </div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (format == <span class="stringliteral">&quot;date-time&quot;</span>) {</div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>            process_array_or_scalar_values(map, path, [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; vals) -&gt; <span class="keyword">auto</span> {</div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>                <span class="keyword">auto</span> ptr = Provisioner::new_DateTime(vals.size());</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>                output.reset(ptr);</div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>                extract_strings(vals, ptr, [&amp;](<span class="keyword">const</span> std::string&amp; x) -&gt; <span class="keywordtype">void</span> {</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>                    <span class="keywordflow">if</span> (!is_rfc3339(x)) {</div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>                         <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;date-times should follow the Internet Date/Time format in &#39;&quot;</span> + path + <span class="stringliteral">&quot;.values&#39;&quot;</span>);</div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>                    }</div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>                }, path);</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>                extract_names(map, ptr, path);</div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>                <span class="keywordflow">return</span> ptr;</div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>            });</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>            <span class="keywordflow">if</span> (type == <span class="stringliteral">&quot;date&quot;</span>) {</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>                format = StringVector::DATE;</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (type == <span class="stringliteral">&quot;date-time&quot;</span>) {</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>                format = StringVector::DATETIME;</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>            }</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>            <span class="keyword">auto</span> fIt = map.find(<span class="stringliteral">&quot;format&quot;</span>);</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>            <span class="keywordflow">if</span> (fIt != map.end()) {</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                <span class="keywordflow">if</span> (fIt-&gt;second-&gt;type() != millijson::STRING) {</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;expected a string at &#39;&quot;</span> + path + <span class="stringliteral">&quot;.format&#39;&quot;</span>);</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>                }</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                <span class="keyword">auto</span> fptr = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>millijson::String*<span class="keyword">&gt;</span>(fIt-&gt;second.get());</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>                <span class="keywordflow">if</span> (fptr-&gt;value == <span class="stringliteral">&quot;date&quot;</span>) {</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>                    format = StringVector::DATE;</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (fptr-&gt;value == <span class="stringliteral">&quot;date-time&quot;</span>) {</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>                    format = StringVector::DATETIME;</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>                } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;unsupported format &#39;&quot;</span> + fptr-&gt;value + <span class="stringliteral">&quot;&#39; at &#39;&quot;</span> + path + <span class="stringliteral">&quot;.format&#39;&quot;</span>);</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>                }</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>            }</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>        }</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span> </div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>        process_array_or_scalar_values(map, path, [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; vals) -&gt; <span class="keyword">auto</span> {</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>            <span class="keyword">auto</span> ptr = Provisioner::new_String(vals.size(), format);</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>            output.reset(ptr);</div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span> </div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>            <span class="keywordflow">if</span> (format == StringVector::NONE) {</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>                extract_strings(vals, ptr, [](<span class="keyword">const</span> std::string&amp;) -&gt; <span class="keywordtype">void</span> {}, path);</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (format == StringVector::DATE) {</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>                extract_strings(vals, ptr, [&amp;](<span class="keyword">const</span> std::string&amp; x) -&gt; <span class="keywordtype">void</span> {</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>                    <span class="keywordflow">if</span> (!is_date(x)) {</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>                         <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;dates should follow YYYY-MM-DD formatting in &#39;&quot;</span> + path + <span class="stringliteral">&quot;.values&#39;&quot;</span>);</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>                    }</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>                }, path);</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (format == StringVector::DATETIME) {</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>                extract_strings(vals, ptr, [&amp;](<span class="keyword">const</span> std::string&amp; x) -&gt; <span class="keywordtype">void</span> {</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>                    <span class="keywordflow">if</span> (!is_rfc3339(x)) {</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>                         <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;date-times should follow the Internet Date/Time format in &#39;&quot;</span> + path + <span class="stringliteral">&quot;.values&#39;&quot;</span>);</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>                    }</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>                }, path);</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>            }</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span> </div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>            extract_names(map, ptr, path);</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>            <span class="keywordflow">return</span> ptr;</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>        });</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span> </div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (type == <span class="stringliteral">&quot;list&quot;</span>) {</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; vals = extract_array(map, <span class="stringliteral">&quot;values&quot;</span>, path);</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>        <span class="keyword">auto</span> ptr = Provisioner::new_List(vals.size());</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>        output.reset(ptr);</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; vals.size(); ++i) {</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>            ptr-&gt;set(i, parse_object&lt;Provisioner&gt;(vals[i].get(), ext, path + <span class="stringliteral">&quot;.values[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;]&quot;</span>, version));</div>
 <div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>        }</div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span> </div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (type == <span class="stringliteral">&quot;list&quot;</span>) {</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; vals = extract_array(map, <span class="stringliteral">&quot;values&quot;</span>, path);</div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>        <span class="keyword">auto</span> ptr = Provisioner::new_List(vals.size());</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>        output.reset(ptr);</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; vals.size(); ++i) {</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>            ptr-&gt;set(i, parse_object&lt;Provisioner&gt;(vals[i].get(), ext, path + <span class="stringliteral">&quot;.values[&quot;</span> + std::to_string(i) + <span class="stringliteral">&quot;]&quot;</span>, version));</div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>        }</div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>        extract_names(map, ptr, path);</div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span> </div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;unknown object type &#39;&quot;</span> + type + <span class="stringliteral">&quot;&#39; at &#39;&quot;</span> + path + <span class="stringliteral">&quot;.type&#39;&quot;</span>);</div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>    }</div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span> </div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>    <span class="keywordflow">return</span> output;</div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>}</div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span> </div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>}</div>
-<div class="line"><a id="l00385" name="l00385"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html">  385</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1JsonParser.html">JsonParser</a> {</div>
-<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00391" name="l00391"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">  391</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">parallel</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span> </div>
-<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
-<div class="line"><a id="l00410" name="l00410"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#afb961bfde43166eafb0d840c9c2b1087">  410</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#afb961bfde43166eafb0d840c9c2b1087">parse</a>(byteme::Reader&amp; reader, Externals ext) {</div>
-<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span>        std::shared_ptr&lt;millijson::Base&gt; contents;</div>
-<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">parallel</a>) {</div>
-<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>            byteme::PerByte bytestream(&amp;reader);</div>
-<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>            contents = millijson::parse(bytestream);</div>
-<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>            byteme::PerByteParallel bytestream(&amp;reader);</div>
-<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>            contents = millijson::parse(bytestream);</div>
-<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>        }</div>
-<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span> </div>
-<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>        Version version;</div>
-<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>        <span class="keywordflow">if</span> (contents-&gt;type() == millijson::OBJECT) {</div>
-<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>            <span class="keyword">auto</span> optr = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>millijson::Object*<span class="keyword">&gt;</span>(contents.get());</div>
-<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; map = optr-&gt;values;</div>
-<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>            <span class="keyword">auto</span> vIt = map.find(<span class="stringliteral">&quot;version&quot;</span>);</div>
-<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>            <span class="keywordflow">if</span> (vIt != map.end()) {</div>
-<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>                <span class="keywordflow">if</span> (vIt-&gt;second-&gt;type() != millijson::STRING) {</div>
-<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;expected a string in &#39;version&#39;&quot;</span>);</div>
-<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>                }</div>
-<div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>                <span class="keyword">auto</span> vptr = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>millijson::String*<span class="keyword">&gt;</span>(vIt-&gt;second.get());</div>
-<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>                version = parse_version_string(vptr-&gt;value);</div>
-<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>            }</div>
-<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span>        }</div>
-<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span> </div>
-<div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span>        ExternalTracker etrack(std::move(ext));</div>
-<div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>        <span class="keyword">auto</span> output = json::parse_object&lt;Provisioner&gt;(contents.get(), etrack, <span class="stringliteral">&quot;&quot;</span>, version);</div>
-<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span>        etrack.validate();</div>
-<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span>        <span class="keywordflow">return</span> ParsedList(std::move(output), std::move(version));</div>
-<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>    }</div>
-<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span> </div>
-<div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
-<div class="line"><a id="l00454" name="l00454"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a0568d1eb72844d593079692aff26b107">  454</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#a0568d1eb72844d593079692aff26b107">parse</a>(byteme::Reader&amp; reader) {</div>
-<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span>        DummyExternals ext(0);</div>
-<div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span>        <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(reader, std::move(ext));</div>
-<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span>    }</div>
-<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span> </div>
-<div class="line"><a id="l00459" name="l00459"></a><span class="lineno">  459</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00476" name="l00476"></a><span class="lineno">  476</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
-<div class="line"><a id="l00477" name="l00477"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#ae774207fd2d4c7e244a63dad3eb248e8">  477</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#ae774207fd2d4c7e244a63dad3eb248e8">parse_file</a>(<span class="keyword">const</span> std::string&amp; file, Externals ext) {</div>
-<div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span>        byteme::SomeFileReader reader(file.c_str());</div>
-<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>        <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(reader, std::move(ext));</div>
-<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>    }</div>
-<div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span> </div>
-<div class="line"><a id="l00495" name="l00495"></a><span class="lineno">  495</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
-<div class="line"><a id="l00496" name="l00496"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#ae83783a2f65ac39244fbb4303172ae56">  496</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#ae83783a2f65ac39244fbb4303172ae56">parse_file</a>(<span class="keyword">const</span> std::string&amp; file) {</div>
-<div class="line"><a id="l00497" name="l00497"></a><span class="lineno">  497</span>        DummyExternals ext(0);</div>
-<div class="line"><a id="l00498" name="l00498"></a><span class="lineno">  498</span>        <span class="keywordflow">return</span> parse_file&lt;Provisioner&gt;(file, std::move(ext));</div>
-<div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>    }</div>
-<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span> </div>
-<div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
-<div class="line"><a id="l00520" name="l00520"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#aa74987f551554ae0328c5b4ec351be8a">  520</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#aa74987f551554ae0328c5b4ec351be8a">parse_buffer</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> len, Externals ext) {</div>
-<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span>        byteme::SomeBufferReader reader(buffer, len);</div>
-<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span>        <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(reader, std::move(ext));</div>
-<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>    }</div>
-<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span> </div>
-<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
-<div class="line"><a id="l00540" name="l00540"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#ae8c6a6f09fd82acc69be2c1246b1373c">  540</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#ae8c6a6f09fd82acc69be2c1246b1373c">parse_buffer</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> len) {</div>
-<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>        DummyExternals ext(0);</div>
-<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>        <span class="keywordflow">return</span> parse_buffer&lt;Provisioner&gt;(buffer, len, std::move(ext));</div>
-<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>    }</div>
-<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span> </div>
-<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00553" name="l00553"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a139a44f876a12cd3a125019ddd200558">  553</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#a139a44f876a12cd3a125019ddd200558">validate</a>(byteme::Reader&amp; reader, <span class="keywordtype">int</span> num_external = 0) {</div>
-<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>        DummyExternals ext(num_external);</div>
-<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>        parse&lt;DummyProvisioner&gt;(reader, std::move(ext));</div>
-<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>    }</div>
-<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span> </div>
-<div class="line"><a id="l00566" name="l00566"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a143500326540feb14f74e985f4816429">  566</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#a143500326540feb14f74e985f4816429">validate_file</a>(<span class="keyword">const</span> std::string&amp; file, <span class="keywordtype">int</span> num_external = 0) {</div>
-<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>        DummyExternals ext(num_external);</div>
-<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>        parse_file&lt;DummyProvisioner&gt;(file, std::move(ext));</div>
-<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>    }</div>
-<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span> </div>
-<div class="line"><a id="l00580" name="l00580"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#aba9136119bad34d29d3da68ae68ad3d8">  580</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#aba9136119bad34d29d3da68ae68ad3d8">validate_buffer</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> len, <span class="keywordtype">int</span> num_external = 0) {</div>
-<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>        DummyExternals ext(num_external);</div>
-<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>        parse_buffer&lt;DummyProvisioner&gt;(buffer, len, std::move(ext));</div>
-<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span>    }</div>
-<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span>};</div>
-<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span> </div>
-<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span>}</div>
-<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span> </div>
-<div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html">uzuki2::JsonParser</a></div><div class="ttdoc">Parse JSON file contents using the uzuki2 specification.</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:385</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a0568d1eb72844d593079692aff26b107"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a0568d1eb72844d593079692aff26b107">uzuki2::JsonParser::parse</a></div><div class="ttdeci">ParsedList parse(byteme::Reader &amp;reader)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:454</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a139a44f876a12cd3a125019ddd200558"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a139a44f876a12cd3a125019ddd200558">uzuki2::JsonParser::validate</a></div><div class="ttdeci">void validate(byteme::Reader &amp;reader, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:553</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a143500326540feb14f74e985f4816429"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a143500326540feb14f74e985f4816429">uzuki2::JsonParser::validate_file</a></div><div class="ttdeci">void validate_file(const std::string &amp;file, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:566</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a43bfcb156c452746b3a3e31cb9cb752d"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">uzuki2::JsonParser::parallel</a></div><div class="ttdeci">bool parallel</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:391</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_aa74987f551554ae0328c5b4ec351be8a"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#aa74987f551554ae0328c5b4ec351be8a">uzuki2::JsonParser::parse_buffer</a></div><div class="ttdeci">ParsedList parse_buffer(const unsigned char *buffer, size_t len, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:520</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_aba9136119bad34d29d3da68ae68ad3d8"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#aba9136119bad34d29d3da68ae68ad3d8">uzuki2::JsonParser::validate_buffer</a></div><div class="ttdeci">void validate_buffer(const unsigned char *buffer, size_t len, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:580</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_ae774207fd2d4c7e244a63dad3eb248e8"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#ae774207fd2d4c7e244a63dad3eb248e8">uzuki2::JsonParser::parse_file</a></div><div class="ttdeci">ParsedList parse_file(const std::string &amp;file, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:477</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_ae83783a2f65ac39244fbb4303172ae56"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#ae83783a2f65ac39244fbb4303172ae56">uzuki2::JsonParser::parse_file</a></div><div class="ttdeci">ParsedList parse_file(const std::string &amp;file)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:496</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_ae8c6a6f09fd82acc69be2c1246b1373c"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#ae8c6a6f09fd82acc69be2c1246b1373c">uzuki2::JsonParser::parse_buffer</a></div><div class="ttdeci">ParsedList parse_buffer(const unsigned char *buffer, size_t len)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:540</div></div>
-<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_afb961bfde43166eafb0d840c9c2b1087"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#afb961bfde43166eafb0d840c9c2b1087">uzuki2::JsonParser::parse</a></div><div class="ttdeci">ParsedList parse(byteme::Reader &amp;reader, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:410</div></div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>        extract_names(map, ptr, path);</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span> </div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;unknown object type &#39;&quot;</span> + type + <span class="stringliteral">&quot;&#39; at &#39;&quot;</span> + path + <span class="stringliteral">&quot;.type&#39;&quot;</span>);</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    }</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span> </div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    <span class="keywordflow">return</span> output;</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>}</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span> </div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>}</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html">  377</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1JsonParser.html">JsonParser</a> {</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">  383</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">parallel</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span> </div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#afb961bfde43166eafb0d840c9c2b1087">  402</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#afb961bfde43166eafb0d840c9c2b1087">parse</a>(byteme::Reader&amp; reader, Externals ext) {</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>        std::shared_ptr&lt;millijson::Base&gt; contents;</div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">parallel</a>) {</div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>            byteme::PerByte bytestream(&amp;reader);</div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>            contents = millijson::parse(bytestream);</div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>            byteme::PerByteParallel bytestream(&amp;reader);</div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>            contents = millijson::parse(bytestream);</div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>        }</div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span> </div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>        Version version;</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>        <span class="keywordflow">if</span> (contents-&gt;type() == millijson::OBJECT) {</div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>            <span class="keyword">auto</span> optr = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>millijson::Object*<span class="keyword">&gt;</span>(contents.get());</div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; map = optr-&gt;values;</div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>            <span class="keyword">auto</span> vIt = map.find(<span class="stringliteral">&quot;version&quot;</span>);</div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>            <span class="keywordflow">if</span> (vIt != map.end()) {</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>                <span class="keywordflow">if</span> (vIt-&gt;second-&gt;type() != millijson::STRING) {</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;expected a string in &#39;version&#39;&quot;</span>);</div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>                }</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>                <span class="keyword">auto</span> vptr = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>millijson::String*<span class="keyword">&gt;</span>(vIt-&gt;second.get());</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>                version = parse_version_string(vptr-&gt;value);</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>            }</div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>        }</div>
+<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span> </div>
+<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>        ExternalTracker etrack(std::move(ext));</div>
+<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>        <span class="keyword">auto</span> output = json::parse_object&lt;Provisioner&gt;(contents.get(), etrack, <span class="stringliteral">&quot;&quot;</span>, version);</div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>        etrack.validate();</div>
+<div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>        <span class="keywordflow">return</span> ParsedList(std::move(output), std::move(version));</div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>    }</div>
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span> </div>
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a0568d1eb72844d593079692aff26b107">  446</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#a0568d1eb72844d593079692aff26b107">parse</a>(byteme::Reader&amp; reader) {</div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>        DummyExternals ext(0);</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span>        <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(reader, std::move(ext));</div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>    }</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span> </div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
+<div class="line"><a id="l00469" name="l00469"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#ae774207fd2d4c7e244a63dad3eb248e8">  469</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#ae774207fd2d4c7e244a63dad3eb248e8">parse_file</a>(<span class="keyword">const</span> std::string&amp; file, Externals ext) {</div>
+<div class="line"><a id="l00470" name="l00470"></a><span class="lineno">  470</span>        byteme::SomeFileReader reader(file.c_str());</div>
+<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span>        <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(reader, std::move(ext));</div>
+<div class="line"><a id="l00472" name="l00472"></a><span class="lineno">  472</span>    }</div>
+<div class="line"><a id="l00473" name="l00473"></a><span class="lineno">  473</span> </div>
+<div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
+<div class="line"><a id="l00488" name="l00488"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#ae83783a2f65ac39244fbb4303172ae56">  488</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#ae83783a2f65ac39244fbb4303172ae56">parse_file</a>(<span class="keyword">const</span> std::string&amp; file) {</div>
+<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span>        DummyExternals ext(0);</div>
+<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span>        <span class="keywordflow">return</span> parse_file&lt;Provisioner&gt;(file, std::move(ext));</div>
+<div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span>    }</div>
+<div class="line"><a id="l00492" name="l00492"></a><span class="lineno">  492</span> </div>
+<div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner, <span class="keyword">class</span> Externals&gt;</div>
+<div class="line"><a id="l00512" name="l00512"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#aa74987f551554ae0328c5b4ec351be8a">  512</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#aa74987f551554ae0328c5b4ec351be8a">parse_buffer</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> len, Externals ext) {</div>
+<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>        byteme::SomeBufferReader reader(buffer, len);</div>
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>        <span class="keywordflow">return</span> parse&lt;Provisioner&gt;(reader, std::move(ext));</div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    }</div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span> </div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Provisioner&gt;</div>
+<div class="line"><a id="l00532" name="l00532"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#ae8c6a6f09fd82acc69be2c1246b1373c">  532</a></span>    ParsedList <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#ae8c6a6f09fd82acc69be2c1246b1373c">parse_buffer</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> len) {</div>
+<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>        DummyExternals ext(0);</div>
+<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span>        <span class="keywordflow">return</span> parse_buffer&lt;Provisioner&gt;(buffer, len, std::move(ext));</div>
+<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>    }</div>
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span> </div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a139a44f876a12cd3a125019ddd200558">  545</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#a139a44f876a12cd3a125019ddd200558">validate</a>(byteme::Reader&amp; reader, <span class="keywordtype">int</span> num_external = 0) {</div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>        DummyExternals ext(num_external);</div>
+<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span>        parse&lt;DummyProvisioner&gt;(reader, std::move(ext));</div>
+<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span>    }</div>
+<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span> </div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#a143500326540feb14f74e985f4816429">  558</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#a143500326540feb14f74e985f4816429">validate_file</a>(<span class="keyword">const</span> std::string&amp; file, <span class="keywordtype">int</span> num_external = 0) {</div>
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>        DummyExternals ext(num_external);</div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>        parse_file&lt;DummyProvisioner&gt;(file, std::move(ext));</div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>    }</div>
+<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span> </div>
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno"><a class="line" href="classuzuki2_1_1JsonParser.html#aba9136119bad34d29d3da68ae68ad3d8">  572</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1JsonParser.html#aba9136119bad34d29d3da68ae68ad3d8">validate_buffer</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> len, <span class="keywordtype">int</span> num_external = 0) {</div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>        DummyExternals ext(num_external);</div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>        parse_buffer&lt;DummyProvisioner&gt;(buffer, len, std::move(ext));</div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span>    }</div>
+<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span>};</div>
+<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span> </div>
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span>}</div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span> </div>
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html">uzuki2::JsonParser</a></div><div class="ttdoc">Parse JSON file contents using the uzuki2 specification.</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:377</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a0568d1eb72844d593079692aff26b107"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a0568d1eb72844d593079692aff26b107">uzuki2::JsonParser::parse</a></div><div class="ttdeci">ParsedList parse(byteme::Reader &amp;reader)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:446</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a139a44f876a12cd3a125019ddd200558"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a139a44f876a12cd3a125019ddd200558">uzuki2::JsonParser::validate</a></div><div class="ttdeci">void validate(byteme::Reader &amp;reader, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:545</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a143500326540feb14f74e985f4816429"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a143500326540feb14f74e985f4816429">uzuki2::JsonParser::validate_file</a></div><div class="ttdeci">void validate_file(const std::string &amp;file, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:558</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_a43bfcb156c452746b3a3e31cb9cb752d"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#a43bfcb156c452746b3a3e31cb9cb752d">uzuki2::JsonParser::parallel</a></div><div class="ttdeci">bool parallel</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:383</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_aa74987f551554ae0328c5b4ec351be8a"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#aa74987f551554ae0328c5b4ec351be8a">uzuki2::JsonParser::parse_buffer</a></div><div class="ttdeci">ParsedList parse_buffer(const unsigned char *buffer, size_t len, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:512</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_aba9136119bad34d29d3da68ae68ad3d8"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#aba9136119bad34d29d3da68ae68ad3d8">uzuki2::JsonParser::validate_buffer</a></div><div class="ttdeci">void validate_buffer(const unsigned char *buffer, size_t len, int num_external=0)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:572</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_ae774207fd2d4c7e244a63dad3eb248e8"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#ae774207fd2d4c7e244a63dad3eb248e8">uzuki2::JsonParser::parse_file</a></div><div class="ttdeci">ParsedList parse_file(const std::string &amp;file, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:469</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_ae83783a2f65ac39244fbb4303172ae56"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#ae83783a2f65ac39244fbb4303172ae56">uzuki2::JsonParser::parse_file</a></div><div class="ttdeci">ParsedList parse_file(const std::string &amp;file)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:488</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_ae8c6a6f09fd82acc69be2c1246b1373c"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#ae8c6a6f09fd82acc69be2c1246b1373c">uzuki2::JsonParser::parse_buffer</a></div><div class="ttdeci">ParsedList parse_buffer(const unsigned char *buffer, size_t len)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:532</div></div>
+<div class="ttc" id="aclassuzuki2_1_1JsonParser_html_afb961bfde43166eafb0d840c9c2b1087"><div class="ttname"><a href="classuzuki2_1_1JsonParser.html#afb961bfde43166eafb0d840c9c2b1087">uzuki2::JsonParser::parse</a></div><div class="ttdeci">ParsedList parse(byteme::Reader &amp;reader, Externals ext)</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:402</div></div>
 <div class="ttc" id="ainterfaces_8hpp_html"><div class="ttname"><a href="interfaces_8hpp.html">interfaces.hpp</a></div><div class="ttdoc">Defines the interfaces to use in HDF5 parsing.</div></div>
 <div class="ttc" id="anamespaceuzuki2_html"><div class="ttname"><a href="namespaceuzuki2.html">uzuki2</a></div><div class="ttdoc">Parse an R list from a HDF5 or JSON file.</div><div class="ttdef"><b>Definition:</b> parse_json.hpp:28</div></div>
+<div class="ttc" id="astructuzuki2_1_1StringVector_html_a19642038725cf2a60f158245c876cab6"><div class="ttname"><a href="structuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">uzuki2::StringVector::Format</a></div><div class="ttdeci">Format</div><div class="ttdef"><b>Definition:</b> interfaces.hpp:172</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

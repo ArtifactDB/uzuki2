@@ -1,9 +1,5 @@
 var searchData=
 [
-  ['set_0',['set',['../structuzuki2_1_1TypedVector.html#ac098971c1d36112d2aadfc63d144c2f4',1,'uzuki2::TypedVector::set()'],['../structuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f',1,'uzuki2::Factor::set()'],['../structuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82',1,'uzuki2::List::set()']]],
-  ['set_5flevel_1',['set_level',['../structuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740',1,'uzuki2::Factor']]],
-  ['set_5fmissing_2',['set_missing',['../structuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41',1,'uzuki2::Vector']]],
-  ['set_5fname_3',['set_name',['../structuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f',1,'uzuki2::Vector::set_name()'],['../structuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff',1,'uzuki2::List::set_name()']]],
-  ['size_4',['size',['../structuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2',1,'uzuki2::Vector::size()'],['../structuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba',1,'uzuki2::List::size()']]],
-  ['stringvector_5',['StringVector',['../namespaceuzuki2.html#a7f2b28d113b4a458fb91c458dcc4b985',1,'uzuki2']]]
+  ['type_0',['type',['../structuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8',1,'uzuki2::Base::type()'],['../structuzuki2_1_1IntegerVector.html#a54a45807198d1947c9ed2a49ec772d60',1,'uzuki2::IntegerVector::type()'],['../structuzuki2_1_1NumberVector.html#a41ff944db6e679a3dc685130d215d322',1,'uzuki2::NumberVector::type()'],['../structuzuki2_1_1StringVector.html#a2f366149232cd6df0dea2e2f0000c7c9',1,'uzuki2::StringVector::type()'],['../structuzuki2_1_1BooleanVector.html#a6408d4f39ad93f71ca2b8b7b0e3770ff',1,'uzuki2::BooleanVector::type()'],['../structuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476',1,'uzuki2::Factor::type()'],['../structuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439',1,'uzuki2::Nothing::type()'],['../structuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095',1,'uzuki2::External::type()'],['../structuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181',1,'uzuki2::List::type()']]],
+  ['type_1',['Type',['../namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736',1,'uzuki2']]]
 ];
