@@ -32,7 +32,7 @@ void set_missing_internal(std::vector<T>& values, size_t i) {
 
 template<typename T>
 struct DefaultVectorBase { 
-    DefaultVectorBase(size_t n) : values(n) {}
+    DefaultVectorBase(size_t l, bool n, bool s) : values(l), has_names(n), names(n ? l : 0), scalar(s) {}
 
     size_t size() const { 
         return values.size(); 
@@ -40,32 +40,24 @@ struct DefaultVectorBase {
 
     void set(size_t i, T val) {
         values[i] = std::move(val);
-        return;
-    }
-
-    void use_names() {
-        has_names = true;
-        names.resize(values.size());
-        return;
     }
 
     void set_missing(size_t i) {
         set_missing_internal(values, i);
-        return;
     }
 
     void set_name(size_t i, std::string name) {
         names[i] = std::move(name);
-        return;
     }
 
     std::vector<T> values;
-    bool has_names = false;
+    bool has_names;
     std::vector<std::string> names;
+    bool scalar;
 };
 
 struct DefaultIntegerVector : public uzuki2::IntegerVector {
-    DefaultIntegerVector(size_t n) : base(n) {}
+    DefaultIntegerVector(size_t l, bool n, bool s) : base(l, n, s) {}
 
     size_t size() const { 
         return base.size();
@@ -73,34 +65,21 @@ struct DefaultIntegerVector : public uzuki2::IntegerVector {
 
     void set(size_t i, int32_t val) {
         base.set(i, val);
-        return;
-    }
-
-    void use_names() {
-        base.use_names();
-        return;
     }
 
     void set_missing(size_t i) {
         base.set_missing(i);
-        return;
     }
 
     void set_name(size_t i, std::string name) {
         base.set_name(i, std::move(name));
-        return;
-    }
-
-    void is_scalar() {
-        scalar = true;
     }
 
     DefaultVectorBase<int32_t> base;
-    bool scalar = false;
 };
 
 struct DefaultNumberVector : public uzuki2::NumberVector {
-    DefaultNumberVector(size_t n) : base(n) {}
+    DefaultNumberVector(size_t l, bool n, bool s) : base(l, n, s) {}
 
     size_t size() const { 
         return base.size();
@@ -108,34 +87,21 @@ struct DefaultNumberVector : public uzuki2::NumberVector {
 
     void set(size_t i, double val) {
         base.set(i, val);
-        return;
-    }
-
-    void use_names() {
-        base.use_names();
-        return;
     }
 
     void set_missing(size_t i) {
         base.set_missing(i);
-        return;
     }
 
     void set_name(size_t i, std::string name) {
         base.set_name(i, std::move(name));
-        return;
-    }
-
-    void is_scalar() {
-        scalar = true;
     }
 
     DefaultVectorBase<double> base;
-    bool scalar = false;
 };
 
 struct DefaultBooleanVector : public uzuki2::BooleanVector {
-    DefaultBooleanVector(size_t n) : base(n) {}
+    DefaultBooleanVector(size_t l, bool n, bool s) : base(l, n, s) {}
 
     size_t size() const { 
         return base.size();
@@ -143,34 +109,21 @@ struct DefaultBooleanVector : public uzuki2::BooleanVector {
 
     void set(size_t i, bool val) {
         base.set(i, val);
-        return;
-    }
-
-    void use_names() {
-        base.use_names();
-        return;
     }
 
     void set_missing(size_t i) {
         base.set_missing(i);
-        return;
     }
 
     void set_name(size_t i, std::string name) {
         base.set_name(i, std::move(name));
-        return;
-    }
-
-    void is_scalar() {
-        scalar = true;
     }
 
     DefaultVectorBase<uint8_t> base;
-    bool scalar = false;
 };
 
 struct DefaultStringVector : public uzuki2::StringVector {
-    DefaultStringVector(size_t n, uzuki2::StringVector::Format f) : base(n), format(f) {}
+    DefaultStringVector(size_t l, bool n, bool s, uzuki2::StringVector::Format f) : base(l, n, s), format(f) {}
 
     size_t size() const { 
         return base.size();
@@ -178,35 +131,22 @@ struct DefaultStringVector : public uzuki2::StringVector {
 
     void set(size_t i, std::string val) {
         base.set(i, std::move(val));
-        return;
-    }
-
-    void use_names() {
-        base.use_names();
-        return;
     }
 
     void set_missing(size_t i) {
         base.set_missing(i);
-        return;
     }
 
     void set_name(size_t i, std::string name) {
         base.set_name(i, std::move(name));
-        return;
-    }
-
-    void is_scalar() {
-        scalar = true;
     }
 
     DefaultVectorBase<std::string> base;
     StringVector::Format format;
-    bool scalar = false;
 };
 
 struct DefaultFactor : public uzuki2::Factor {
-    DefaultFactor(size_t l, size_t ll) : vbase(l), levels(ll) {}
+    DefaultFactor(size_t l, bool n, bool s, size_t ll, bool o) : vbase(l, n, s), levels(ll), ordered(o) {}
 
     size_t size() const { 
         return vbase.size(); 
@@ -214,37 +154,23 @@ struct DefaultFactor : public uzuki2::Factor {
 
     void set(size_t i, size_t l) {
         vbase.set(i, l);
-        return;
-    }
-
-    void use_names() {
-        vbase.use_names();
-        return;
     }
 
     void set_missing(size_t i) {
         vbase.set_missing(i);
-        return;
     }
 
     void set_name(size_t i, std::string name) {
         vbase.set_name(i, std::move(name));
-        return;
     }
 
     void set_level(size_t i, std::string l) {
         levels[i] = std::move(l);
-        return;
-    }
-
-    void is_ordered() {
-        ordered = true;
-        return;
     }
 
     DefaultVectorBase<size_t> vbase;
     std::vector<std::string> levels;
-    bool ordered = false;
+    bool ordered;
 };
 
 /** Defining the structural elements. **/
@@ -257,7 +183,7 @@ struct DefaultExternal : public uzuki2::External {
 };
 
 struct DefaultList : public uzuki2::List {
-    DefaultList(size_t n) : values(n) {}
+    DefaultList(size_t l, bool n) : values(l), has_names(n), names(n ? l : 0) {}
 
     size_t size() const { 
         return values.size(); 
@@ -265,18 +191,10 @@ struct DefaultList : public uzuki2::List {
 
     void set(size_t i, std::shared_ptr<uzuki2::Base> ptr) {
         values[i] = std::move(ptr);
-        return;
     }
 
     void set_name(size_t i, std::string name) {
         names[i] = std::move(name);
-        return;
-    }
-
-    void use_names() {
-        has_names = true;
-        names.resize(values.size());
-        return;
     }
 
     std::vector<std::shared_ptr<uzuki2::Base> > values;
@@ -291,17 +209,23 @@ struct DefaultProvisioner {
 
     static uzuki2::External* new_External(void* p) { return (new DefaultExternal(p)); }
 
-    static uzuki2::List* new_List(size_t l) { return (new DefaultList(l)); }
+    template<class ... Args_>
+    static uzuki2::List* new_List(Args_&& ... args) { return (new DefaultList(std::forward<Args_>(args)...)); }
 
-    static uzuki2::IntegerVector* new_Integer(size_t l) { return (new DefaultIntegerVector(l)); }
+    template<class ... Args_>
+    static uzuki2::IntegerVector* new_Integer(Args_&& ... args) { return (new DefaultIntegerVector(std::forward<Args_>(args)...)); }
 
-    static uzuki2::NumberVector* new_Number(size_t l) { return (new DefaultNumberVector(l)); }
+    template<class ... Args_>
+    static uzuki2::NumberVector* new_Number(Args_&& ... args) { return (new DefaultNumberVector(std::forward<Args_>(args)...)); }
 
-    static uzuki2::StringVector* new_String(size_t l, uzuki2::StringVector::Format f) { return (new DefaultStringVector(l, f)); }
+    template<class ... Args_>
+    static uzuki2::StringVector* new_String(Args_&& ... args) { return (new DefaultStringVector(std::forward<Args_>(args)...)); }
 
-    static uzuki2::BooleanVector* new_Boolean(size_t l) { return (new DefaultBooleanVector(l)); }
+    template<class ... Args_>
+    static uzuki2::BooleanVector* new_Boolean(Args_&& ... args) { return (new DefaultBooleanVector(std::forward<Args_>(args)...)); }
 
-    static uzuki2::Factor* new_Factor(size_t l, size_t ll) { return (new DefaultFactor(l, ll)); }
+    template<class ... Args_>
+    static uzuki2::Factor* new_Factor(Args_&& ... args) { return (new DefaultFactor(std::forward<Args_>(args)...)); }
 };
 
 struct DefaultExternals {

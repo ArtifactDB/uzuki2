@@ -23,7 +23,7 @@ TEST(Hdf5DateTest, SimpleLoading) {
         EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
         EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
         EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
-        EXPECT_FALSE(sptr->scalar);
+        EXPECT_FALSE(sptr->base.scalar);
     }
 
     // Scalars work correctly.
@@ -38,7 +38,7 @@ TEST(Hdf5DateTest, SimpleLoading) {
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->size(), 1);
         EXPECT_EQ(sptr->base.values.front(), "2022-05-09");
-        EXPECT_TRUE(sptr->scalar);
+        EXPECT_TRUE(sptr->base.scalar);
         EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
     }
 
@@ -58,7 +58,7 @@ TEST(Hdf5DateTest, SimpleLoading) {
         EXPECT_EQ(sptr->size(), 3);
         EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
         EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
-        EXPECT_FALSE(sptr->scalar);
+        EXPECT_FALSE(sptr->base.scalar);
         EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
     }
 
@@ -178,7 +178,7 @@ TEST(JsonDateTest, SimpleLoading) {
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(dptr->size(), 2);
-        EXPECT_FALSE(dptr->scalar);
+        EXPECT_FALSE(dptr->base.scalar);
         EXPECT_EQ(dptr->base.values[0], "2022-01-22");
         EXPECT_EQ(dptr->base.values[1], "1990-06-30");
         EXPECT_EQ(dptr->format, uzuki2::StringVector::DATE);
@@ -190,7 +190,7 @@ TEST(JsonDateTest, SimpleLoading) {
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(dptr->size(), 2);
-        EXPECT_FALSE(dptr->scalar);
+        EXPECT_FALSE(dptr->base.scalar);
         EXPECT_EQ(dptr->base.values[0], "2022-01-22");
         EXPECT_EQ(dptr->base.values[1], "1990-06-30");
         EXPECT_EQ(dptr->format, uzuki2::StringVector::DATE);
@@ -201,7 +201,7 @@ TEST(JsonDateTest, SimpleLoading) {
         auto parsed = load_json("{ \"type\": \"string\", \"values\": \"2023-02-19\", \"format\":\"date\", \"version\":\"1.1\" }");
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_TRUE(stuff->scalar);
+        EXPECT_TRUE(stuff->base.scalar);
         EXPECT_EQ(stuff->base.values[0], "2023-02-19");
         EXPECT_EQ(stuff->format, uzuki2::StringVector::DATE);
     }
