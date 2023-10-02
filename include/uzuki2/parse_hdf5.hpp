@@ -343,7 +343,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 }
             } else if (handle.exists("format")) {
                 auto fhandle = get_scalar_dataset(handle, "format", H5T_STRING, path);
-                load_string_dataset(fhandle, 1, path + "/format", [&](size_t, std::string x) -> void {
+                load_string_dataset(fhandle, 1, [&](size_t, std::string x) -> void {
                     format = std::move(x);
                 });
 
