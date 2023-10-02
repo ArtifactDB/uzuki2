@@ -55,6 +55,12 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
     return parent.createDataSet(name, dtype, dspace);
 }
 
+inline void add_version(const H5::Group& parent, const std::string& version) {
+    H5::StrType stype(0, H5T_VARIABLE);
+    auto ahandle = parent.createAttribute("uzuki_version", stype, H5S_SCALAR);
+    ahandle.write(stype, version);
+}
+
 template<typename T>
 H5::DataSet write_scalar(const H5::Group& parent, const std::string& name, T value, const H5::DataType& dtype) {
     H5::DataSpace dspace;
@@ -132,11 +138,11 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
     }
 }
 
-inline std::shared_ptr<uzuki2::Base> load_hdf5(std::string name, std::string group) {
+inline auto load_hdf5(std::string name, std::string group) {
     return uzuki2::Hdf5Parser().parse<DefaultProvisioner>(name, group);
 }
 
-inline std::shared_ptr<uzuki2::Base> load_json(std::string x, bool parallel = false) {
+inline auto load_json(std::string x, bool parallel = false) {
     uzuki2::JsonParser parser;
     parser.parallel = parallel;
     return parser.parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size());

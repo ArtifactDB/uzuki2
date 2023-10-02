@@ -55,6 +55,20 @@ TEST(Hdf5StringTest, SimpleLoading) {
         EXPECT_TRUE(sptr->scalar);
     }
 
+    // Works with recent versions.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        add_version(vhandle, "1.1");
+        create_dataset(vhandle, "data", { "foo", "whee", "stuff" });
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_EQ(sptr->size(), 3);
+    }
+
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
@@ -98,13 +112,15 @@ TEST(Hdf5StringTest, CheckError) {
 }
 
 TEST(JsonStringTest, SimpleLoading) {
-    auto parsed = load_json("{\"type\":\"string\", \"values\":[\"alpha\", \"bravo\", \"charlie\"] }");
-    EXPECT_EQ(parsed->type(), uzuki2::STRING);
-    auto bptr = static_cast<const DefaultStringVector*>(parsed.get());
-    EXPECT_EQ(bptr->size(), 3);
-    EXPECT_FALSE(bptr->scalar);
-    EXPECT_EQ(bptr->base.values.front(), "alpha");
-    EXPECT_EQ(bptr->base.values.back(), "charlie");
+    {
+        auto parsed = load_json("{\"type\":\"string\", \"values\":[\"alpha\", \"bravo\", \"charlie\"] }");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto bptr = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_EQ(bptr->size(), 3);
+        EXPECT_FALSE(bptr->scalar);
+        EXPECT_EQ(bptr->base.values.front(), "alpha");
+        EXPECT_EQ(bptr->base.values.back(), "charlie");
+    }
 
     // Works with scalars.
     {
@@ -113,6 +129,14 @@ TEST(JsonStringTest, SimpleLoading) {
         auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_TRUE(stuff->scalar);
         EXPECT_EQ(stuff->base.values[0], "foo");
+    }
+
+    // Works with recent versions.
+    {
+        auto parsed = load_json("{\"type\":\"string\", \"values\":[\"alpha\", \"bravo\", \"charlie\"], \"version\": \"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto bptr = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_EQ(bptr->size(), 3);
     }
 
     /********************************************
@@ -132,6 +156,8 @@ TEST(JsonStringTest, MissingValues) {
 
 TEST(JsonStringTest, CheckError) {
     expect_json_error("{ \"type\": \"string\", \"values\": [true]}", "expected a string");
+    expect_json_error("{\"type\":\"string\", \"format\":2, \"values\":[\"foo\", \"bar\"], \"version\":\"1.1\"}", "expected a string");
+    expect_json_error("{\"type\":\"string\", \"format\":\"whee\", \"values\":[\"foo\", \"bar\"], \"version\":\"1.1\"}", "unsupported format");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

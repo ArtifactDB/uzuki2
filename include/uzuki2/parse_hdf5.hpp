@@ -14,6 +14,7 @@
 #include "interfaces.hpp"
 #include "Dummy.hpp"
 #include "utils.hpp"
+#include "Version.hpp"
 
 /**
  * @file parse_hdf5.hpp
@@ -73,6 +74,26 @@ void load_string_dataset(const H5::DataSet& handle, hsize_t full_length, Functio
             fun(i, std::string(start, start + j));
         }
     }
+}
+
+inline H5::DataSet get_scalar_dataset(const H5::Group& handle, const std::string& name, H5T_class_t type_class, const std::string& path) {
+    if (handle.childObjType(name) != H5O_TYPE_DATASET) {
+        throw std::runtime_error("expected a dataset at '" + path + "/" + name + "'");
+    }
+
+    auto dhandle = handle.openDataSet(name);
+    auto dtype = dhandle.getDataType();
+    if (dtype.getClass() != type_class) {
+        throw std::runtime_error("dataset at '" + path + "/" + name + "' has the wrong datatype class");
+    }
+
+    auto dspace = dhandle.getSpace();
+    int ndims = dspace.getSimpleExtentNdims();
+    if (ndims != 0) {
+        throw std::runtime_error("expected a scalar dataset at '" + path + "/" + name + "'");
+    }
+
+    return dhandle;
 }
 
 inline hsize_t check_1d_length(const H5::DataSet& handle, const std::string& path, bool allow_scalar) {
@@ -209,7 +230,7 @@ void parse_names(const H5::Group& handle, Host* ptr, const std::string& path, co
 }
 
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const std::string& path) {
+std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const std::string& path, const Version& version) {
     // Deciding what type we're dealing with.
     auto object_type = load_string_attribute(handle, "uzuki_object", path);
     std::shared_ptr<Base> output;
@@ -231,7 +252,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 throw std::runtime_error("expected a group at '" + ipath + "'");
             }
             auto lhandle = dhandle.openGroup(istr);
-            lptr->set(i, parse_inner<Provisioner>(lhandle, ext, ipath));
+            lptr->set(i, parse_inner<Provisioner>(lhandle, ext, ipath, version));
         }
 
         parse_names(handle, lptr, path, dpath);
@@ -271,7 +292,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 bptr->is_scalar();
             }
 
-        } else if (vector_type == "factor" || vector_type == "ordered") {
+        } else if (vector_type == "factor" || (version.equals(1, 0) && vector_type == "ordered")) {
             // First we need to figure out the number of levels.
             auto levpath = path + "/levels";
             if (!handle.exists("levels") || handle.childObjType("levels") != H5O_TYPE_DATASET) {
@@ -287,8 +308,16 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             // Then we can initialize the interface.
             auto fptr = Provisioner::new_Factor(len, levlen);
             output.reset(fptr);
+
             if (vector_type == "ordered") {
                 fptr->is_ordered();
+            } else if (handle.exists("ordered")) {
+                auto ohandle = get_scalar_dataset(handle, "ordered", H5T_INTEGER, path);
+                int ordered = 0;
+                ohandle.read(&ordered, H5::PredType::NATIVE_INT);
+                if (ordered) {
+                    fptr->is_ordered();
+                }
             }
 
             parse_integer_like(dhandle, fptr, dpath, [&](int32_t x) -> void { 
@@ -306,34 +335,52 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 present.insert(x);
             });
 
-        } else if (vector_type == "string") {
-            auto sptr = Provisioner::new_String(len);
-            output.reset(sptr);
-            parse_string_like(dhandle, sptr, dpath, [](const std::string&) -> void {});
-            if (is_scalar) {
-                sptr->is_scalar();
+        } else if (vector_type == "string" || (version.equals(1, 0) && (vector_type == "date" || vector_type == "date-time"))) {
+            std::string format;
+            if (version.equals(1, 0)) {
+                if (vector_type == "date" || vector_type == "date-time") {
+                    format = vector_type;
+                }
+            } else if (handle.exists("format")) {
+                auto fhandle = get_scalar_dataset(handle, "format", H5T_STRING, path);
+                load_string_dataset(fhandle, 1, [&](size_t, std::string x) -> void {
+                    format = std::move(x);
+                });
+
+                if (format != "date" && format != "date-time") {
+                    throw std::runtime_error("unsupported format '" + format + "' at '" + path + "/format'");
+                }
             }
 
-        } else if (vector_type == "date") {
-            auto dptr = Provisioner::new_Date(len);
-            output.reset(dptr);
-            parse_string_like(dhandle, dptr, dpath, [&](const std::string& x) -> void {
-                if (!is_date(x)) {
-                     throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + dpath + "'");
+            if (format == "") {
+                auto sptr = Provisioner::new_String(len);
+                output.reset(sptr);
+                parse_string_like(dhandle, sptr, dpath, [](const std::string&) -> void {});
+                if (is_scalar) {
+                    sptr->is_scalar();
                 }
-            });
-            if (is_scalar) {
-                dptr->is_scalar();
-            }
 
-        } else if (vector_type == "date-time") {
-            auto dptr = Provisioner::new_DateTime(len);
-            output.reset(dptr);
-            parse_string_like(dhandle, dptr, dpath, [&](const std::string& x) -> void {
-                if (!is_rfc3339(x)) {
-                     throw std::runtime_error("dates should follow the Internet Date/Time format in '" + dpath + "'");
+            } else if (format == "date") {
+                auto dptr = Provisioner::new_Date(len);
+                output.reset(dptr);
+                parse_string_like(dhandle, dptr, dpath, [&](const std::string& x) -> void {
+                    if (!is_date(x)) {
+                         throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + dpath + "'");
+                    }
+                });
+                if (is_scalar) {
+                    dptr->is_scalar();
                 }
-            });
+
+            } else if (format == "date-time") {
+                auto dptr = Provisioner::new_DateTime(len);
+                output.reset(dptr);
+                parse_string_like(dhandle, dptr, dpath, [&](const std::string& x) -> void {
+                    if (!is_rfc3339(x)) {
+                         throw std::runtime_error("dates should follow the Internet Date/Time format in '" + dpath + "'");
+                    }
+                });
+            }
 
         } else if (vector_type == "number") {
             auto dptr = Provisioner::new_Number(len);
@@ -438,8 +485,14 @@ public:
      */
     template<class Provisioner, class Externals>
     std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name, Externals ext) {
+        Version version;
+        if (handle.attrExists("uzuki_version")) {
+            auto ver_str = hdf5::load_string_attribute(handle.openAttribute("uzuki_version"), "uzuki_version", name);
+            version = parse_version_string(ver_str);
+        }
+
         ExternalTracker etrack(std::move(ext));
-        auto ptr = hdf5::parse_inner<Provisioner>(handle, etrack, name);
+        auto ptr = hdf5::parse_inner<Provisioner>(handle, etrack, name, version);
         etrack.validate();
         return ptr;
     }

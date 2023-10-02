@@ -40,6 +40,25 @@ TEST(Hdf5DateTest, SimpleLoading) {
         EXPECT_TRUE(sptr->scalar);
     }
 
+    // Latest version works correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        add_version(vhandle, "1.1");
+
+        create_dataset(vhandle, "data", { "2077-12-12", "2055-01-01", "2022-05-06" });
+        write_string(vhandle, "format", "date");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::DATE);
+        auto sptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(sptr->size(), 3);
+        EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
+        EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
+        EXPECT_FALSE(sptr->scalar);
+    }
+
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
@@ -126,6 +145,13 @@ TEST(Hdf5DateTest, CheckError) {
     }
     expect_hdf5_error(path, "foo", "dates should follow");
 
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "date");
+        add_version(vhandle, "1.1");
+        create_dataset(vhandle, "data", { "2077-12-12" });
+    }
+    expect_hdf5_error(path, "foo", "unknown vector type");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***
@@ -133,22 +159,37 @@ TEST(Hdf5DateTest, CheckError) {
 }
 
 TEST(JsonDateTest, SimpleLoading) {
-    auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::DATE);
-    auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
-    EXPECT_EQ(dptr->size(), 2);
-    EXPECT_FALSE(dptr->scalar);
-    EXPECT_EQ(dptr->base.values[0], "2022-01-22");
-    EXPECT_EQ(dptr->base.values[1], "1990-06-30");
+    {
+        auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ] }");
+        EXPECT_EQ(parsed->type(), uzuki2::DATE);
+        auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(dptr->size(), 2);
+        EXPECT_FALSE(dptr->scalar);
+        EXPECT_EQ(dptr->base.values[0], "2022-01-22");
+        EXPECT_EQ(dptr->base.values[1], "1990-06-30");
+    }
+
+    // Works with later versions.
+    {
+        auto parsed = load_json("{ \"type\": \"string\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ], \"format\": \"date\", \"version\": \"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::DATE);
+        auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_EQ(dptr->size(), 2);
+        EXPECT_FALSE(dptr->scalar);
+        EXPECT_EQ(dptr->base.values[0], "2022-01-22");
+        EXPECT_EQ(dptr->base.values[1], "1990-06-30");
+    }
 
     // Works with scalars.
     {
-        auto parsed = load_json("{ \"type\": \"date\", \"values\": \"2023-02-19\" }");
+        auto parsed = load_json("{ \"type\": \"string\", \"values\": \"2023-02-19\", \"format\":\"date\", \"version\":\"1.1\" }");
         EXPECT_EQ(parsed->type(), uzuki2::DATE);
         auto stuff = static_cast<const DefaultDateVector*>(parsed.get());
         EXPECT_TRUE(stuff->scalar);
         EXPECT_EQ(stuff->base.values[0], "2023-02-19");
     }
+
+    expect_json_error("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ], \"version\": \"1.1\" }", "unknown object type");
 
     /********************************************
      *** See integer.cpp for tests for names. ***
@@ -166,6 +207,7 @@ TEST(JsonDateTest, MissingValues) {
 TEST(JsonDateTest, CheckError) {
     expect_json_error("{\"type\":\"date\", \"values\":[true,1,2] }", "expected a string");
     expect_json_error("{\"type\":\"date\", \"values\":[\"foo\", \"bar\"] }", "YYYY-MM-DD");
+    expect_json_error("{\"type\":\"string\", \"format\":\"date\", \"values\":[\"foo\", \"bar\"], \"version\":\"1.1\"}", "YYYY-MM-DD");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***
