@@ -113,8 +113,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a8ffb41fd40c9578911b82d7463642cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a308225edf101962afc751caa321f5f82"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82">set</a> (size_t i, std::shared_ptr&lt; <a class="el" href="structuzuki2_1_1Base.html">Base</a> &gt; v)=0</td></tr>
 <tr class="separator:a308225edf101962afc751caa321f5f82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c52266ea14bcb1dca38cd9bdb54a8c5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structuzuki2_1_1List.html#a9c52266ea14bcb1dca38cd9bdb54a8c5">use_names</a> ()=0</td></tr>
-<tr class="separator:a9c52266ea14bcb1dca38cd9bdb54a8c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16d57dcda0cb9c8ffa7724d16473a4ff"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff">set_name</a> (size_t i, std::string n)=0</td></tr>
 <tr class="separator:a16d57dcda0cb9c8ffa7724d16473a4ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37447b97260aa3a4dd591a71aaad70b8"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">type</a> () const =0</td></tr>
@@ -200,7 +198,7 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >Set the name of an element of the list.</p>
+<p >Set the name of an element of the list. This should only be called if this <code><a class="el" href="structuzuki2_1_1List.html" title="Interface for lists.">List</a></code> instance was constructed with support for names.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">i</td><td>Index of a list element. </td></tr>
@@ -262,32 +260,6 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The data type. </dd></dl>
 
 <p>Implements <a class="el" href="structuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">uzuki2::Base</a>.</p>
-
-</div>
-</div>
-<a id="a9c52266ea14bcb1dca38cd9bdb54a8c5" name="a9c52266ea14bcb1dca38cd9bdb54a8c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c52266ea14bcb1dca38cd9bdb54a8c5">&#9670;&#160;</a></span>use_names()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void uzuki2::List::use_names </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Indicate that the elements of the list are named. If not called, it is assumed that the list is unnamed. </p>
 
 </div>
 </div>

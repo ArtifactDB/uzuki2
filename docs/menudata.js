@@ -37,18 +37,14 @@ var menudata={children:[
 {text:"Class Members",url:"functions.html",children:[
 {text:"All",url:"functions.html",children:[
 {text:"f",url:"functions.html#index_f"},
-{text:"i",url:"functions.html#index_i"},
 {text:"p",url:"functions.html#index_p"},
 {text:"s",url:"functions.html#index_s"},
 {text:"t",url:"functions.html#index_t"},
-{text:"u",url:"functions.html#index_u"},
 {text:"v",url:"functions.html#index_v"}]},
 {text:"Functions",url:"functions_func.html",children:[
-{text:"i",url:"functions_func.html#index_i"},
 {text:"p",url:"functions_func.html#index_p"},
 {text:"s",url:"functions_func.html#index_s"},
 {text:"t",url:"functions_func.html#index_t"},
-{text:"u",url:"functions_func.html#index_u"},
 {text:"v",url:"functions_func.html#index_v"}]},
 {text:"Variables",url:"functions_vars.html"},
 {text:"Enumerations",url:"functions_enum.html"}]}]},
