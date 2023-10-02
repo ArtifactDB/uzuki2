@@ -160,7 +160,7 @@ $(function() {
 </ul>
 <p >The contents of <code>values</code> is subject to some constraints:</p>
 <ul>
-<li><code>"number"</code>: values should be JSON numbers. Missing values are represented by <code>null</code>.</li>
+<li><code>"number"</code>: values should be JSON numbers. Missing values are represented by <code>null</code>. IEEE special values can be represented by strings, i.e., <code>NaN</code>, <code>Inf</code>, <code>-Inf</code>.</li>
 <li><code>"integer"</code>: values should be JSON numbers that can be represented by a 32-bit signed integer. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
 <li><code>"boolean"</code>: values should be JSON booleans or <code>null</code> (for missing values).</li>
 <li><code>string</code>: values should be JSON strings. <code>null</code> is also allowed and represents a missing value.</li>
