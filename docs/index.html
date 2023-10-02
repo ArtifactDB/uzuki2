@@ -101,13 +101,8 @@ $(function() {
 <li><code>"number"</code>: any type of <code>H5T_FLOAT</code> that can be represented by a double-precision float.</li>
 <li><code>"string"</code>: any type of <code>H5T_STRING</code> that can be represented by a UTF-8 encoded string.</li>
 </ul>
-<p >For some <code>uzuki_type</code>, further considerations may be applicable:</p>
-<ul>
-<li><code>"integer"</code>: values of <code>**/data</code> that are equal to -2147483648 should be treated as missing.</li>
-<li><code>"boolean"</code>: values in <code>**/data</code> should be one of 0 (false), 1 (true), or -2147483648 (missing).</li>
-<li><code>string</code>: the <code>**/data</code> dataset may contain a <code>"missing-value-placeholder"</code> attribute. If present, this should be a string scalar dataset that specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing.</li>
-</ul>
-<p >For <code>string</code> types, the group may optionally contain the <code>**/format</code> dataset. This should be a scalar string dataset that specifies constraints to the format of the values in <code>**/data</code>:</p>
+<p >For <code>boolean</code> type, values in <code>**/data</code> should be one of 0 (false) or 1 (true).</p>
+<p >For <code>string</code> type, the group may optionally contain the <code>**/format</code> dataset. This should be a scalar string dataset that specifies constraints to the format of the values in <code>**/data</code>:</p>
 <ul>
 <li><code>"date"</code>: strings should be <code>YYYY-MM-DD</code> dates or the placeholder value.</li>
 <li><code>"date-time"</code>: strings should be in the Internet Date/Time format (<a href="https://www.rfc-editor.org/rfc/rfc3339#section-5.6">RFC 3339, Section 5.6</a>) or the placeholder value.</li>
@@ -116,13 +111,20 @@ $(function() {
 <details >
 <p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>uzuki_type</code> of <code>"string"</code> with <code>**/format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
 </details>
+<h3>Representing missing values</h3>
+<p >Each <code>**/data</code> dataset may optionally contain a <code>"missing-value-placeholder"</code> attribute. If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing. If no such attribute is present, it can be assumed that there are no missing values.</p>
+<p >Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.</p>
+<details >
+<p ><summary>Changes from previous versions</summary> In version 1.0, integer or boolean values of -2147483648 were treated as missing.</p>
+<p >In version 1.0, missing floats were represented by <a href="https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98">R's NA representation</a>. </p>
+</details>
 <h2>Factors</h2>
 <p >A factor is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
 <li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"vector"</code>.</li>
 <li><code>uzuki_type</code>, a scalar string dataset containing <code>"factor"</code>.</li>
 </ul>
-<p >The group should contain an 1-dimensional dataset at <code>**/data</code>, containing 0-based indices into the levels. This should be type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer. Missing values are represented by -2147483648.</p>
+<p >The group should contain an 1-dimensional dataset at <code>**/data</code>, containing 0-based indices into the levels. This should be type of <code>H5T_INTEGER</code> that can be represented by a 32-bit signed integer. Missing values are represented as described above for atomic vectors.</p>
 <p >The group should also contain <code>**/levels</code>, a 1-dimensional string dataset that contains the levels for the indices in <code>data</code>. Values in <code>**/levels</code> should be unique. Values in <code>**/data</code> should be non-negative (missing values excepted) and less than the length of <code>**/levels</code>.</p>
 <p >The group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to <code>data</code>.</p>
 <p >The group may optionally contain <code>**/ordered</code>, a scalar integer dataset. This should be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.</p>
@@ -161,7 +163,7 @@ $(function() {
 <p >The contents of <code>values</code> is subject to some constraints:</p>
 <ul>
 <li><code>"number"</code>: values should be JSON numbers. Missing values are represented by <code>null</code>. IEEE special values can be represented by strings, i.e., <code>NaN</code>, <code>Inf</code>, <code>-Inf</code>.</li>
-<li><code>"integer"</code>: values should be JSON numbers that can be represented by a 32-bit signed integer. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
+<li><code>"integer"</code>: values should be JSON numbers that can be represented by a 32-bit signed integer. Missing values may be represented by <code>null</code>.</li>
 <li><code>"boolean"</code>: values should be JSON booleans or <code>null</code> (for missing values).</li>
 <li><code>string</code>: values should be JSON strings. <code>null</code> is also allowed and represents a missing value.</li>
 </ul>
@@ -172,19 +174,21 @@ $(function() {
 </ul>
 <p >Vectors of length 1 may also be represented as scalars of the appropriate type. While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.</p>
 <details >
-<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>"type": "string"</code> with <code>format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
+<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>"type": "string"</code> with <code>format</code> set to <code>"date"</code> or <code>"date-time"</code>.</p>
+<p >In version 1.0, missing integers could also be represented by the special value -2147483648. </p>
 </details>
 <h2>Factors</h2>
 <p >A factor is represented as a JSON object with the following properties:</p>
 <ul>
 <li><code>type</code>, set to <code>"factor"</code>.</li>
-<li><code>values</code>, an array of 0-based integer indices for the factor. These should be non-negative JSON numbers that can fit into a 32-bit signed integer. They should also be less than the length of <code>levels</code>. Missing values may be represented by <code>null</code> or the special value -2147483648.</li>
+<li><code>values</code>, an array of 0-based integer indices for the factor. These should be non-negative JSON numbers that can fit into a 32-bit signed integer. They should also be less than the length of <code>levels</code>. Missing values are represented by <code>null</code>.</li>
 <li><code>levels</code>, an array of unique strings containing the levels for the indices in <code>values</code>.</li>
 <li>(optional) <code>ordered</code>, a boolean indicating whether to assume that the levels are ordered. If absent, levels are assumed to be non-ordered.</li>
 <li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements.</li>
 </ul>
 <details >
-<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>"type": "ordered"</code>. This is the same as <code>"type": "factor"</code> with <code>"ordered": true</code>. </p>
+<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>"type": "ordered"</code>. This is the same as <code>"type": "factor"</code> with <code>"ordered": true</code>.</p>
+<p >In version 1.0, missing values could also be represented by the special value -2147483648. </p>
 </details>
 <h2>Nothing</h2>
 <p >A "nothing" (a.k.a., "null", "none") value is represented as a JSON object with the following properties:</p>
