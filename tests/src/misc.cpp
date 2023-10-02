@@ -174,3 +174,48 @@ TEST(JsonFileTest, CheckMethods) {
         EXPECT_NO_THROW(parser.validate_file(path, 2));
     }
 }
+
+TEST(JsonFileTest, CheckVersion) {
+    expect_json_error("{ version: true }", "expected a string");
+}
+
+TEST(VersionParsing, Basic) {
+    {
+        auto v = uzuki2::parse_version_string("1.0");
+        EXPECT_EQ(v.major, 1);
+        EXPECT_EQ(v.minor, 0);
+    }
+
+    {
+        auto v = uzuki2::parse_version_string("1.12");
+        EXPECT_EQ(v.major, 1);
+        EXPECT_EQ(v.minor, 12);
+    }
+
+    {
+        auto v = uzuki2::parse_version_string("123.456");
+        EXPECT_EQ(v.major, 123);
+        EXPECT_EQ(v.minor, 456);
+    }
+}
+
+static void expect_version_error(std::string version, std::string msg) {
+    EXPECT_ANY_THROW({
+        try {
+            uzuki2::parse_version_string(version);
+        } catch (std::exception& e) {
+            EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
+            throw;
+        }
+    });
+}
+
+TEST(VersionParsing, Errors) {
+    expect_version_error("", "empty");
+    expect_version_error("0.1", "leading zeros");
+    expect_version_error("a.1", "non-digit");
+    expect_version_error("1", "minor version");
+    expect_version_error("1.", "minor version");
+    expect_version_error("1.01", "leading zeros");
+    expect_version_error("1.a", "non-digit");
+}

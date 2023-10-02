@@ -94,17 +94,37 @@ TEST(Hdf5DateTimeTest, CheckError) {
      ***********************************************/
 }
 
-TEST(JsonDateTimeTest, SimpleLoading) {
-    auto parsed = load_json("{ \"type\": \"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ] }");
+TEST(JsonDateTimeTest, SimpleLoading_v1_1) {
+    auto parsed = load_json("{ \"type\":\"string\", \"format\":\"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ], \"version\":\"1.1\"}");
     EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
     auto dptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
     EXPECT_EQ(dptr->size(), 2);
     EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
     EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
 
+    // Works with scalars.
+    {
+        auto parsed = load_json("{ \"type\": \"string\", \"format\":\"date-time\", \"values\": \"2023-02-19T12:34:56-09:00\", \"version\":\"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
+        auto stuff = static_cast<const DefaultDateVector*>(parsed.get());
+        EXPECT_TRUE(stuff->scalar);
+        EXPECT_EQ(stuff->base.values[0], "2023-02-19T12:34:56-09:00");
+    }
+
+    expect_json_error("{ \"type\": \"date-time\", \"values\": [ \"2023-02-19T12:34:56-09:00\" ], \"version\": \"1.1\" }", "unknown object type");
+
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
+}
+
+TEST(JsonDateTimeTest, SimpleLoading_v1_0) {
+    auto parsed = load_json("{ \"type\": \"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
+    auto dptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
+    EXPECT_EQ(dptr->size(), 2);
+    EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
+    EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
 }
 
 TEST(JsonDateTimeTest, MissingValues) {
@@ -118,6 +138,7 @@ TEST(JsonDateTimeTest, MissingValues) {
 TEST(JsonDateTimeTest, CheckError) {
     expect_json_error("{\"type\":\"date-time\", \"values\":[true,1,2] }", "expected a string");
     expect_json_error("{\"type\":\"date-time\", \"values\":[\"foo\", \"bar\"] }", "Internet Date/Time");
+    expect_json_error("{\"type\":\"string\", \"format\":\"date-time\", \"values\":[\"foo\", \"bar\"], \"version\":\"1.1\"}", "Internet Date/Time");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

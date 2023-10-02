@@ -103,7 +103,7 @@ TEST(Hdf5ExternalTest, CheckErrors) {
     expect_hdf5_external_error(path, "foo", "consecutive", 2);
 }
 
-std::shared_ptr<uzuki2::Base> load_json_with_externals(std::string x, int num_externals) {
+auto load_json_with_externals(std::string x, int num_externals) {
     DefaultExternals ext(num_externals);
     return uzuki2::JsonParser().parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), ext);
 }

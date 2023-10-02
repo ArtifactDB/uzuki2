@@ -18,6 +18,7 @@
 #include "interfaces.hpp"
 #include "Dummy.hpp"
 #include "utils.hpp"
+#include "ParsedList.hpp"
 
 /**
  * @file parse_json.hpp
@@ -149,7 +150,7 @@ void extract_names(const std::unordered_map<std::string, std::shared_ptr<millijs
 }
 
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& ext, const std::string& path) {
+std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& ext, const std::string& path, const Version& version) {
     if (contents->type() != millijson::OBJECT) {
         throw std::runtime_error("each R object should be represented by a JSON object at '" + path + "'");
     }
@@ -198,7 +199,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
             return ptr;
         });
 
-    } else if (type == "factor" || type == "ordered") {
+    } else if (type == "factor" || (version.equals(1, 0) && type == "ordered")) {
         const auto& vals = extract_array(map, "values", path);
         const auto& lvals = extract_array(map, "levels", path);
 
@@ -206,6 +207,17 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
         output.reset(ptr);
         if (type == "ordered") {
             ptr->is_ordered();
+        } else {
+            auto oIt = map.find("ordered");
+            if (oIt != map.end()) {
+                if (oIt->second->type() != millijson::BOOLEAN) {
+                    throw std::runtime_error("expected a boolean at '" + path + ".ordered'");
+                }
+                auto optr = static_cast<const millijson::Boolean*>((oIt->second).get());
+                if (optr->value) {
+                    ptr->is_ordered();
+                }
+            }
         }
 
         int32_t nlevels = lvals.size();
@@ -285,45 +297,69 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
             return ptr;
         });
 
-    } else if (type == "string") {
-        process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
-            auto ptr = Provisioner::new_String(vals.size());
-            output.reset(ptr);
-            extract_strings(vals, ptr, [](const std::string&) -> void {}, path);
-            extract_names(map, ptr, path);
-            return ptr;
-        });
-
-    } else if (type == "date") {
-        process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
-            auto ptr = Provisioner::new_Date(vals.size());
-            output.reset(ptr);
-            extract_strings(vals, ptr, [&](const std::string& x) -> void {
-                if (!is_date(x)) {
-                     throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
-                }
-            }, path);
-            extract_names(map, ptr, path);
-            return ptr;
-        });
-
-    } else if (type == "date-time") {
-        const auto& vals = extract_array(map, "values", path);
-        auto ptr = Provisioner::new_DateTime(vals.size());
-        output.reset(ptr);
-        extract_strings(vals, ptr, [&](const std::string& x) -> void {
-            if (!is_rfc3339(x)) {
-                 throw std::runtime_error("date-times should follow the Internet Date/Time format in '" + path + ".values'");
+    } else if (type == "string" || (version.equals(1, 0) && (type == "date" || type == "date-time"))) {
+        std::string format;
+        if (version.equals(1, 0)) {
+            if (type == "date" || type == "date-time") {
+                format = type;
             }
-        }, path);
-        extract_names(map, ptr, path);
+        } else {
+            auto fIt = map.find("format");
+            if (fIt != map.end()) {
+                if (fIt->second->type() != millijson::STRING) {
+                    throw std::runtime_error("expected a string at '" + path + ".format'");
+                }
+                auto fptr = static_cast<const millijson::String*>(fIt->second.get());
+                if (fptr->value == "date" || fptr->value == "date-time") {
+                    format = fptr->value;
+                } else {
+                    throw std::runtime_error("unsupported format '" + fptr->value + "' at '" + path + ".format'");
+                }
+            }
+        }
+
+        if (format == "") {
+            process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
+                auto ptr = Provisioner::new_String(vals.size());
+                output.reset(ptr);
+                extract_strings(vals, ptr, [](const std::string&) -> void {}, path);
+                extract_names(map, ptr, path);
+                return ptr;
+            });
+
+        } else if (format == "date") {
+            process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
+                auto ptr = Provisioner::new_Date(vals.size());
+                output.reset(ptr);
+                extract_strings(vals, ptr, [&](const std::string& x) -> void {
+                    if (!is_date(x)) {
+                         throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
+                    }
+                }, path);
+                extract_names(map, ptr, path);
+                return ptr;
+            });
+
+        } else if (format == "date-time") {
+            process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
+                auto ptr = Provisioner::new_DateTime(vals.size());
+                output.reset(ptr);
+                extract_strings(vals, ptr, [&](const std::string& x) -> void {
+                    if (!is_rfc3339(x)) {
+                         throw std::runtime_error("date-times should follow the Internet Date/Time format in '" + path + ".values'");
+                    }
+                }, path);
+                extract_names(map, ptr, path);
+                return ptr;
+            });
+        }
 
     } else if (type == "list") {
         const auto& vals = extract_array(map, "values", path);
         auto ptr = Provisioner::new_List(vals.size());
         output.reset(ptr);
         for (size_t i = 0; i < vals.size(); ++i) {
-            ptr->set(i, parse_object<Provisioner>(vals[i].get(), ext, path + ".values[" + std::to_string(i) + "]"));
+            ptr->set(i, parse_object<Provisioner>(vals[i].get(), ext, path + ".values[" + std::to_string(i) + "]", version));
         }
         extract_names(map, ptr, path);
 
@@ -371,7 +407,7 @@ public:
      * Any invalid representations in `reader` will cause an error to be thrown.
      */
     template<class Provisioner, class Externals>
-    std::shared_ptr<Base> parse(byteme::Reader& reader, Externals ext) {
+    ParsedList parse(byteme::Reader& reader, Externals ext) {
         std::shared_ptr<millijson::Base> contents;
         if (parallel) {
             byteme::PerByte bytestream(&reader);
@@ -381,10 +417,24 @@ public:
             contents = millijson::parse(bytestream);
         }
 
+        Version version;
+        if (contents->type() == millijson::OBJECT) {
+            auto optr = static_cast<const millijson::Object*>(contents.get());
+            const auto& map = optr->values;
+            auto vIt = map.find("version");
+            if (vIt != map.end()) {
+                if (vIt->second->type() != millijson::STRING) {
+                    throw std::runtime_error("expected a string in 'version'");
+                }
+                auto vptr = static_cast<const millijson::String*>(vIt->second.get());
+                version = parse_version_string(vptr->value);
+            }
+        }
+
         ExternalTracker etrack(std::move(ext));
-        auto output = json::parse_object<Provisioner>(contents.get(), etrack, "");
+        auto output = json::parse_object<Provisioner>(contents.get(), etrack, "", version);
         etrack.validate();
-        return output;
+        return ParsedList(std::move(output), std::move(version));
     }
 
     /**
@@ -401,7 +451,7 @@ public:
      * Any invalid representations in `reader` will cause an error to be thrown.
      */
     template<class Provisioner>
-    std::shared_ptr<Base> parse(byteme::Reader& reader) {
+    ParsedList parse(byteme::Reader& reader) {
         DummyExternals ext(0);
         return parse<Provisioner>(reader, std::move(ext));
     }
@@ -424,7 +474,7 @@ public:
      * Any invalid representations in `reader` will cause an error to be thrown.
      */
     template<class Provisioner, class Externals>
-    std::shared_ptr<Base> parse_file(const std::string& file, Externals ext) {
+    ParsedList parse_file(const std::string& file, Externals ext) {
         byteme::SomeFileReader reader(file.c_str());
         return parse<Provisioner>(reader, std::move(ext));
     }
@@ -443,7 +493,7 @@ public:
      * Any invalid representations in `reader` will cause an error to be thrown.
      */
     template<class Provisioner>
-    std::shared_ptr<Base> parse_file(const std::string& file) {
+    ParsedList parse_file(const std::string& file) {
         DummyExternals ext(0);
         return parse_file<Provisioner>(file, std::move(ext));
     }
@@ -467,7 +517,7 @@ public:
      * Any invalid representations in `reader` will cause an error to be thrown.
      */
     template<class Provisioner, class Externals>
-    std::shared_ptr<Base> parse_buffer(const unsigned char* buffer, size_t len, Externals ext) {
+    ParsedList parse_buffer(const unsigned char* buffer, size_t len, Externals ext) {
         byteme::SomeBufferReader reader(buffer, len);
         return parse<Provisioner>(reader, std::move(ext));
     }
@@ -487,7 +537,7 @@ public:
      * Any invalid representations in `reader` will cause an error to be thrown.
      */
     template<class Provisioner>
-    std::shared_ptr<Base> parse_buffer(const unsigned char* buffer, size_t len) {
+    ParsedList parse_buffer(const unsigned char* buffer, size_t len) {
         DummyExternals ext(0);
         return parse_buffer<Provisioner>(buffer, len, std::move(ext));
     }

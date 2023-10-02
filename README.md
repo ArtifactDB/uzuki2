@@ -186,7 +186,8 @@ A factor is represented as a JSON object with the following properties:
   They should also be less than the length of `levels`.
   Missing values may be represented by `null` or the special value -2147483648.
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
-- `ordered`, a boolean indicating whether to assume that the levels are ordered.
+- (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
+  If absent, levels are assumed to be non-ordered.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
 
 <details>

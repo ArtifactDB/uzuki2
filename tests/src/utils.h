@@ -132,11 +132,11 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
     }
 }
 
-inline std::shared_ptr<uzuki2::Base> load_hdf5(std::string name, std::string group) {
+inline auto load_hdf5(std::string name, std::string group) {
     return uzuki2::Hdf5Parser().parse<DefaultProvisioner>(name, group);
 }
 
-inline std::shared_ptr<uzuki2::Base> load_json(std::string x, bool parallel = false) {
+inline auto load_json(std::string x, bool parallel = false) {
     uzuki2::JsonParser parser;
     parser.parallel = parallel;
     return parser.parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size());

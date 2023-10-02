@@ -132,8 +132,8 @@ TEST(Hdf5DateTest, CheckError) {
      ***********************************************/
 }
 
-TEST(JsonDateTest, SimpleLoading) {
-    auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ] }");
+TEST(JsonDateTest, SimpleLoading_v1_1) {
+    auto parsed = load_json("{ \"type\": \"string\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ], \"format\": \"date\", \"version\": \"1.1\" }");
     EXPECT_EQ(parsed->type(), uzuki2::DATE);
     auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
     EXPECT_EQ(dptr->size(), 2);
@@ -143,16 +143,28 @@ TEST(JsonDateTest, SimpleLoading) {
 
     // Works with scalars.
     {
-        auto parsed = load_json("{ \"type\": \"date\", \"values\": \"2023-02-19\" }");
+        auto parsed = load_json("{ \"type\": \"string\", \"values\": \"2023-02-19\", \"format\":\"date\", \"version\":\"1.1\" }");
         EXPECT_EQ(parsed->type(), uzuki2::DATE);
         auto stuff = static_cast<const DefaultDateVector*>(parsed.get());
         EXPECT_TRUE(stuff->scalar);
         EXPECT_EQ(stuff->base.values[0], "2023-02-19");
     }
 
+    expect_json_error("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ], \"version\": \"1.1\" }", "unknown object type");
+
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
+}
+
+TEST(JsonDateTest, SimpleLoading_v1_0) {
+    auto parsed = load_json("{ \"type\": \"date\", \"values\": [ \"2022-01-22\", \"1990-06-30\" ] }");
+    EXPECT_EQ(parsed->type(), uzuki2::DATE);
+    auto dptr = static_cast<const DefaultDateVector*>(parsed.get());
+    EXPECT_EQ(dptr->size(), 2);
+    EXPECT_FALSE(dptr->scalar);
+    EXPECT_EQ(dptr->base.values[0], "2022-01-22");
+    EXPECT_EQ(dptr->base.values[1], "1990-06-30");
 }
 
 TEST(JsonDateTest, MissingValues) {
@@ -166,6 +178,7 @@ TEST(JsonDateTest, MissingValues) {
 TEST(JsonDateTest, CheckError) {
     expect_json_error("{\"type\":\"date\", \"values\":[true,1,2] }", "expected a string");
     expect_json_error("{\"type\":\"date\", \"values\":[\"foo\", \"bar\"] }", "YYYY-MM-DD");
+    expect_json_error("{\"type\":\"string\", \"format\":\"date\", \"values\":[\"foo\", \"bar\"], \"version\":\"1.1\"}", "YYYY-MM-DD");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

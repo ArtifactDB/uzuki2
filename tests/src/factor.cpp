@@ -119,7 +119,27 @@ TEST(JsonFactorTest, SimpleLoading) {
      ********************************************/
 }
 
-TEST(JsonFactorTest, OrderedLoading) {
+TEST(JsonFactorTest, OrderedLoading_v1_1) {
+    {
+        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": true, \"version\": \"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_TRUE(fptr->ordered);
+    }
+
+    {
+        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": false, \"version\": \"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_FALSE(fptr->ordered);
+    }
+
+    expect_json_error("{ \"type\": \"factor\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": 1, \"version\": \"1.1\" }", "expected a boolean");
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }", "unknown object type 'ordered'");
+}
+
+
+TEST(JsonFactorTest, OrderedLoading_v_1_0) {
     auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
     EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
     auto fptr = static_cast<const DefaultFactor*>(parsed.get());
