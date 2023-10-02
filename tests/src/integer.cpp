@@ -73,6 +73,40 @@ TEST(Hdf5IntegerTest, MissingValues) {
         EXPECT_EQ(iptr->size(), 5);
         EXPECT_EQ(iptr->base.values[2], -123456789); // i.e., the test's missing value placeholder.
     }
+
+    // Latest version doesn't automatically use -2**31 to be a placeholder.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "integer");
+        add_version(vhandle, "1.1");
+        create_dataset<int>(vhandle, "data", { 1, 2, -2147483648, 4, 5 }, H5::PredType::NATIVE_INT);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->size(), 5);
+        EXPECT_EQ(iptr->base.values[2], -2147483648); 
+    }
+
+    // We can instead set our own placeholder.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "integer");
+        add_version(vhandle, "1.1");
+
+        auto dhandle = create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT, H5S_SCALAR);
+        int placeholder = 3;
+        ahandle.write(H5::PredType::NATIVE_INT, &placeholder);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->size(), 5);
+        EXPECT_EQ(iptr->base.values[2], -123456789); 
+    }
 }
 
 TEST(Hdf5IntegerTest, CheckError) {
@@ -137,11 +171,13 @@ TEST(JsonIntegerTest, SimpleLoading) {
 }
 
 TEST(JsonIntegerTest, MissingValues) {
-    auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -1, null, -2e+4 ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-    auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
-    EXPECT_EQ(iptr->size(), 5);
-    EXPECT_EQ(iptr->base.values[3], -123456789); // i.e., the test's missing value placeholder.
+    {
+        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -1, null, -2e+4 ] }");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->size(), 5);
+        EXPECT_EQ(iptr->base.values[3], -123456789); // i.e., the test's missing value placeholder.
+    }
 
     // Same for our special value.
     {
@@ -151,6 +187,16 @@ TEST(JsonIntegerTest, MissingValues) {
         EXPECT_EQ(iptr->size(), 5);
         EXPECT_EQ(iptr->base.values[2], -123456789); 
         EXPECT_EQ(iptr->base.values[3], -123456789);
+    }
+
+    // Except in the latest version.
+    {
+        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -2147483648, null, -2e+4 ], \"version\":\"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->size(), 5);
+        EXPECT_EQ(iptr->base.values[2], -2147483648); 
+        EXPECT_EQ(iptr->base.values[3], -123456789); 
     }
 }
 

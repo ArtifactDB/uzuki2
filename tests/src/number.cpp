@@ -48,10 +48,29 @@ TEST(Hdf5NumberTest, SimpleLoading) {
 TEST(Hdf5NumberTest, MissingValues) {
     auto path = "TEST-number.h5";
 
+    auto missing = uzuki2::hdf5::legacy_missing_double();
+    EXPECT_TRUE(std::isnan(missing));
+
+    // Old version used the missing R value.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "number");
-        create_dataset<double>(vhandle, "data", { 1, 0, std::numeric_limits<double>::quiet_NaN(), 0, 1 }, H5::PredType::NATIVE_DOUBLE);
+        create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, 1 }, H5::PredType::NATIVE_DOUBLE);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+        auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
+        EXPECT_EQ(bptr->size(), 5);
+        EXPECT_EQ(bptr->base.values[2], -123456789);
+    }
+
+    // This is no longer directly supported in the new version.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        add_version(vhandle, "1.1");
+        create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, 1 }, H5::PredType::NATIVE_DOUBLE);
     }
     {
         auto parsed = load_hdf5(path, "blub");
@@ -59,6 +78,24 @@ TEST(Hdf5NumberTest, MissingValues) {
         auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
         EXPECT_EQ(bptr->size(), 5);
         EXPECT_TRUE(std::isnan(bptr->base.values[2]));
+    }
+
+    // Unless we specify it.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        add_version(vhandle, "1.1");
+
+        auto dhandle = create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, 1 }, H5::PredType::NATIVE_DOUBLE);
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
+        ahandle.write(H5::PredType::NATIVE_DOUBLE, &missing);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+        auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
+        EXPECT_EQ(bptr->size(), 5);
+        EXPECT_EQ(bptr->base.values[2], -123456789);
     }
 }
 

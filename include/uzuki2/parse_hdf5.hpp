@@ -5,6 +5,7 @@
 #include <vector>
 #include <cctype>
 #include <string>
+#include <cstring>
 #include <stdexcept>
 #include <cstdint>
 #include <unordered_set>
@@ -131,22 +132,34 @@ inline void forbid_large_integers(const H5::DataSet& handle, const std::string& 
 }
 
 template<class Host, class Function>
-void parse_integer_like(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check) {
+void parse_integer_like(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check, const Version& version) {
     if (handle.getDataType().getClass() != H5T_INTEGER) {
         throw std::runtime_error("expected an integer dataset at '" + path + "'");
     }
     forbid_large_integers(handle, path);
 
-    size_t len = ptr->size();
+    bool has_missing = false;
+    int32_t missing_value = -2147483648;
+    if (version.equals(1, 0)) {
+        has_missing = true;
+    } else {
+        has_missing = handle.attrExists("missing-value-placeholder");
+        if (has_missing) {
+            auto attr = handle.openAttribute("missing-value-placeholder");
+            if (attr.getTypeClass() != H5T_INTEGER || attr.getSpace().getSimpleExtentNdims() != 0) {
+                throw std::runtime_error("'missing-value-placeholder' attribute should be a scalar integer at '" + path + "'");
+            }
+            attr.read(H5::PredType::NATIVE_INT32, &missing_value);
+        }
+    }
 
     // TODO: loop in chunks to reduce memory usage.
+    size_t len = ptr->size();
     std::vector<int32_t> buffer(len);
     handle.read(buffer.data(), H5::PredType::NATIVE_INT32);
-    constexpr int32_t missing_value = -2147483648;
-
     for (hsize_t i = 0; i < len; ++i) {
         auto current = buffer[i];
-        if (current == missing_value) {
+        if (has_missing && current == missing_value) {
             ptr->set_missing(i);
         } else {
             check(current);
@@ -180,8 +193,35 @@ void parse_string_like(const H5::DataSet& handle, Host* ptr, const std::string& 
     });
 }
 
+inline double legacy_missing_double() {
+    uint32_t tmp_value = 1;
+    auto tmp_ptr = reinterpret_cast<unsigned char*>(&tmp_value);
+
+    // Mimic R's generation of these values, but we can't use type punning as
+    // this is not legal in C++, and we don't have bit_cast yet.
+    double missing_value = 0;
+    auto missing_ptr = reinterpret_cast<unsigned char*>(&missing_value);
+
+    int step = 1;
+    if (tmp_ptr[0] == 1) { // little-endian. 
+        missing_ptr += sizeof(double) - 1;
+        step = -1;
+    }
+
+    *missing_ptr = 0x7f;
+    *(missing_ptr += step) = 0xf0;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x00;
+    *(missing_ptr += step) = 0x07;
+    *(missing_ptr += step) = 0xa2;
+
+    return missing_value;
+}
+
 template<class Host, class Function>
-void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check) {
+void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check, const Version& version) {
     if (handle.getDataType().getClass() != H5T_FLOAT) {
         throw std::runtime_error("expected a float dataset at '" + path + "'");
     }
@@ -191,16 +231,43 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path
         throw std::runtime_error("data type is potentially out of range for a double at '" + path + "'");
     }
 
-    size_t len = ptr->size();
+    bool has_missing = false;
+    double missing_value = 0;
+
+    if (version.equals(1, 0)) {
+        has_missing = true;
+        missing_value = legacy_missing_double();
+    } else {
+        has_missing = handle.attrExists("missing-value-placeholder");
+        if (has_missing) {
+            auto attr = handle.openAttribute("missing-value-placeholder");
+            if (attr.getTypeClass() != H5T_FLOAT || attr.getSpace().getSimpleExtentNdims() != 0) {
+                throw std::runtime_error("'missing-value-placeholder' attribute should be a scalar float at '" + path + "'");
+            }
+            attr.read(H5::PredType::NATIVE_DOUBLE, &missing_value);
+        }
+    }
+
+    auto missing_ptr = reinterpret_cast<unsigned char*>(&missing_value);
+    auto is_missing = [&](double val) {
+        // Can't compare directly as missing_value or val might be NaN,
+        // so instead we need to do the comparison byte-by-byte.
+        auto candidate_ptr = reinterpret_cast<unsigned char*>(&val);
+        return std::memcmp(candidate_ptr, missing_ptr, sizeof(double)) == 0;
+    };
 
     // TODO: loop in chunks to reduce memory usage.
+    size_t len = ptr->size();
     std::vector<double> buffer(len);
     handle.read(buffer.data(), H5::PredType::NATIVE_DOUBLE);
-
     for (hsize_t i = 0; i < len; ++i) {
         auto current = buffer[i];
-        check(current);
-        ptr->set(i, current);
+        if (has_missing && is_missing(current)) {
+            ptr->set_missing(i);
+        } else {
+            check(current);
+            ptr->set(i, current);
+        }
     }
 }
 
@@ -275,7 +342,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         if (vector_type == "integer") {
             auto iptr = Provisioner::new_Integer(len);
             output.reset(iptr);
-            parse_integer_like(dhandle, iptr, dpath, [](int32_t) -> void {});
+            parse_integer_like(dhandle, iptr, dpath, [](int32_t) -> void {}, version);
             if (is_scalar) {
                 iptr->is_scalar();
             }
@@ -287,7 +354,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 if (x != 0 && x != 1) {
                      throw std::runtime_error("boolean values should be 0 or 1 in '" + dpath + "'");
                 }
-            });
+            }, version);
             if (is_scalar) {
                 bptr->is_scalar();
             }
@@ -324,7 +391,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 if (x < 0 || x >= levlen) {
                      throw std::runtime_error("factor codes should be non-negative and less than the number of levels in '" + dpath + "'");
                 }
-            });
+            }, version);
 
             std::unordered_set<std::string> present;
             load_string_dataset(levhandle, levlen, [&](size_t i, std::string x) -> void { 
@@ -381,7 +448,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         } else if (vector_type == "number") {
             auto dptr = Provisioner::new_Number(len);
             output.reset(dptr);
-            parse_numbers(dhandle, dptr, dpath, [](double) -> void {});
+            parse_numbers(dhandle, dptr, dpath, [](double) -> void {}, version);
             if (is_scalar) {
                 dptr->is_scalar();
             }

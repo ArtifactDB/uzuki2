@@ -60,6 +60,33 @@ TEST(Hdf5BooleanTest, MissingValues) {
         EXPECT_EQ(bptr->size(), 5);
         EXPECT_EQ(bptr->base.values[2], 255); // i.e., the test's missing value placeholder.
     }
+
+    // Except in the latest version.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "boolean");
+        add_version(vhandle, "1.1");
+        create_dataset<int>(vhandle, "data", { 1, 0, -2147483648, 0, 1 }, H5::PredType::NATIVE_INT);
+    }
+    expect_hdf5_error(path, "blub", "boolean values should be");
+
+    // Unless we specify a placeholder.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "boolean");
+        add_version(vhandle, "1.1");
+        auto dhandle = create_dataset<int>(vhandle, "data", { 1, 0, 2, 0, 1 }, H5::PredType::NATIVE_UINT8);
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT, H5S_SCALAR);
+        int placeholder = 2;
+        ahandle.write(H5::PredType::NATIVE_INT, &placeholder);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
+        auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
+        EXPECT_EQ(bptr->size(), 5);
+        EXPECT_EQ(bptr->base.values[2], 255); // i.e., the test's missing value placeholder.
+    }
 }
 
 TEST(Hdf5BooleanTest, CheckError) {

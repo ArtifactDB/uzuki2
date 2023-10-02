@@ -72,7 +72,7 @@ void process_array_or_scalar_values(
 }
 
 template<class Destination, class Function>
-void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination* dest, Function check, const std::string& path) {
+void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination* dest, Function check, const std::string& path, const Version& version) {
     for (size_t i = 0; i < values.size(); ++i) {
         if (values[i]->type() == millijson::NOTHING) {
             dest->set_missing(i);
@@ -95,7 +95,7 @@ void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& valu
         }
 
         int32_t ival = val;
-        if (val == -2147483648) {
+        if (version.equals(1, 0) && val == -2147483648) {
             dest->set_missing(i);
             continue;
         }
@@ -194,7 +194,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
         process_array_or_scalar_values(map, path, [&](const auto& vals) -> auto {
             auto ptr = Provisioner::new_Integer(vals.size());
             output.reset(ptr);
-            extract_integers(vals, ptr, [](int32_t) -> void {}, path);
+            extract_integers(vals, ptr, [](int32_t) -> void {}, path, version);
             extract_names(map, ptr, path);
             return ptr;
         });
@@ -225,7 +225,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
             if (x < 0 || x >= nlevels) {
                 throw std::runtime_error("factor indices of out of range of levels in '" + path + "'");
             }
-        }, path);
+        }, path, version);
 
         std::unordered_set<std::string> existing;
         for (size_t l = 0; l < lvals.size(); ++l) {

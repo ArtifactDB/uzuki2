@@ -57,15 +57,9 @@ The allowed HDF5 datatype depends on `uzuki_type`:
 - `"number"`: any type of `H5T_FLOAT` that can be represented by a double-precision float.
 - `"string"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
 
-For some `uzuki_type`, further considerations may be applicable:
+For `boolean` type, values in `**/data` should be one of 0 (false) or 1 (true).
 
-- `"integer"`: values of `**/data` that are equal to -2147483648 should be treated as missing.
-- `"boolean"`: values in `**/data` should be one of 0 (false), 1 (true), or -2147483648 (missing).
-- `string`: the `**/data` dataset may contain a `"missing-value-placeholder"` attribute.
-  If present, this should be a string scalar dataset that specifies the placeholder for missing values.
-  Any value of `**/data` that is equal to this placeholder should be treated as missing.
-
-For `string` types, the group may optionally contain the `**/format` dataset.
+For `string` type, the group may optionally contain the `**/format` dataset.
 This should be a scalar string dataset that specifies constraints to the format of the values in `**/data`:
 
 - `"date"`: strings should be `YYYY-MM-DD` dates or the placeholder value.
@@ -80,6 +74,23 @@ In version 1.0, it was possible to have `uzuki_type` set to `"date"` or `"date-t
 This is the same as `uzuki_type` of `"string"` with `**/format` set to `"date"` or `"date-time"`.
 </details>
 
+#### Representing missing values
+
+Each `**/data` dataset may optionally contain a `"missing-value-placeholder"` attribute.
+If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values.
+Any value of `**/data` that is equal to this placeholder should be treated as missing.
+If no such attribute is present, it can be assumed that there are no missing values. 
+
+Floating point missingness may be encoded in the payload of an NaN,
+which distinguishes it from a non-missing "not-a-number" value.
+
+<details>
+<summary>Changes from previous versions</summary>
+In version 1.0, integer or boolean values of -2147483648 were treated as missing.
+
+In version 1.0, missing floats were represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
+</details>
+
 ### Factors
 
 A factor is represented as a HDF5 group (`**/`) with the following attributes:
@@ -89,7 +100,7 @@ A factor is represented as a HDF5 group (`**/`) with the following attributes:
 
 The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
 This should be type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
-Missing values are represented by -2147483648.
+Missing values are represented as described above for atomic vectors.
 
 The group should also contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `data`.
 Values in `**/levels` should be unique.
@@ -157,7 +168,7 @@ The contents of `values` is subject to some constraints:
   Missing values are represented by `null`.
   IEEE special values can be represented by strings, i.e., `NaN`, `Inf`, `-Inf`.
 - `"integer"`: values should be JSON numbers that can be represented by a 32-bit signed integer.
-  Missing values may be represented by `null` or the special value -2147483648.
+  Missing values may be represented by `null`.
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
@@ -176,6 +187,8 @@ While R makes no distinction between scalars and length-1 vectors, this may be u
 <summary>Changes from previous versions</summary>
 In version 1.0, it was possible to have `type` set to `"date"` or `"date-time"`.
 This is the same as `"type": "string"` with `format` set to `"date"` or `"date-time"`.
+
+In version 1.0, missing integers could also be represented by the special value -2147483648.
 </details>
 
 ### Factors
@@ -186,7 +199,7 @@ A factor is represented as a JSON object with the following properties:
 - `values`, an array of 0-based integer indices for the factor.
   These should be non-negative JSON numbers that can fit into a 32-bit signed integer.
   They should also be less than the length of `levels`.
-  Missing values may be represented by `null` or the special value -2147483648.
+  Missing values are represented by `null`.
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
 - (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
   If absent, levels are assumed to be non-ordered.
@@ -196,6 +209,8 @@ A factor is represented as a JSON object with the following properties:
 <summary>Changes from previous versions</summary>
 In version 1.0, it was possible to have `"type": "ordered"`.
 This is the same as `"type": "factor"` with `"ordered": true`. 
+
+In version 1.0, missing values could also be represented by the special value -2147483648.
 </details>
 
 ### Nothing
