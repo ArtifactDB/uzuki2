@@ -1,6 +1,6 @@
 <map id="uzuki2/uzuki2.hpp" name="uzuki2/uzuki2.hpp">
 <area shape="rect" id="node1" title="Umbrella header for the uzuki2 library." alt="" coords="821,5,945,31"/>
-<area shape="rect" id="node2" href="$parse__hdf5_8hpp_source.html" title=" " alt="" coords="514,79,625,104"/>
+<area shape="rect" id="node2" href="$parse__hdf5_8hpp.html" title="Parsing methods for HDF5 files." alt="" coords="514,79,625,104"/>
 <area shape="rect" id="node16" href="$parse__json_8hpp.html" title="Parsing methods for JSON files." alt="" coords="1201,79,1311,104"/>
 <area shape="rect" id="node3" title=" " alt="" coords="421,225,489,251"/>
 <area shape="rect" id="node4" title=" " alt="" coords="513,225,572,251"/>

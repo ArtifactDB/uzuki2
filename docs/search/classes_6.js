@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['list_0',['List',['../structuzuki2_1_1List.html',1,'uzuki2']]]
+  ['options_0',['Options',['../structuzuki2_1_1json_1_1Options.html',1,'uzuki2::json']]]
 ];

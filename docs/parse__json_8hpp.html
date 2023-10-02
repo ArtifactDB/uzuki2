@@ -77,7 +77,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">parse_json.hpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -141,8 +142,8 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classuzuki2_1_1JsonParser.html">uzuki2::JsonParser</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification.  <a href="classuzuki2_1_1JsonParser.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structuzuki2_1_1json_1_1Options.html">uzuki2::json::Options</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for JSON file parsing.  <a href="structuzuki2_1_1json_1_1Options.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
@@ -150,6 +151,36 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceuzuki2"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2.html">uzuki2</a></td></tr>
 <tr class="memdesc:namespaceuzuki2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse an R list from a HDF5 or JSON file. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespaceuzuki2_1_1json"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html">uzuki2::json</a></td></tr>
+<tr class="memdesc:namespaceuzuki2_1_1json"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse an R list from a JSON file. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a93eaeba4d87e2c0198e7471b42c9af2f"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
+<tr class="memitem:a93eaeba4d87e2c0198e7471b42c9af2f"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#a93eaeba4d87e2c0198e7471b42c9af2f">uzuki2::json::parse</a> (byteme::Reader &amp;reader, Externals ext, Options options=Options())</td></tr>
+<tr class="separator:a93eaeba4d87e2c0198e7471b42c9af2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02e2cf9f24339f7024c66bd5e9926b0e"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
+<tr class="memitem:a02e2cf9f24339f7024c66bd5e9926b0e"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#a02e2cf9f24339f7024c66bd5e9926b0e">uzuki2::json::parse</a> (byteme::Reader &amp;reader, Options options=Options())</td></tr>
+<tr class="separator:a02e2cf9f24339f7024c66bd5e9926b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ba190735981274470383bae279c8ea1"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
+<tr class="memitem:a8ba190735981274470383bae279c8ea1"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#a8ba190735981274470383bae279c8ea1">uzuki2::json::parse_file</a> (const std::string &amp;file, Externals ext, Options options=Options())</td></tr>
+<tr class="separator:a8ba190735981274470383bae279c8ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f8eda33218387c127e23ba0029a4529"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
+<tr class="memitem:a2f8eda33218387c127e23ba0029a4529"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#a2f8eda33218387c127e23ba0029a4529">uzuki2::json::parse_file</a> (const std::string &amp;file, Options options=Options())</td></tr>
+<tr class="separator:a2f8eda33218387c127e23ba0029a4529"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc1a0d4cd584d0d005e819e1edf41be1"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
+<tr class="memitem:afc1a0d4cd584d0d005e819e1edf41be1"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#afc1a0d4cd584d0d005e819e1edf41be1">uzuki2::json::parse_buffer</a> (const unsigned char *buffer, size_t len, Externals ext, Options options=Options())</td></tr>
+<tr class="separator:afc1a0d4cd584d0d005e819e1edf41be1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64a9cd9d870ee0c8a167842f75b28e2f"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
+<tr class="memitem:a64a9cd9d870ee0c8a167842f75b28e2f"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#a64a9cd9d870ee0c8a167842f75b28e2f">uzuki2::json::parse_buffer</a> (const unsigned char *buffer, size_t len, Options options=Options())</td></tr>
+<tr class="separator:a64a9cd9d870ee0c8a167842f75b28e2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abff6ef0d77d222cd9b3daae7185d07f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#abff6ef0d77d222cd9b3daae7185d07f8">uzuki2::json::validate</a> (byteme::Reader &amp;reader, int num_external=0, Options options=Options())</td></tr>
+<tr class="separator:abff6ef0d77d222cd9b3daae7185d07f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab4e4a3e54218ba7171468f933407326"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#aab4e4a3e54218ba7171468f933407326">uzuki2::json::validate_file</a> (const std::string &amp;file, int num_external=0, Options options=Options())</td></tr>
+<tr class="separator:aab4e4a3e54218ba7171468f933407326"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef946a811ebd472d6261cc52e3554382"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1json.html#aef946a811ebd472d6261cc52e3554382">uzuki2::json::validate_buffer</a> (const unsigned char *buffer, size_t len, int num_external=0, Options options=Options())</td></tr>
+<tr class="separator:aef946a811ebd472d6261cc52e3554382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Parsing methods for JSON files. </p>
