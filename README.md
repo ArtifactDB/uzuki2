@@ -65,7 +65,8 @@ For some `uzuki_type`, further considerations may be applicable:
   If present, this should be a string scalar dataset that specifies the placeholder for missing values.
   Any value of `**/data` that is equal to this placeholder should be treated as missing.
 
-For `string` types, the group may also contain the `uzuki_format` attribute to constrain the string values in `**/data`:
+For `string` types, the group may optionally contain the `**/format` dataset.
+This should be a scalar string dataset that specifies constraints to the format of the values in `**/data`:
 
 - `"date"`: strings should be `YYYY-MM-DD` dates or the placeholder value.
 - `"date-time"`: strings should be in the Internet Date/Time format ([RFC 3339, Section 5.6](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)) or the placeholder value.
@@ -76,7 +77,7 @@ If `**/data` is a scalar, `**/names` should have length 1.
 <details>
 <summary>Changes from previous versions</summary>
 In version 1.0, it was possible to have `uzuki_type` set to `"date"` or `"date-time"`.
-This is the same as `uzuki_type` of `"string"` with `format` set to `"date"` or `"date-time"`.
+This is the same as `uzuki_type` of `"string"` with `**/format` set to `"date"` or `"date-time"`.
 </details>
 
 ### Factors
@@ -96,13 +97,13 @@ Values in `**/data` should be non-negative (missing values excepted) and less th
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
 
-The group may also have an `uzuki_ordered` attribute, containing a scalar integer dataset.
-This is to be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.
+The group may optionally contain `**/ordered`, a scalar integer dataset.
+This should be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.
 
 <details>
 <summary>Changes from previous versions</summary>
 In version 1.0, it was possible to have `uzuki_type` set to `"ordered"`.
-This is the same as `uzuki_type` of `"factor"` with the `ordered` dataset set to a truthy value.
+This is the same as `uzuki_type` of `"factor"` with the `**/ordered` dataset set to a truthy value.
 </details>
 
 ### Nothing

@@ -30,6 +30,44 @@ TEST(Hdf5DateTimeTest, SimpleLoading) {
         EXPECT_EQ(sptr->base.values.back(), "2022-05-06T13:00:00.334-02:12");
     }
 
+    // Works for scalars.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "date-time");
+        write_string(vhandle, "data", "2077-12-12T22:11:00Z");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
+        auto sptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
+        EXPECT_EQ(sptr->size(), 1);
+        EXPECT_EQ(sptr->base.values.front(), "2077-12-12T22:11:00Z");
+    }
+
+    // Works for the most recent version.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        add_version(vhandle, "1.1");
+
+        create_dataset(vhandle, "data", { 
+            "2077-12-12T22:11:00Z", 
+            "2055-01-01T05:34:12+19:11", 
+            "2022-05-06T24:00:00-02:12", 
+            "2022-05-06T24:00:00.000+02:12", 
+            "2022-05-06T13:00:00.334-02:12"
+        });
+        write_string(vhandle, "format", "date-time");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
+        auto sptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
+        EXPECT_EQ(sptr->size(), 5);
+        EXPECT_EQ(sptr->base.values.front(), "2077-12-12T22:11:00Z");
+        EXPECT_EQ(sptr->base.values.back(), "2022-05-06T13:00:00.334-02:12");
+    }
+
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
@@ -89,18 +127,38 @@ TEST(Hdf5DateTimeTest, CheckError) {
         expect_hdf5_error(path, "foo", "dates should follow");
     }
 
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "date-time");
+        add_version(vhandle, "1.1");
+        create_dataset(vhandle, "data", { "2077-12-12T00:00:00Z" });
+    }
+    expect_hdf5_error(path, "foo", "unknown vector type");
+
     /***********************************************
      *** See integer.cpp for vector error tests. ***
      ***********************************************/
 }
 
-TEST(JsonDateTimeTest, SimpleLoading_v1_1) {
-    auto parsed = load_json("{ \"type\":\"string\", \"format\":\"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ], \"version\":\"1.1\"}");
-    EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
-    auto dptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
-    EXPECT_EQ(dptr->size(), 2);
-    EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
-    EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
+TEST(JsonDateTimeTest, SimpleLoading) {
+    {
+        auto parsed = load_json("{ \"type\": \"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ] }");
+        EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
+        auto dptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
+        EXPECT_EQ(dptr->size(), 2);
+        EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
+        EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
+    }
+
+    // Works with a more recent version.
+    {
+        auto parsed = load_json("{ \"type\":\"string\", \"format\":\"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ], \"version\":\"1.1\"}");
+        EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
+        auto dptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
+        EXPECT_EQ(dptr->size(), 2);
+        EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
+        EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
+    }
 
     // Works with scalars.
     {
@@ -116,15 +174,6 @@ TEST(JsonDateTimeTest, SimpleLoading_v1_1) {
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
-}
-
-TEST(JsonDateTimeTest, SimpleLoading_v1_0) {
-    auto parsed = load_json("{ \"type\": \"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::DATETIME);
-    auto dptr = static_cast<const DefaultDateTimeVector*>(parsed.get());
-    EXPECT_EQ(dptr->size(), 2);
-    EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
-    EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
 }
 
 TEST(JsonDateTimeTest, MissingValues) {

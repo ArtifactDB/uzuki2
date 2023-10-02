@@ -28,6 +28,22 @@ TEST(Hdf5FactorTest, SimpleLoading) {
         EXPECT_EQ(fptr->levels[2], "Gillard");
     }
 
+    // Works in later verisons.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+
+        create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
+        create_dataset(vhandle, "levels", { "Albo", "Rudd", "Gillard" });
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_FALSE(fptr->ordered);
+    }
+
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
@@ -36,7 +52,6 @@ TEST(Hdf5FactorTest, SimpleLoading) {
 TEST(Hdf5FactorTest, OrderedLoading) {
     auto path = "TEST-factor.h5";
 
-    // Simple stuff works correctly.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "ordered");
@@ -49,6 +64,41 @@ TEST(Hdf5FactorTest, OrderedLoading) {
         auto fptr = static_cast<const DefaultFactor*>(parsed.get());
         EXPECT_TRUE(fptr->ordered);
     }
+
+    // Works with later versions.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+
+        create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
+        create_dataset(vhandle, "levels", { "Albo", "Rudd", "Gillard" });
+        write_scalar(vhandle, "ordered", 1, H5::PredType::NATIVE_UINT8);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_TRUE(fptr->ordered);
+    }
+
+    // Works in the negative case.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+
+        create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
+        create_dataset(vhandle, "levels", { "Albo", "Rudd", "Gillard" });
+        write_scalar(vhandle, "ordered", 0, H5::PredType::NATIVE_UINT8);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_FALSE(fptr->ordered);
+    }
+
 }
 
 TEST(Hdf5FactorTest, MissingValues) {
@@ -97,29 +147,81 @@ TEST(Hdf5FactorTest, CheckError) {
     }
     expect_hdf5_error(path, "blub", "unique");
 
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+
+        create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
+        create_dataset(vhandle, "levels", { "Malcolm", "Tony", "John" });
+        vhandle.createGroup("ordered");
+    }
+    expect_hdf5_error(path, "blub", "dataset");
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+
+        create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
+        create_dataset(vhandle, "levels", { "Malcolm", "Tony", "John" });
+        write_scalar(vhandle, "ordered", 1.2, H5::PredType::NATIVE_DOUBLE);
+    }
+    expect_hdf5_error(path, "blub", "wrong datatype");
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "factor");
+        add_version(vhandle, "1.1");
+
+        create_dataset<int>(vhandle, "data", { 0, 1, 2, 2, 1 }, H5::PredType::NATIVE_INT);
+        create_dataset(vhandle, "levels", { "Malcolm", "Tony", "John" });
+        create_dataset<int>(vhandle, "ordered", { 1 }, H5::PredType::NATIVE_INT);
+    }
+    expect_hdf5_error(path, "blub", "scalar dataset");
+
     /***********************************************
      *** See integer.cpp for vector error tests. ***
      ***********************************************/
 }
 
 TEST(JsonFactorTest, SimpleLoading) {
-    auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 0, 1, 1, 0, 2 ], \"levels\": [ \"akari\", \"alice\", \"aika\" ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+    {
+        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 0, 1, 1, 0, 2 ], \"levels\": [ \"akari\", \"alice\", \"aika\" ] }");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
 
-    auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-    EXPECT_EQ(fptr->size(), 5);
-    EXPECT_EQ(fptr->vbase.values.front(), 0);
-    EXPECT_EQ(fptr->vbase.values.back(), 2);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_EQ(fptr->size(), 5);
+        EXPECT_EQ(fptr->vbase.values.front(), 0);
+        EXPECT_EQ(fptr->vbase.values.back(), 2);
 
-    EXPECT_EQ(fptr->levels[0], "akari");
-    EXPECT_EQ(fptr->levels[2], "aika");
+        EXPECT_EQ(fptr->levels[0], "akari");
+        EXPECT_EQ(fptr->levels[2], "aika");
+    }
+
+    // Works in later versions.
+    {
+        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_FALSE(fptr->ordered);
+    }
+
 
     /********************************************
      *** See integer.cpp for tests for names. ***
      ********************************************/
 }
 
-TEST(JsonFactorTest, OrderedLoading_v1_1) {
+TEST(JsonFactorTest, OrderedLoading) {
+    {
+        auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
+        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
+        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
+        EXPECT_TRUE(fptr->ordered);
+    }
+
+    // Works in later versions.
     {
         auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": true, \"version\": \"1.1\" }");
         EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
@@ -127,23 +229,13 @@ TEST(JsonFactorTest, OrderedLoading_v1_1) {
         EXPECT_TRUE(fptr->ordered);
     }
 
+    // Responds to the negative case.
     {
         auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": false, \"version\": \"1.1\" }");
         EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
         auto fptr = static_cast<const DefaultFactor*>(parsed.get());
         EXPECT_FALSE(fptr->ordered);
     }
-
-    expect_json_error("{ \"type\": \"factor\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": 1, \"version\": \"1.1\" }", "expected a boolean");
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }", "unknown object type 'ordered'");
-}
-
-
-TEST(JsonFactorTest, OrderedLoading_v_1_0) {
-    auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-    auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-    EXPECT_TRUE(fptr->ordered);
 }
 
 TEST(JsonFactorTest, MissingValues) {
@@ -161,6 +253,9 @@ TEST(JsonFactorTest, CheckError) {
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 3, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "out of range");
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, -1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "out of range");
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"aria\", \"aria\", \"aria\" ] }", "duplicate string");
+
+    expect_json_error("{ \"type\": \"factor\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": 1, \"version\": \"1.1\" }", "expected a boolean");
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }", "unknown object type 'ordered'");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***
