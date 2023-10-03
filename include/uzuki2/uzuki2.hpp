@@ -11,7 +11,9 @@
  * @brief Parse an R list from a HDF5 or JSON file.
  */
 
+#ifdef __has_include("H5Cpp.h")
 #include "parse_hdf5.hpp"
+#endif
 #include "parse_json.hpp"
 
 #endif
