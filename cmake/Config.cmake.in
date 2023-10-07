@@ -4,4 +4,8 @@ include(CMakeFindDependencyMacro)
 find_dependency(ltla_millijson CONFIG REQUIRED)
 find_dependency(ltla_byteme CONFIG REQUIRED)
 
+if(@UZUKI2_FIND_HDF5@)
+    find_package(HDF5 COMPONENTS C CXX)
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/artifactdb_uzuki2Targets.cmake")
