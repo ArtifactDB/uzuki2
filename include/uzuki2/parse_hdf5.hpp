@@ -55,25 +55,30 @@ std::string load_string_attribute(const H5Object& handle, const std::string& fie
     return load_string_attribute(handle.openAttribute(field), field, path);
 }
 
-inline hsize_t pick_block_size(const H5::DataSet& handle) {
+inline hsize_t pick_block_size(const H5::DataSet& handle, hsize_t full_length) {
     constexpr hsize_t buffer_size = 10000;
-    hsize_t block_size = buffer_size;
-
-    auto cplist = handle.getCreatePlist();
-    if (cplist.getLayout() == H5D_CHUNKED) {
-        hsize_t chunk_size;
-        cplist.getChunk(1, &chunk_size);
-
-        // Finding the number of chunks to load per iteration; this is either
-        // the largest multiple below 'buffer_size' or the chunk size.
-        int num_chunks = (buffer_size / chunk_size);
-        if (num_chunks == 0) {
-            num_chunks = 1;
-        }
-        block_size = num_chunks * chunk_size;
+    if (full_length < buffer_size) {
+        return full_length;
     }
 
-    return block_size;
+    auto cplist = handle.getCreatePlist();
+    if (cplist.getLayout() != H5D_CHUNKED) {
+        return buffer_size;
+    }
+
+    hsize_t chunk_size;
+    cplist.getChunk(1, &chunk_size);
+
+    // Finding the number of chunks to load per iteration; this is either
+    // the largest multiple below 'buffer_size' or the chunk size.
+    int num_chunks = (buffer_size / chunk_size);
+    if (num_chunks == 0) {
+        num_chunks = 1;
+    }
+
+    // This is already guaranteed to be less than 'full_length', as 
+    // 'chunk_size <= full_length' from HDF5.
+    return num_chunks * chunk_size;
 }
 
 template<class Function>
@@ -92,7 +97,7 @@ void process_by_block(hsize_t block_size, hsize_t full_length, Function fun) {
 
 template<class Function>
 void load_string_dataset(const H5::DataSet& handle, hsize_t full_length, Function fun) {
-    auto block_size = pick_block_size(handle);
+    auto block_size = pick_block_size(handle, full_length);
     auto dtype = handle.getDataType();
 
     if (dtype.isVariableStr()) {
@@ -205,11 +210,12 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, const std::string&
         }
     }
 
-    auto block_size = pick_block_size(handle);
+    hsize_t full_length = ptr->size();
+    auto block_size = pick_block_size(handle, full_length);
     std::vector<int32_t> buffer(block_size);
     process_by_block(
         block_size, 
-        ptr->size(),
+        full_length,
         [&](hsize_t counter, hsize_t limit, const H5::DataSpace& mspace, const H5::DataSpace& dspace) -> void {
             handle.read(buffer.data(), H5::PredType::NATIVE_INT32, mspace, dspace);
             for (hsize_t i = 0; i < limit; ++i) {
@@ -313,11 +319,12 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path
         return std::memcmp(candidate_ptr, missing_ptr, sizeof(double)) == 0;
     };
 
-    auto block_size = pick_block_size(handle);
+    hsize_t full_length = ptr->size();
+    auto block_size = pick_block_size(handle, full_length);
     std::vector<double> buffer(block_size);
     process_by_block(
         block_size, 
-        ptr->size(),
+        full_length,
         [&](hsize_t counter, hsize_t limit, const H5::DataSpace& mspace, const H5::DataSpace& dspace) -> void {
             handle.read(buffer.data(), H5::PredType::NATIVE_DOUBLE, mspace, dspace);
             for (hsize_t i = 0; i < limit; ++i) {

@@ -74,10 +74,10 @@ TEST(Hdf5BlockSizeTest, Choices) {
     auto path = "TEST-blocks.h5";
 
     // Rounds down to the nearest multiple.
+    hsize_t len = 30000;
     hsize_t chunk = 57;
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
-        hsize_t len = 30000;
         H5::DataSpace dspace(1, &len);
         H5::DSetCreatPropList cplist;
         cplist.setChunk(1, &chunk);
@@ -87,14 +87,13 @@ TEST(Hdf5BlockSizeTest, Choices) {
     {
         H5::H5File handle(path, H5F_ACC_RDONLY);
         auto dhandle = handle.openDataSet("YAY");
-        auto block_size = uzuki2::hdf5::pick_block_size(dhandle);
+        auto block_size = uzuki2::hdf5::pick_block_size(dhandle, len);
         EXPECT_EQ(block_size, (10000 / chunk) * chunk);
     }
 
     // Or uses the entire chunk.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
-        hsize_t len = 30000;
         H5::DataSpace dspace(1, &len);
         H5::DSetCreatPropList cplist;
         hsize_t chunk = 15000;
@@ -105,22 +104,35 @@ TEST(Hdf5BlockSizeTest, Choices) {
     {
         H5::H5File handle(path, H5F_ACC_RDONLY);
         auto dhandle = handle.openDataSet("YAY");
-        auto block_size = uzuki2::hdf5::pick_block_size(dhandle);
+        auto block_size = uzuki2::hdf5::pick_block_size(dhandle, len);
         EXPECT_EQ(block_size, 15000);
     }
 
     // Or just uses the hard-coded value for uncompressed things.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
-        hsize_t len = 30000;
         H5::DataSpace dspace(1, &len);
         handle.createDataSet("YAY", H5::PredType::NATIVE_UINT8, dspace);
     }
     {
         H5::H5File handle(path, H5F_ACC_RDONLY);
         auto dhandle = handle.openDataSet("YAY");
-        auto block_size = uzuki2::hdf5::pick_block_size(dhandle);
+        auto block_size = uzuki2::hdf5::pick_block_size(dhandle, len);
         EXPECT_EQ(block_size, 10000);
+    }
+
+    // Or falls back to the full length if it's small enough.
+    hsize_t shortlen = 5;
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        H5::DataSpace dspace(1, &shortlen);
+        handle.createDataSet("YAY", H5::PredType::NATIVE_UINT8, dspace);
+    }
+    {
+        H5::H5File handle(path, H5F_ACC_RDONLY);
+        auto dhandle = handle.openDataSet("YAY");
+        auto block_size = uzuki2::hdf5::pick_block_size(dhandle, shortlen);
+        EXPECT_EQ(block_size, shortlen);
     }
 }
 
