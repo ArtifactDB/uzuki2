@@ -57,6 +57,42 @@ TEST(Hdf5IntegerTest, SimpleLoading) {
     }
 }
 
+TEST(Hdf5NumberTest, BlockLoading) {
+    auto path = "TEST-string.h5";
+
+    // Buffer size is 10000, so we make sure we have enough values to go through a few iterations.
+    std::vector<int> collected(25000);
+    for (size_t i = 0; i < collected.size(); ++i) {
+        collected[i] = i;
+    }
+
+    // Uncompressed works correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "integer");
+        create_dataset<int>(vhandle, "data", collected, H5::PredType::NATIVE_INT, /* compressed */ false);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->base.values, collected);
+    }
+
+    // Compressed works correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "integer");
+        create_dataset<int>(vhandle, "data", collected, H5::PredType::NATIVE_INT, /* compressed */ true);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
+        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
+        EXPECT_EQ(iptr->base.values, collected);
+    }
+}
+
 TEST(Hdf5IntegerTest, MissingValues) {
     auto path = "TEST-integer.h5";
 

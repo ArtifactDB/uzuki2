@@ -85,10 +85,20 @@ inline H5::DataSet write_string(const H5::Group& parent, const std::string& name
 }
 
 template<typename T>
-H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, std::vector<T> values, const H5::DataType& dtype) {
+H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, const std::vector<T>& values, const H5::DataType& dtype, bool compressed = false) {
     hsize_t len = values.size();
     H5::DataSpace dspace(1, &len);
-    auto dhandle = parent.createDataSet(name, dtype, dspace);
+
+    H5::DSetCreatPropList cplist;
+    if (compressed) {
+        hsize_t chunk = 57;
+        cplist.setChunk(1, &chunk);
+        cplist.setDeflate(8);
+    } else {
+        cplist = H5::DSetCreatPropList::DEFAULT;
+    }
+
+    auto dhandle = parent.createDataSet(name, dtype, dspace, cplist);
 
     if constexpr(std::is_same<T, int>::value) {
         dhandle.write(values.data(), H5::PredType::NATIVE_INT);
@@ -101,9 +111,18 @@ H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, std
     return dhandle;
 }
 
-inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, std::vector<std::string> values, bool variable = false) {
+inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, const std::vector<std::string>& values, bool variable = false, bool compressed = false) {
     hsize_t len = values.size();
     H5::DataSpace dspace(1, &len);
+
+    H5::DSetCreatPropList cplist;
+    if (compressed) {
+        hsize_t chunk = 96;
+        cplist.setChunk(1, &chunk);
+        cplist.setDeflate(6);
+    } else {
+        cplist = H5::DSetCreatPropList::DEFAULT;
+    }
 
     if (!variable) {
         size_t maxlen = 1;
@@ -120,7 +139,7 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
         }
 
         H5::StrType stype(0, maxlen);
-        auto dhandle = parent.createDataSet(name, stype, dspace);
+        auto dhandle = parent.createDataSet(name, stype, dspace, cplist);
         dhandle.write(buffer.data(), stype);
         return dhandle;
 
@@ -132,7 +151,7 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
         }
 
         H5::StrType stype(H5::PredType::C_S1, H5T_VARIABLE); 
-        auto dhandle = parent.createDataSet(name, stype, dspace);
+        auto dhandle = parent.createDataSet(name, stype, dspace, cplist);
         dhandle.write(ptrs.data(), stype);
         return dhandle;
     }
