@@ -78,6 +78,55 @@ TEST(Hdf5StringTest, SimpleLoading) {
      ********************************************/
 }
 
+TEST(Hdf5StringTest, BlockLoading) {
+    auto path = "TEST-string.h5";
+
+    // Buffer size is 10000, so we make sure we have enough values to go through a few iterations.
+    std::vector<std::string> collected(25000);
+    for (size_t i = 0; i < collected.size(); ++i) {
+        collected[i] = std::to_string(i);
+    }
+
+    // Uncompressed works correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        create_dataset(vhandle, "data", collected, /* variable */ false, /* compressed */ false);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_EQ(sptr->base.values, collected);
+    }
+
+    // Compressed works correctly.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        create_dataset(vhandle, "data", collected, /* variable */ false, /* compressed */ true);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_EQ(sptr->base.values, collected);
+    }
+
+    // Compressed works correctly with variable strings.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        create_dataset(vhandle, "data", collected, /* variable */ true, /* compressed */ true);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::STRING);
+        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+        EXPECT_EQ(sptr->base.values, collected);
+    }
+}
+
 TEST(Hdf5StringTest, MissingValues) {
     auto path = "TEST-string.h5";
 

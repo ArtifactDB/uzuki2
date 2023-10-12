@@ -55,33 +55,82 @@ std::string load_string_attribute(const H5Object& handle, const std::string& fie
     return load_string_attribute(handle.openAttribute(field), field, path);
 }
 
+inline hsize_t pick_block_size(const H5::DataSet& handle, hsize_t full_length) {
+    constexpr hsize_t buffer_size = 10000;
+    if (full_length < buffer_size) {
+        return full_length;
+    }
+
+    auto cplist = handle.getCreatePlist();
+    if (cplist.getLayout() != H5D_CHUNKED) {
+        return buffer_size;
+    }
+
+    hsize_t chunk_size;
+    cplist.getChunk(1, &chunk_size);
+
+    // Finding the number of chunks to load per iteration; this is either
+    // the largest multiple below 'buffer_size' or the chunk size.
+    int num_chunks = (buffer_size / chunk_size);
+    if (num_chunks == 0) {
+        num_chunks = 1;
+    }
+
+    // This is already guaranteed to be less than 'full_length', as 
+    // 'chunk_size <= full_length' from HDF5.
+    return num_chunks * chunk_size;
+}
+
+template<class Function>
+void process_by_block(hsize_t block_size, hsize_t full_length, Function fun) {
+    H5::DataSpace mspace(1, &block_size);
+    H5::DataSpace dspace(1, &full_length);
+    hsize_t start = 0;
+
+    for (hsize_t counter = 0; counter < full_length; counter += block_size) {
+        hsize_t limit = std::min(full_length - counter, block_size);
+        mspace.selectHyperslab(H5S_SELECT_SET, &limit, &start);
+        dspace.selectHyperslab(H5S_SELECT_SET, &limit, &counter);
+        fun(counter, limit, mspace, dspace);
+    }
+}
+
 template<class Function>
 void load_string_dataset(const H5::DataSet& handle, hsize_t full_length, Function fun) {
+    auto block_size = pick_block_size(handle, full_length);
     auto dtype = handle.getDataType();
 
-    // TODO: read this in chunks.
     if (dtype.isVariableStr()) {
-        std::vector<char*> buffer(full_length);
-        handle.read(buffer.data(), dtype);
+        std::vector<char*> buffer(block_size);
 
-        for (size_t i = 0; i < full_length; ++i) {
-            fun(i, std::string(buffer[i]));
-        }
-
-        auto dspace = handle.getSpace();
-        H5Dvlen_reclaim(dtype.getId(), dspace.getId(), H5P_DEFAULT, buffer.data());
+        process_by_block(
+            block_size, 
+            full_length, 
+            [&](hsize_t counter, hsize_t limit, const H5::DataSpace& mspace, const H5::DataSpace& dspace) -> void {
+                handle.read(buffer.data(), dtype, mspace, dspace);
+                for (size_t i = 0; i < limit; ++i) {
+                    fun(counter + i, std::string(buffer[i]));
+                }
+                H5Dvlen_reclaim(dtype.getId(), mspace.getId(), H5P_DEFAULT, buffer.data());
+            }
+        );
 
     } else {
         size_t len = dtype.getSize();
-        std::vector<char> buffer(len * full_length);
-        handle.read(buffer.data(), dtype);
-
-        auto start = buffer.data();
-        for (size_t i = 0; i < full_length; ++i, start += len) {
-            size_t j = 0;
-            for (; j < len && start[j] != '\0'; ++j) {}
-            fun(i, std::string(start, start + j));
-        }
+        std::vector<char> buffer(len * block_size);
+        process_by_block(
+            block_size, 
+            full_length, 
+            [&](hsize_t counter, hsize_t limit, const H5::DataSpace& mspace, const H5::DataSpace& dspace) -> void {
+                handle.read(buffer.data(), dtype, mspace, dspace);
+                auto start = buffer.data();
+                for (size_t i = 0; i < limit; ++i, start += len) {
+                    size_t j = 0;
+                    for (; j < len && start[j] != '\0'; ++j) {}
+                    fun(counter + i, std::string(start, start + j));
+                }
+            }
+        );
     }
 }
 
@@ -161,19 +210,25 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, const std::string&
         }
     }
 
-    // TODO: loop in chunks to reduce memory usage.
-    size_t len = ptr->size();
-    std::vector<int32_t> buffer(len);
-    handle.read(buffer.data(), H5::PredType::NATIVE_INT32);
-    for (hsize_t i = 0; i < len; ++i) {
-        auto current = buffer[i];
-        if (has_missing && current == missing_value) {
-            ptr->set_missing(i);
-        } else {
-            check(current);
-            ptr->set(i, current);
+    hsize_t full_length = ptr->size();
+    auto block_size = pick_block_size(handle, full_length);
+    std::vector<int32_t> buffer(block_size);
+    process_by_block(
+        block_size, 
+        full_length,
+        [&](hsize_t counter, hsize_t limit, const H5::DataSpace& mspace, const H5::DataSpace& dspace) -> void {
+            handle.read(buffer.data(), H5::PredType::NATIVE_INT32, mspace, dspace);
+            for (hsize_t i = 0; i < limit; ++i) {
+                auto current = buffer[i];
+                if (has_missing && current == missing_value) {
+                    ptr->set_missing(counter + i);
+                } else {
+                    check(current);
+                    ptr->set(counter + i, current);
+                }
+            }
         }
-    }
+    );
 }
 
 template<class Host, class Function>
@@ -264,19 +319,25 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path
         return std::memcmp(candidate_ptr, missing_ptr, sizeof(double)) == 0;
     };
 
-    // TODO: loop in chunks to reduce memory usage.
-    size_t len = ptr->size();
-    std::vector<double> buffer(len);
-    handle.read(buffer.data(), H5::PredType::NATIVE_DOUBLE);
-    for (hsize_t i = 0; i < len; ++i) {
-        auto current = buffer[i];
-        if (has_missing && is_missing(current)) {
-            ptr->set_missing(i);
-        } else {
-            check(current);
-            ptr->set(i, current);
+    hsize_t full_length = ptr->size();
+    auto block_size = pick_block_size(handle, full_length);
+    std::vector<double> buffer(block_size);
+    process_by_block(
+        block_size, 
+        full_length,
+        [&](hsize_t counter, hsize_t limit, const H5::DataSpace& mspace, const H5::DataSpace& dspace) -> void {
+            handle.read(buffer.data(), H5::PredType::NATIVE_DOUBLE, mspace, dspace);
+            for (hsize_t i = 0; i < limit; ++i) {
+                auto current = buffer[i];
+                if (has_missing && is_missing(current)) {
+                    ptr->set_missing(counter + i);
+                } else {
+                    check(current);
+                    ptr->set(counter + i, current);
+                }
+            }
         }
-    }
+    ); 
 }
 
 template<class Host>
