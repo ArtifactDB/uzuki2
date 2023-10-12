@@ -83,7 +83,7 @@ void process_by_block(hsize_t block_size, hsize_t full_length, Function fun) {
     hsize_t start = 0;
 
     for (hsize_t counter = 0; counter < full_length; counter += block_size) {
-        auto limit = std::min(full_length - counter, block_size);
+        hsize_t limit = std::min(full_length - counter, block_size);
         mspace.selectHyperslab(H5S_SELECT_SET, &limit, &start);
         dspace.selectHyperslab(H5S_SELECT_SET, &limit, &counter);
         fun(counter, limit, mspace, dspace);
