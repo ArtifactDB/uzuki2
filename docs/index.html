@@ -109,13 +109,15 @@ $(function() {
 </ul>
 <p >The atomic vector's group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to that of <code>**/data</code>. If <code>**/data</code> is a scalar, <code>**/names</code> should have length 1.</p>
 <details >
-<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>uzuki_type</code> of <code>"string"</code> with <code>**/format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
+<p ><summary>Changes from previous versions</summary></p>
+<p >In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>uzuki_type</code> of <code>"string"</code> with <code>**/format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
 </details>
 <h3>Representing missing values</h3>
 <p >Each <code>**/data</code> dataset may optionally contain a <code>"missing-value-placeholder"</code> attribute. If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing. If no such attribute is present, it can be assumed that there are no missing values.</p>
 <p >Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.</p>
 <details >
-<p ><summary>Changes from previous versions</summary> In version 1.0, integer or boolean values of -2147483648 were treated as missing.</p>
+<p ><summary>Changes from previous versions</summary></p>
+<p >In version 1.0, integer or boolean values of -2147483648 were treated as missing.</p>
 <p >In version 1.0, missing floats were represented by <a href="https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98">R's NA representation</a>. </p>
 </details>
 <h2>Factors</h2>
@@ -129,7 +131,8 @@ $(function() {
 <p >The group may also contain <code>**/names</code>, a 1-dimensional string dataset of length equal to <code>data</code>.</p>
 <p >The group may optionally contain <code>**/ordered</code>, a scalar integer dataset. This should be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.</p>
 <details >
-<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"ordered"</code>. This is the same as <code>uzuki_type</code> of <code>"factor"</code> with the <code>**/ordered</code> dataset set to a truthy value. </p>
+<p ><summary>Changes from previous versions</summary></p>
+<p >In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"ordered"</code>. This is the same as <code>uzuki_type</code> of <code>"factor"</code> with the <code>**/ordered</code> dataset set to a truthy value. </p>
 </details>
 <h2>Nothing</h2>
 <p >A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:</p>
@@ -174,7 +177,8 @@ $(function() {
 </ul>
 <p >Vectors of length 1 may also be represented as scalars of the appropriate type. While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.</p>
 <details >
-<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>"type": "string"</code> with <code>format</code> set to <code>"date"</code> or <code>"date-time"</code>.</p>
+<p ><summary>Changes from previous versions</summary></p>
+<p >In version 1.0, it was possible to have <code>type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>"type": "string"</code> with <code>format</code> set to <code>"date"</code> or <code>"date-time"</code>.</p>
 <p >In version 1.0, missing integers could also be represented by the special value -2147483648. </p>
 </details>
 <h2>Factors</h2>
@@ -187,7 +191,8 @@ $(function() {
 <li>(optional) <code>"names"</code>, an array of length equal to <code>values</code>, containing the names of the list elements.</li>
 </ul>
 <details >
-<p ><summary>Changes from previous versions</summary> In version 1.0, it was possible to have <code>"type": "ordered"</code>. This is the same as <code>"type": "factor"</code> with <code>"ordered": true</code>.</p>
+<p ><summary>Changes from previous versions</summary></p>
+<p >In version 1.0, it was possible to have <code>"type": "ordered"</code>. This is the same as <code>"type": "factor"</code> with <code>"ordered": true</code>.</p>
 <p >In version 1.0, missing values could also be represented by the special value -2147483648. </p>
 </details>
 <h2>Nothing</h2>
