@@ -70,6 +70,7 @@ If `**/data` is a scalar, `**/names` should have length 1.
 
 <details>
 <summary>Changes from previous versions</summary>
+
 In version 1.0, it was possible to have `uzuki_type` set to `"date"` or `"date-time"`.
 This is the same as `uzuki_type` of `"string"` with `**/format` set to `"date"` or `"date-time"`.
 </details>
@@ -86,6 +87,7 @@ which distinguishes it from a non-missing "not-a-number" value.
 
 <details>
 <summary>Changes from previous versions</summary>
+
 In version 1.0, integer or boolean values of -2147483648 were treated as missing.
 
 In version 1.0, missing floats were represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
@@ -113,6 +115,7 @@ This should be interpreted as a boolean where a non-zero value specifies that we
 
 <details>
 <summary>Changes from previous versions</summary>
+
 In version 1.0, it was possible to have `uzuki_type` set to `"ordered"`.
 This is the same as `uzuki_type` of `"factor"` with the `**/ordered` dataset set to a truthy value.
 </details>
@@ -185,6 +188,7 @@ While R makes no distinction between scalars and length-1 vectors, this may be u
 
 <details>
 <summary>Changes from previous versions</summary>
+
 In version 1.0, it was possible to have `type` set to `"date"` or `"date-time"`.
 This is the same as `"type": "string"` with `format` set to `"date"` or `"date-time"`.
 
@@ -207,6 +211,7 @@ A factor is represented as a JSON object with the following properties:
 
 <details>
 <summary>Changes from previous versions</summary>
+
 In version 1.0, it was possible to have `"type": "ordered"`.
 This is the same as `"type": "factor"` with `"ordered": true`. 
 
