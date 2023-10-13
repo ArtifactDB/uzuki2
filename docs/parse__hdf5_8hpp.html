@@ -97,12 +97,13 @@ $(function() {
 <code>#include &quot;Dummy.hpp&quot;</code><br />
 <code>#include &quot;utils.hpp&quot;</code><br />
 <code>#include &quot;Version.hpp&quot;</code><br />
+<code>#include &quot;ParsedList.hpp&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for parse_hdf5.hpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="parse__hdf5_8hpp__incl.png" border="0" usemap="#auzuki2_2parse__hdf5_8hpp" alt=""/></div>
 <map name="auzuki2_2parse__hdf5_8hpp" id="auzuki2_2parse__hdf5_8hpp">
-<area shape="rect" title="Parsing methods for HDF5 files." alt="" coords="384,5,535,31"/>
+<area shape="rect" title="Parsing methods for HDF5 files." alt="" coords="431,5,581,31"/>
 <area shape="rect" title=" " alt="" coords="5,152,73,177"/>
 <area shape="rect" title=" " alt="" coords="105,152,163,177"/>
 <area shape="rect" title=" " alt="" coords="344,79,404,104"/>
@@ -116,6 +117,7 @@ Include dependency graph for parse_hdf5.hpp:</div>
 <area shape="rect" title=" " alt="" coords="842,79,933,104"/>
 <area shape="rect" title=" " alt="" coords="957,79,1028,104"/>
 <area shape="rect" title=" " alt="" coords="1053,79,1143,104"/>
+<area shape="rect" title=" " alt="" coords="1167,79,1277,104"/>
 </map>
 </div>
 </div>
@@ -132,18 +134,18 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a5c598b0c0302e1c2a7d4723dd2ea2f7f"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
-<tr class="memitem:a5c598b0c0302e1c2a7d4723dd2ea2f7f"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; Base &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#a5c598b0c0302e1c2a7d4723dd2ea2f7f">uzuki2::hdf5::parse</a> (const H5::Group &amp;handle, const std::string &amp;name, Externals ext)</td></tr>
-<tr class="separator:a5c598b0c0302e1c2a7d4723dd2ea2f7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39bc9082bb2af2dd9bff75379dc3ee15"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
-<tr class="memitem:a39bc9082bb2af2dd9bff75379dc3ee15"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; Base &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#a39bc9082bb2af2dd9bff75379dc3ee15">uzuki2::hdf5::parse</a> (const H5::Group &amp;handle, const std::string &amp;name)</td></tr>
-<tr class="separator:a39bc9082bb2af2dd9bff75379dc3ee15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1568cfcff4d487683ab3ed6ee2d00bc"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
-<tr class="memitem:af1568cfcff4d487683ab3ed6ee2d00bc"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; Base &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#af1568cfcff4d487683ab3ed6ee2d00bc">uzuki2::hdf5::parse</a> (const std::string &amp;file, const std::string &amp;name, Externals ext)</td></tr>
-<tr class="separator:af1568cfcff4d487683ab3ed6ee2d00bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80cefd1b53c2c22a645fa732c3d498b7"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
-<tr class="memitem:a80cefd1b53c2c22a645fa732c3d498b7"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; Base &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#a80cefd1b53c2c22a645fa732c3d498b7">uzuki2::hdf5::parse</a> (const std::string &amp;file, const std::string &amp;name)</td></tr>
-<tr class="separator:a80cefd1b53c2c22a645fa732c3d498b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac84fd6dd341af551b87394d2a2cffb45"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
+<tr class="memitem:ac84fd6dd341af551b87394d2a2cffb45"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#ac84fd6dd341af551b87394d2a2cffb45">uzuki2::hdf5::parse</a> (const H5::Group &amp;handle, const std::string &amp;name, Externals ext)</td></tr>
+<tr class="separator:ac84fd6dd341af551b87394d2a2cffb45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef2d980e6aecad49e414f52c56c7339d"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
+<tr class="memitem:aef2d980e6aecad49e414f52c56c7339d"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#aef2d980e6aecad49e414f52c56c7339d">uzuki2::hdf5::parse</a> (const H5::Group &amp;handle, const std::string &amp;name)</td></tr>
+<tr class="separator:aef2d980e6aecad49e414f52c56c7339d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5afd1d44d180e94f191d90c4f28ba1db"><td class="memTemplParams" colspan="2">template&lt;class Provisioner , class Externals &gt; </td></tr>
+<tr class="memitem:a5afd1d44d180e94f191d90c4f28ba1db"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#a5afd1d44d180e94f191d90c4f28ba1db">uzuki2::hdf5::parse</a> (const std::string &amp;file, const std::string &amp;name, Externals ext)</td></tr>
+<tr class="separator:a5afd1d44d180e94f191d90c4f28ba1db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82339fcfaf4fe5f3bb532c2bd3843337"><td class="memTemplParams" colspan="2">template&lt;class Provisioner &gt; </td></tr>
+<tr class="memitem:a82339fcfaf4fe5f3bb532c2bd3843337"><td class="memTemplItemLeft" align="right" valign="top">ParsedList&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#a82339fcfaf4fe5f3bb532c2bd3843337">uzuki2::hdf5::parse</a> (const std::string &amp;file, const std::string &amp;name)</td></tr>
+<tr class="separator:a82339fcfaf4fe5f3bb532c2bd3843337"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5330687aa9572260d194eef4e89966b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#ae5330687aa9572260d194eef4e89966b">uzuki2::hdf5::validate</a> (const H5::Group &amp;handle, const std::string &amp;name, int num_external=0)</td></tr>
 <tr class="separator:ae5330687aa9572260d194eef4e89966b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af19a7b6203d50b10bf04868134cc86e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceuzuki2_1_1hdf5.html#af19a7b6203d50b10bf04868134cc86e4">uzuki2::hdf5::validate</a> (const std::string &amp;file, const std::string &amp;name, int num_external=0)</td></tr>
