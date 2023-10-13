@@ -16,6 +16,7 @@
 #include "Dummy.hpp"
 #include "utils.hpp"
 #include "Version.hpp"
+#include "ParsedList.hpp"
 
 /**
  * @file parse_hdf5.hpp
@@ -565,7 +566,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
  * Only used for error messages.
  * @param ext Instance of an external reference resolver class.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects. 
  * 
  * Any invalid representations in `contents` will cause an error to be thrown.
@@ -603,7 +604,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
  * - `size_t size()`, which returns the number of available external references.
  */
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name, Externals ext) {
+ParsedList parse(const H5::Group& handle, const std::string& name, Externals ext) {
     Version version;
     if (handle.attrExists("uzuki_version")) {
         auto ver_str = load_string_attribute(handle.openAttribute("uzuki_version"), "uzuki_version", name);
@@ -613,7 +614,7 @@ std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name, Ex
     ExternalTracker etrack(std::move(ext));
     auto ptr = parse_inner<Provisioner>(handle, etrack, name, version);
     etrack.validate();
-    return ptr;
+    return ParsedList(std::move(ptr), std::move(version));
 }
 
 /**
@@ -626,13 +627,13 @@ std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name, Ex
  * @param name Name of the HDF5 group corresponding to `handle`. 
  * Only used for error messages.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects. 
  * 
  * Any invalid representations in `contents` will cause an error to be thrown.
  */
 template<class Provisioner>
-std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name) {
+ParsedList parse(const H5::Group& handle, const std::string& name) {
     return parse<Provisioner>(handle, name, uzuki2::DummyExternals(0));
 }
 
@@ -646,13 +647,13 @@ std::shared_ptr<Base> parse(const H5::Group& handle, const std::string& name) {
  * @param name Name of the HDF5 group containing the list in `file`.
  * @param ext Instance of an external reference resolver class.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects. 
  * 
  * Any invalid representations in `contents` will cause an error to be thrown.
  */
 template<class Provisioner, class Externals>
-std::shared_ptr<Base> parse(const std::string& file, const std::string& name, Externals ext) {
+ParsedList parse(const std::string& file, const std::string& name, Externals ext) {
     H5::H5File handle(file, H5F_ACC_RDONLY);
     return parse<Provisioner>(handle.openGroup(name), name, std::move(ext));
 }
@@ -666,13 +667,13 @@ std::shared_ptr<Base> parse(const std::string& file, const std::string& name, Ex
  * @param file Path to a HDF5 file.
  * @param name Name of the HDF5 group containing the list in `file`.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects. 
  * 
  * Any invalid representations in `contents` will cause an error to be thrown.
  */
 template<class Provisioner>
-std::shared_ptr<Base> parse(const std::string& file, const std::string& name) {
+ParsedList parse(const std::string& file, const std::string& name) {
     H5::H5File handle(file, H5F_ACC_RDONLY);
     return parse<Provisioner>(handle.openGroup(name), name, uzuki2::DummyExternals(0));
 }

@@ -409,7 +409,7 @@ struct Options {
  * @param ext Instance of an external reference resolver class.
  * @param options Options for parsing.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
@@ -454,7 +454,7 @@ ParsedList parse(byteme::Reader& reader, Externals ext, Options options = Option
  * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
  * @param options Options for parsing.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
@@ -477,7 +477,7 @@ ParsedList parse(byteme::Reader& reader, Options options = Options()) {
  * @param ext Instance of an external reference resolver class.
  * @param options Options for parsing.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
@@ -497,7 +497,7 @@ ParsedList parse_file(const std::string& file, Externals ext, Options options = 
  * @param file Path to a (possibly Gzip-compressed) JSON file.
  * @param options Options for parsing.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
@@ -521,7 +521,7 @@ ParsedList parse_file(const std::string& file, Options options = Options()) {
  * @param ext Instance of an external reference resolver class.
  * @param options Options for parsing.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
@@ -542,7 +542,7 @@ ParsedList parse_buffer(const unsigned char* buffer, size_t len, Externals ext, 
  * @param len Length of the buffer in bytes.
  * @param options Options for parsing.
  *
- * @return Pointer to the root `Base` object.
+ * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
