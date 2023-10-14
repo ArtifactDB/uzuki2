@@ -19,7 +19,10 @@ struct Version {
      * @cond
      */
     Version() = default;
-    Version(int maj, int min) : major(maj), minor(min) {}
+    Version(int maj, int min) {
+        major = maj;
+        minor = min;
+    }
     /**
      * @endcond
      */
