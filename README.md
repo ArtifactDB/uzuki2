@@ -24,7 +24,7 @@ as defined by users (for the top-level group) or by the specification (e.g., as 
 
 All objects should be nested inside an R list.
 
-The top-level group may have a `uzuki2_version` attribute, describing the version of the **uzuki2** specification that it uses.
+The top-level group may have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
 This should be a scalar string dataset of the form `X.Y` for non-negative integers `X` and `Y`.
 If not provided, it is assumed to be "1.0".
 
@@ -36,9 +36,10 @@ An R list is represented as a HDF5 group (`**/`) with the following attributes:
 
 This group should contain a subgroup `**/data` that contains the list elements.
 Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., `**/data/0` for the first list element.
+One subgroup should be present for each integer in `[0, N)`, given a list of length `N`.
 Each list element may be any of the objects described in this specification, including further nested lists.
 
-If the list is named, there will additionally be a 1-dimensional `**/names` string dataset of length equal to `uzuki_length`.
+If the list is named, there will additionally be a 1-dimensional `**/names` string dataset of length equal to the number of elements in `**/data`.
 
 ### Atomic vectors
 
@@ -77,7 +78,7 @@ This is the same as `uzuki_type` of `"string"` with `**/format` set to `"date"` 
 
 #### Representing missing values
 
-Each `**/data` dataset may optionally contain a `"missing-value-placeholder"` attribute.
+Each `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values. 
