@@ -87,8 +87,8 @@ $(function() {
 <ul>
 <li><code>uzuki_object</code>, a scalar string dataset containing the value <code>"list"</code>.</li>
 </ul>
-<p >This group should contain a subgroup <code>**/data</code> that contains the list elements. Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., <code>**/data/0</code> for the first list element. Each list element may be any of the objects described in this specification, including further nested lists.</p>
-<p >If the list is named, there will additionally be a 1-dimensional <code>**/names</code> string dataset of length equal to <code>uzuki_length</code>.</p>
+<p >This group should contain a subgroup <code>**/data</code> that contains the list elements. Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., <code>**/data/0</code> for the first list element. One subgroup should be present for each integer in <code>[0, N)</code>, given a list of length <code>N</code>. Each list element may be any of the objects described in this specification, including further nested lists.</p>
+<p >If the list is named, there will additionally be a 1-dimensional <code>**/names</code> string dataset of length equal to the number of elements in <code>**/data</code>.</p>
 <h2>Atomic vectors</h2>
 <p >An atomic vector is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
 <ul>
@@ -113,7 +113,7 @@ $(function() {
 <p >In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>uzuki_type</code> of <code>"string"</code> with <code>**/format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
 </details>
 <h3>Representing missing values</h3>
-<p >Each <code>**/data</code> dataset may optionally contain a <code>"missing-value-placeholder"</code> attribute. If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing. If no such attribute is present, it can be assumed that there are no missing values.</p>
+<p >Each <code>**/data</code> dataset may optionally contain a <code>missing-value-placeholder</code> attribute. If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing. If no such attribute is present, it can be assumed that there are no missing values.</p>
 <p >Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.</p>
 <details >
 <p ><summary>Changes from previous versions</summary></p>
