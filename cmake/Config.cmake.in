@@ -3,6 +3,7 @@
 include(CMakeFindDependencyMacro)
 find_dependency(ltla_millijson CONFIG REQUIRED)
 find_dependency(ltla_byteme CONFIG REQUIRED)
+find_dependency(artifactdb_ritsuko CONFIG REQUIRED)
 
 if(@UZUKI2_FIND_HDF5@)
     find_package(HDF5 COMPONENTS C CXX)
