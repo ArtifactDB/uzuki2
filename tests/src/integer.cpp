@@ -153,7 +153,7 @@ TEST(Hdf5IntegerTest, CheckError) {
         auto ghandle = vector_opener(handle, "foo", "integer");
         ghandle.createGroup("data");
     }
-    expect_hdf5_error(path, "foo", "expected a dataset at 'foo/data'");
+    expect_hdf5_error(path, "foo", "expected a dataset at");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);

@@ -42,9 +42,8 @@ namespace hdf5 {
  * @cond
  */
 inline H5::DataSet get_scalar_dataset(const H5::Group& handle, const std::string& name, H5T_class_t type_class, const std::string& path) {
-    auto dhandle = ritsuko::hdf5::get_scalar_dataset(handle, name.c_str(), path.c_str());
-    auto dtype = dhandle.getDataType();
-    if (dtype.getClass() != type_class) {
+    auto dhandle = ritsuko::hdf5::get_scalar_dataset(handle, name.c_str());
+    if (dhandle.getTypeClass() != type_class) {
         throw std::runtime_error("dataset at '" + path + "/" + name + "' has the wrong datatype class");
     }
     return dhandle;
@@ -231,7 +230,9 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         }
 
     } else if (object_type == "vector") {
-        auto dhandle = ritsuko::hdf5::get_dataset(handle, "data", path.c_str());
+        auto vector_type = ritsuko::hdf5::load_scalar_string_attribute(handle, "uzuki_type", path.c_str());
+
+        auto dhandle = ritsuko::hdf5::get_dataset(handle, "data");
         std::string dpath = path + "/data";
         auto len = ritsuko::hdf5::get_1d_length(dhandle.getSpace(), true, dpath.c_str());
         bool is_scalar = (len == 0);
@@ -241,7 +242,6 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
         bool named = handle.exists("names");
 
-        auto vector_type = ritsuko::hdf5::load_scalar_string_attribute(handle, "uzuki_type", path.c_str());
         if (vector_type == "integer") {
             auto iptr = Provisioner::new_Integer(len, named, is_scalar);
             output.reset(iptr);
@@ -257,10 +257,11 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             }, version);
 
         } else if (vector_type == "factor" || (version.equals(1, 0) && vector_type == "ordered")) {
-            auto levhandle = ritsuko::hdf5::get_dataset(handle, "levels", path.c_str());
+            auto levhandle = ritsuko::hdf5::get_dataset(handle, "levels");
             auto levtype = levhandle.getDataType();
+            std::string levpath = path + "/levels";
             if (levtype.getClass() != H5T_STRING) {
-                throw std::runtime_error("expected a string dataset at '" + path + "/levels'");
+                throw std::runtime_error("expected a string dataset at '" + levpath + "'");
             }
             int32_t levlen = ritsuko::hdf5::get_1d_length(levhandle.getSpace(), false, levpath.c_str()); // use int-32 for comparison with the integer codes.
 
@@ -363,7 +364,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
     } else if (object_type == "external") {
         auto ipath = path + "/index";
-        auto ihandle = ritsuko::hdf5::get_dataset(handle, "index", path.c_str());
+        auto ihandle = ritsuko::hdf5::get_dataset(handle, "index");
         if (ihandle.getDataType().getClass() != H5T_INTEGER) {
             throw std::runtime_error("expected integer dataset at '" + ipath + "'");
         }

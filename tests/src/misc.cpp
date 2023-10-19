@@ -49,14 +49,14 @@ TEST(Hdf5IntegerTypeTest, Forbidden) {
         auto vhandle = vector_opener(handle, "blub", "integer");
         create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_UINT32);
     }
-    expect_hdf5_error(path, "blub", "potentially out of range");
+    expect_hdf5_error(path, "blub", "exceeds the range");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "integer");
         create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT64);
     }
-    expect_hdf5_error(path, "blub", "potentially out of range");
+    expect_hdf5_error(path, "blub", "exceeds the range");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
