@@ -1,8 +1,8 @@
-#ifndef UZUKI2_UTILS_HPP
-#define UZUKI2_UTILS_HPP
+#ifndef UZUKI2_EXTERNAL_TRACKER_HPP
+#define UZUKI2_EXTERNAL_TRACKER_HPP
 
-#include <cctype>
-#include <string>
+#include <vector>
+#include <stdexcept>
 #include <algorithm>
 
 namespace uzuki2 {
