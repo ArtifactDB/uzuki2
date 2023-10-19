@@ -45,6 +45,18 @@ struct Version {
     bool equals(int maj, int min) const {
         return (major == maj && minor == min);
     }
+
+    /**
+     * @param maj Major version number.
+     * @param min Minor version number.
+     * @return Whether the version is less than `<maj>.<min>`.
+     */
+    bool lt(int maj, int min) const {
+        if (major == maj) {
+            return minor < min;
+        }
+        return (major < maj);
+    }
 };
 
 /**

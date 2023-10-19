@@ -345,13 +345,13 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
                 extract_strings(vals, ptr, [](const std::string&) -> void {}, path);
             } else if (format == StringVector::DATE) {
                 extract_strings(vals, ptr, [&](const std::string& x) -> void {
-                    if (!is_date(x)) {
+                    if (!ritsuko::is_date(x.c_str(), x.size())) {
                          throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + ".values'");
                     }
                 }, path);
             } else if (format == StringVector::DATETIME) {
                 extract_strings(vals, ptr, [&](const std::string& x) -> void {
-                    if (!is_rfc3339(x)) {
+                    if (!ritsuko::is_rfc3339(x.c_str(), x.size())) {
                          throw std::runtime_error("date-times should follow the Internet Date/Time format in '" + path + ".values'");
                     }
                 }, path);
