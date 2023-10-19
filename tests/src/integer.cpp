@@ -169,6 +169,24 @@ TEST(Hdf5IntegerTest, CheckError) {
         create_dataset(vhandle, "names", { "A", "B", "C", "D" });
     }
     expect_hdf5_error(path, "blub", "should be equal to length");
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = vector_opener(handle, "foo", "integer");
+        add_version(ghandle, "1.1");
+        auto dhandle = create_dataset<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
+        dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
+    }
+    expect_hdf5_error(path, "foo", "same type class as");
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = vector_opener(handle, "foo", "integer");
+        add_version(ghandle, "1.2");
+        auto dhandle = create_dataset<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_UINT8);
+        dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT8, H5S_SCALAR);
+    }
+    expect_hdf5_error(path, "foo", "same type as");
 }
 
 TEST(JsonIntegerTest, SimpleLoading) {

@@ -147,6 +147,24 @@ TEST(Hdf5NumberTest, CheckError) {
     }
     expect_hdf5_error(path, "foo", "expected a float");
 
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = vector_opener(handle, "foo", "number");
+        add_version(ghandle, "1.1");
+        auto dhandle = create_dataset<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_DOUBLE);
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT, H5S_SCALAR);
+    }
+    expect_hdf5_error(path, "foo", "same type class as");
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = vector_opener(handle, "foo", "number");
+        auto dhandle = create_dataset<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_DOUBLE);
+        add_version(ghandle, "1.2");
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_FLOAT, H5S_SCALAR);
+    }
+    expect_hdf5_error(path, "foo", "same type as");
+
     /***********************************************
      *** See integer.cpp for vector error tests. ***
      ***********************************************/

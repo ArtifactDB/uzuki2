@@ -79,19 +79,27 @@ This is the same as `uzuki_type` of `"string"` with `**/format` set to `"date"` 
 #### Representing missing values
 
 Each `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
-If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values.
+If present, this should be a scalar dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values. 
 
-Floating point missingness may be encoded in the payload of an NaN,
-which distinguishes it from a non-missing "not-a-number" value.
+The data type of the placeholder attribute should be exactly the same as that of `**/data`, so as to avoid unexpected results upon casting.
+The only exception is when `**/data` is a string, in which case the placeholder type may be of any string type;
+it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.
+
+Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
+Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with `memcmp`) to ensure that the payload is taken into account.
 
 <details>
 <summary>Changes from previous versions</summary>
 
-In version 1.0, integer or boolean values of -2147483648 were treated as missing.
+**Version 1.1**
+The missing value placeholder only needed to be of the same type class as `**/data`.
 
-In version 1.0, missing floats were represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
+**Version 1.0**
+Integer or boolean values of -2147483648 were treated as missing.
+
+Missing floats were represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
 </details>
 
 ### Factors
