@@ -98,6 +98,13 @@ TEST(Hdf5StringTest, BlockLoading) {
         EXPECT_EQ(parsed->type(), uzuki2::STRING);
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->base.values, collected);
+
+        ASSERT_EQ(sptr->base.values.size(), collected.size());
+        for (size_t i = 0; i < collected.size(); ++i) {
+            if (sptr->base.values[i] != collected[i]) {
+                std::cout << sptr->base.values[i] << "\t" << collected[i] << std::endl;
+            }
+        }
     }
 
     // Compressed works correctly.

@@ -3,6 +3,8 @@
 
 #include "uzuki2/parse_hdf5.hpp"
 
+#include "ritsuko/ritsuko.hpp"
+
 #include "test_subclass.h"
 #include "utils.h"
 
@@ -84,7 +86,7 @@ TEST(Hdf5IntegerTest, BlockLoading) {
 TEST(Hdf5NumberTest, MissingValues) {
     auto path = "TEST-number.h5";
 
-    auto missing = uzuki2::hdf5::legacy_missing_double();
+    auto missing = ritsuko::r_missing_value();
     EXPECT_TRUE(std::isnan(missing));
 
     // Old version used the missing R value.

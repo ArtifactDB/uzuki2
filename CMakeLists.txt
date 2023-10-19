@@ -21,9 +21,10 @@ if(UZUKI2_FETCH_EXTERN)
 else()
     find_package(ltla_byteme CONFIG REQUIRED)
     find_package(ltla_millijson CONFIG REQUIRED)
+    find_package(artifactdb_ritsuko CONFIG REQUIRED)
 endif()
 
-target_link_libraries(uzuki2 INTERFACE ltla::byteme ltla::millijson)
+target_link_libraries(uzuki2 INTERFACE ltla::byteme ltla::millijson artifactdb::ritsuko)
 
 option(UZUKI2_FIND_HDF5 "Try to find and link to HDF5 for uzuki2." ON)
 if(UZUKI2_FIND_HDF5)
