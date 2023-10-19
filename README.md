@@ -113,9 +113,11 @@ The group should contain an 1-dimensional dataset at `**/data`, containing 0-bas
 This should be type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
 Missing values are represented as described above for atomic vectors.
 
-The group should also contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `data`.
+The group should also contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `**/data`.
 Values in `**/levels` should be unique.
 Values in `**/data` should be non-negative (missing values excepted) and less than the length of `**/levels`.
+Note that the type constraints on `**/data` suggest that there should not be more than 2147483647 levels;
+beyond that count, the levels cannot be indexed by elements of `**/data`.
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
 
