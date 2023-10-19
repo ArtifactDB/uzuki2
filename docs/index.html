@@ -113,12 +113,14 @@ $(function() {
 <p >In version 1.0, it was possible to have <code>uzuki_type</code> set to <code>"date"</code> or <code>"date-time"</code>. This is the same as <code>uzuki_type</code> of <code>"string"</code> with <code>**/format</code> set to <code>"date"</code> or <code>"date-time"</code>. </p>
 </details>
 <h3>Representing missing values</h3>
-<p >Each <code>**/data</code> dataset may optionally contain a <code>missing-value-placeholder</code> attribute. If present, this should be a scalar dataset of the appropriate type, which specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing. If no such attribute is present, it can be assumed that there are no missing values.</p>
-<p >Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.</p>
+<p >Each <code>**/data</code> dataset may optionally contain a <code>missing-value-placeholder</code> attribute. If present, this should be a scalar dataset that specifies the placeholder for missing values. Any value of <code>**/data</code> that is equal to this placeholder should be treated as missing. If no such attribute is present, it can be assumed that there are no missing values.</p>
+<p >The data type of the placeholder attribute should be exactly the same as that of <code>**/data</code>, so as to avoid unexpected results upon casting. The only exception is when <code>**/data</code> is a string, in which case the placeholder type may be of any string type; it is expected that any comparison between the placeholder and strings in <code>**/data</code> will be performed bytewise in the same manner as <code>strcmp</code>.</p>
+<p >Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value. Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with <code>memcmp</code>) to ensure that the payload is taken into account.</p>
 <details >
 <p ><summary>Changes from previous versions</summary></p>
-<p >In version 1.0, integer or boolean values of -2147483648 were treated as missing.</p>
-<p >In version 1.0, missing floats were represented by <a href="https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98">R's NA representation</a>. </p>
+<p ><b>Version 1.1</b> The missing value placeholder only needed to be of the same type class as <code>**/data</code>.</p>
+<p ><b>Version 1.0</b> Integer or boolean values of -2147483648 were treated as missing.</p>
+<p >Missing floats were represented by <a href="https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98">R's NA representation</a>. </p>
 </details>
 <h2>Factors</h2>
 <p >A factor is represented as a HDF5 group (<code>**/</code>) with the following attributes:</p>
