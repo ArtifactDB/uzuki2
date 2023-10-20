@@ -26,7 +26,8 @@ All objects should be nested inside an R list.
 
 The top-level group may have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
 This should be a scalar string dataset of the form `X.Y` for non-negative integers `X` and `Y`.
-If not provided, it is assumed to be "1.0".
+The latest version is 1.2; if not provided, it is assumed to be 1.0.
+(Note the version number of the specification has no direct relationship to the version number of the **uzuki2** library.)
 
 ### Lists
 
@@ -57,9 +58,12 @@ The allowed HDF5 datatype depends on `uzuki_type`:
   Note that the converse is not required, i.e., the storage type does not need to be 32-bit if no such values are present in the dataset.
 - `"number"`: any type of `H5T_FLOAT` that can be represented by a double-precision float.
 - `"string"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
+- **(for version 1.0)** `"date"`: any type of `H5T_STRING` where the srings are in the `YYYY-MM-DD` format, or are equal to a missing placeholder value.
+- **(for version 1.0)** `"date-time"`: any type of `H5T_STRING` where the srings are Internet Date/Time format, or are equal to a missing placeholder value.
 
 For `boolean` type, values in `**/data` should be one of 0 (false) or 1 (true).
 
+**(for version >= 1.1)** 
 For `string` type, the group may optionally contain the `**/format` dataset.
 This should be a scalar string dataset that specifies constraints to the format of the values in `**/data`:
 
@@ -72,21 +76,22 @@ If `**/data` is a scalar, `**/names` should have length 1.
 <details>
 <summary>Changes from previous versions</summary>
 
-In version 1.0, it was possible to have `uzuki_type` set to `"date"` or `"date-time"`.
-This is the same as `uzuki_type` of `"string"` with `**/format` set to `"date"` or `"date-time"`.
 </details>
 
 #### Representing missing values
 
+**(for version >= 1.1)** 
 Each `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values. 
 
+**(for version >= 1.2)** 
 The data type of the placeholder attribute should be exactly the same as that of `**/data`, so as to avoid unexpected results upon casting.
 The only exception is when `**/data` is a string, in which case the placeholder type may be of any string type;
 it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.
 
+**(for version == 1.1)** 
 Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
 Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with `memcmp`) to ensure that the payload is taken into account.
 
