@@ -26,8 +26,7 @@ All objects should be nested inside an R list.
 
 The top-level group may have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
 This should be a scalar string dataset of the form `X.Y` for non-negative integers `X` and `Y`.
-The latest version is 1.2; if not provided, it is assumed to be 1.0.
-(Note the version number of the specification has no direct relationship to the version number of the **uzuki2** library.)
+The latest version of this specification is **1.2**; if not provided, it is assumed to be **1.0**.
 
 ### Lists
 
@@ -63,7 +62,7 @@ The allowed HDF5 datatype depends on `uzuki_type`:
 
 For `boolean` type, values in `**/data` should be one of 0 (false) or 1 (true).
 
-**(for version >= 1.1)** 
+**(in versions >= 1.1)** 
 For `string` type, the group may optionally contain the `**/format` dataset.
 This should be a scalar string dataset that specifies constraints to the format of the values in `**/data`:
 
@@ -72,11 +71,6 @@ This should be a scalar string dataset that specifies constraints to the format 
 
 The atomic vector's group may also contain `**/names`, a 1-dimensional string dataset of length equal to that of `**/data`.
 If `**/data` is a scalar, `**/names` should have length 1.
-
-<details>
-<summary>Changes from previous versions</summary>
-
-</details>
 
 #### Representing missing values
 
@@ -92,20 +86,15 @@ The only exception is when `**/data` is a string, in which case the placeholder 
 it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.
 
 **(for version == 1.1)** 
+The data type of the placeholder attribute should have the same data type class as `**/data`.
+
+**(for version >= 1.1)** 
 Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
 Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with `memcmp`) to ensure that the payload is taken into account.
 
-<details>
-<summary>Changes from previous versions</summary>
-
-**Version 1.1**
-The missing value placeholder only needed to be of the same type class as `**/data`.
-
-**Version 1.0**
+**(for version 1.0)** 
 Integer or boolean values of -2147483648 were treated as missing.
-
 Missing floats were represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
-</details>
 
 ### Factors
 
@@ -113,6 +102,8 @@ A factor is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing `"factor"`.
+  - **(for version 1.0)** `uzuki_type` could also be set to `"ordered"`.
+    This is the same as `uzuki_type` of `"factor"` with the `**/ordered` dataset set to a truthy value.
 
 The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
 This should be type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
@@ -126,15 +117,8 @@ beyond that count, the levels cannot be indexed by elements of `**/data`.
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
 
-The group may optionally contain `**/ordered`, a scalar integer dataset.
+**(for version >= 1.1)** The group may optionally contain `**/ordered`, a scalar integer dataset.
 This should be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.
-
-<details>
-<summary>Changes from previous versions</summary>
-
-In version 1.0, it was possible to have `uzuki_type` set to `"ordered"`.
-This is the same as `uzuki_type` of `"factor"` with the `**/ordered` dataset set to a truthy value.
-</details>
 
 ### Nothing
 
@@ -160,7 +144,7 @@ All R objects are represented by JSON objects with a `type` property.
 Every R object should be nested inside an R list.
 
 The top-level object may have a `version` property that contains the **uzuki2** specification version as a `"X.Y"` string for non-negative integers `X` and `Y`.
-If missing, the version can be assumed to be "1.0".
+The latest version of this specification is **1.2**; if missing, the version can be assumed to be **1.0**.
 
 ### Lists
 
@@ -176,6 +160,8 @@ An R list is represented as a JSON object with the following properties:
 An atomic vector is represented as a JSON object with the following properties:
 
 - `type`, set to one of `"integer"`, `"boolean"`, `"number"`, `"string"`.
+  - **(for version 1.0)** `type` could also be set to `"date"` or `"date-time"`.
+    This specifies strings in the date or Internet Date/Time format.
 - `values`, an array of values for the vector (see below).
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
@@ -188,10 +174,12 @@ The contents of `values` is subject to some constraints:
   IEEE special values can be represented by strings, i.e., `NaN`, `Inf`, `-Inf`.
 - `"integer"`: values should be JSON numbers that can be represented by a 32-bit signed integer.
   Missing values may be represented by `null`.
+  - **(for version 1.0)** missing integers could also be represented by the special value -2147483648.
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
 
+**(for version >= 1.1)** 
 For `type` of `"string"`, the object may optionally have a `format` property that constrains the `values`:
   
 - `"date"`: values should be JSON strings following a `YYYY-MM-DD` format.
@@ -202,37 +190,21 @@ For `type` of `"string"`, the object may optionally have a `format` property tha
 Vectors of length 1 may also be represented as scalars of the appropriate type.
 While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
 
-<details>
-<summary>Changes from previous versions</summary>
-
-In version 1.0, it was possible to have `type` set to `"date"` or `"date-time"`.
-This is the same as `"type": "string"` with `format` set to `"date"` or `"date-time"`.
-
-In version 1.0, missing integers could also be represented by the special value -2147483648.
-</details>
-
 ### Factors
 
 A factor is represented as a JSON object with the following properties:
 
 - `type`, set to `"factor"`. 
+  - **(for version 1.0)** `type` can also be set to `"ordered"` for ordered levels.
 - `values`, an array of 0-based integer indices for the factor.
   These should be non-negative JSON numbers that can fit into a 32-bit signed integer.
   They should also be less than the length of `levels`.
   Missing values are represented by `null`.
+  - **(for version 1.0)** missing values could also be represented by the special value -2147483648.
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
-- (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
-  If absent, levels are assumed to be non-ordered.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
-
-<details>
-<summary>Changes from previous versions</summary>
-
-In version 1.0, it was possible to have `"type": "ordered"`.
-This is the same as `"type": "factor"` with `"ordered": true`. 
-
-In version 1.0, missing values could also be represented by the special value -2147483648.
-</details>
+- **(for version >= 1.1)** (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
+  If absent, levels are assumed to be non-ordered.
 
 ### Nothing
 
@@ -289,6 +261,15 @@ which can be used to load the HDF5 contents into `std::vector`s for easier downs
 DefaultExternals ext(nexpected);
 auto ptr = uzuki2::hdf5::parse<DefaultProvisioner>(file_path, group_name, ext);
 ```
+
+The parser supports multiple specification versions,
+though note the version number of the specification has no direct relationship to the version number of the **uzuki2** library.
+
+|Library version|HDF5 version|JSON version|
+|---------------|------------|------------|
+|          1.0.x|         1.0|         1.0|
+|          1.1.x|   1.0 - 1.1|   1.0 - 1.1|
+|          1.2.x|   1.0 - 1.2|   1.0 - 1.2|
 
 Also see the [reference documentation](https://artifactdb.github.io/uzuki2) for more details.
 
