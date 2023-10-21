@@ -47,6 +47,7 @@ An atomic vector is represented as a HDF5 group (`**/`) with the following attri
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"` or `"string"`.
+   - **(for version 1.0)** this may also be `"date"` or `"date-time"`.
 
 The group should contain an 1-dimensional dataset at `**/data`.
 Vectors of length 1 may also be represented as a scalar dataset.
@@ -62,8 +63,8 @@ The allowed HDF5 datatype depends on `uzuki_type`:
 
 For `boolean` type, values in `**/data` should be one of 0 (false) or 1 (true).
 
-**(in versions >= 1.1)** 
-For `string` type, the group may optionally contain the `**/format` dataset.
+**(for versions >= 1.1)** 
+For the `string` type, the group may optionally contain the `**/format` dataset.
 This should be a scalar string dataset that specifies constraints to the format of the values in `**/data`:
 
 - `"date"`: strings should be `YYYY-MM-DD` dates or the placeholder value.
@@ -95,6 +96,10 @@ Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., 
 **(for version 1.0)** 
 Integer or boolean values of -2147483648 were treated as missing.
 Missing floats were represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
+For strings, each `**/data` dataset may contain a `missing-value-placeholder` attribute.
+If present, this should be a scalar string dataset that specifies the placeholder for missing values.
+Any value of `**/data` that is equal to this placeholder should be treated as missing.
+If no such attribute is present, it can be assumed that there are no missing values. 
 
 ### Factors
 
