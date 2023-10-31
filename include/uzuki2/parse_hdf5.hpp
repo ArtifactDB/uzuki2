@@ -123,8 +123,19 @@ void parse_string_like(const H5::DataSet& handle, Host* ptr, const std::string& 
 
 template<class Host, class Function>
 void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path, Function check, const Version& version) {
-    if (handle.getDataType().getClass() != H5T_FLOAT) {
-        throw std::runtime_error("expected a float dataset at '" + path + "'");
+    auto tclass = handle.getDataType().getClass();
+    if (tclass != H5T_FLOAT) {
+        if (version.lt(1, 3)) {
+            throw std::runtime_error("expected a float dataset at '" + path + "'");
+        } else {
+            if (tclass != H5T_INTEGER) {
+                throw std::runtime_error("expected a float or integer dataset at '" + path + "'");
+            }
+            H5::IntType itype(handle);
+            if (itype.getPrecision() >= 32) {
+                throw std::runtime_error("integer type of '" + path + "' cannot be represented by double-precision floats");
+            }
+        }
     }
 
     H5::FloatType ftype(handle);
@@ -147,6 +158,18 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path
         }
     }
 
+    bool should_compare_nan = version.lt(1, 3);
+    bool is_placeholder_nan = std::isnan(missing_value);
+    auto is_missing_value = [&](double val) -> bool {
+        if (should_compare_nan) {
+            return ritsuko::are_floats_identical(&val, &missing_value);
+        } else if (is_placeholder_nan) {
+            return std::isnan(val);
+        } else {
+            return val == missing_value;
+        }
+    };
+
     hsize_t full_length = ptr->size();
     auto block_size = ritsuko::hdf5::pick_1d_block_size(handle.getCreatePlist(), full_length, /* buffer_size = */ 10000);
     std::vector<double> buffer(block_size);
@@ -157,7 +180,7 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, const std::string& path
             handle.read(buffer.data(), H5::PredType::NATIVE_DOUBLE, mspace, dspace);
             for (hsize_t i = 0; i < limit; ++i) {
                 auto current = buffer[i];
-                if (has_missing && ritsuko::are_floats_identical(&current, &missing_value)) {
+                if (has_missing && is_missing_value(current)) {
                     ptr->set_missing(counter + i);
                 } else {
                     check(current);

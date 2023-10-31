@@ -26,7 +26,7 @@ All objects should be nested inside an R list.
 
 The top-level group may have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
 This should be a scalar string dataset of the form `X.Y` for non-negative integers `X` and `Y`.
-The latest version of this specification is **1.2**; if not provided, it is assumed to be **1.0**.
+The latest version of this specification is **1.3**; if not provided, it is assumed to be **1.0**.
 
 ### Lists
 
@@ -56,7 +56,10 @@ The allowed HDF5 datatype depends on `uzuki_type`:
 
 - `"integer"`, `"boolean"`: any type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
   Note that the converse is not required, i.e., the storage type does not need to be 32-bit if no such values are present in the dataset.
-- `"number"`: any type of `H5T_FLOAT` that can be represented by a double-precision float.
+- **(for version < 1.3)** `"number"`: any type of `H5T_FLOAT` that can be represented by a double-precision float.
+- **(for version >= 1.3)** `"number"`: any type of `H5T_FLOAT` or `H5T_INTEGER` that can be represented exactly by a double-precision (64-bit) float.
+  This implies a limit of 32 bits for any integer datatype.
+  See also the [HDF5 policy draft (v0.1.0)](https://github.com/ArtifactDB/Bioc-HDF5-policy/tree/v0.1.0) for more details.
 - `"string"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
 - **(for version 1.0)** `"date"`: any type of `H5T_STRING` where the srings are in the `YYYY-MM-DD` format, or are equal to a missing placeholder value.
 - **(for version 1.0)** `"date-time"`: any type of `H5T_STRING` where the srings are Internet Date/Time format, or are equal to a missing placeholder value.
@@ -89,13 +92,19 @@ it is expected that any comparison between the placeholder and strings in `**/da
 **(for version == 1.1)** 
 The data type of the placeholder attribute should have the same data type class as `**/data`.
 
-**(for version >= 1.1)** 
-Floating point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
+**(for version >= 1.3)** 
+Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
+No casting should be performed to a lower-precision type, as this may cause a non-missing value to become equal to the placeholder.
+If the placeholder is NaN, all NaNs in the dataset should be considered missing (regardless of the exact bit representation in the NaN payload).
+See the [HDF5 policy draft (v0.1.0)](https://github.com/ArtifactDB/Bioc-HDF5-policy/tree/v0.1.0) for more details.
+
+**(for version >= 1.1, < 1.3)** 
+Floating-point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
 Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with `memcmp`) to ensure that the payload is taken into account.
 
 **(for version 1.0)** 
-Integer or boolean values of -2147483648 were treated as missing.
-Missing floats were represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
+Integer or boolean values of -2147483648 are treated as missing.
+Missing floats are represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
 For strings, each `**/data` dataset may contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar string dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
