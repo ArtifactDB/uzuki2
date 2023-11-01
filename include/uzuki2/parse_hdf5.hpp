@@ -90,7 +90,7 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, co
         }
     );
 } catch (std::exception& e) {
-    throw std::runtime_error("failed to load dataset at '" + ritsuko::hdf5::get_name(handle) + "'; " + std::string(e.what()));
+    throw std::runtime_error("failed to load integer dataset at '" + ritsuko::hdf5::get_name(handle) + "'; " + std::string(e.what()));
 }
 
 template<class Host, class Function>
@@ -123,7 +123,7 @@ void parse_string_like(const H5::DataSet& handle, Host* ptr, Function check) try
         }
     );
 } catch (std::exception& e) {
-    throw std::runtime_error("failed to load dataset at '" + ritsuko::hdf5::get_name(handle) + "'; " + std::string(e.what()));
+    throw std::runtime_error("failed to load string dataset at '" + ritsuko::hdf5::get_name(handle) + "'; " + std::string(e.what()));
 }
 
 template<class Host, class Function>
@@ -185,7 +185,7 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, Function check, const V
         }
     ); 
 } catch (std::exception& e) {
-    throw std::runtime_error("failed to load dataset at '" + ritsuko::hdf5::get_name(handle) + "'; " + std::string(e.what()));
+    throw std::runtime_error("failed to load floating-point dataset at '" + ritsuko::hdf5::get_name(handle) + "'; " + std::string(e.what()));
 }
 
 template<class Host>
@@ -238,7 +238,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         for (size_t i = 0; i < len; ++i) {
             auto istr = std::to_string(i);
             if (!dhandle.exists(istr) || dhandle.childObjType(istr) != H5O_TYPE_GROUP) {
-                throw std::runtime_error("expected a group at '" + istr + "'");
+                throw std::runtime_error("expected a group at 'data/" + istr + "'");
             }
             auto lhandle = dhandle.openGroup(istr);
             lptr->set(i, parse_inner<Provisioner>(lhandle, ext, version));
