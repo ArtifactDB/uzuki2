@@ -95,7 +95,7 @@ The data type of the placeholder attribute should have the same data type class 
 **(for version >= 1.3)** 
 Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
 No casting should be performed to a lower-precision type, as this may cause a non-missing value to become equal to the placeholder.
-If the placeholder is NaN, all NaNs in the dataset should be considered missing (regardless of the exact bit representation in the NaN payload).
+If the placeholder is NaN, all NaNs in the dataset should be considered missing, regardless of the exact bit representation in the NaN payload.
 See the [HDF5 policy draft (v0.1.0)](https://github.com/ArtifactDB/Bioc-HDF5-policy/tree/v0.1.0) for more details.
 
 **(for version >= 1.1, < 1.3)** 
