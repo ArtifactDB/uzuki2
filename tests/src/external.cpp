@@ -75,7 +75,7 @@ TEST(Hdf5ExternalTest, CheckErrors) {
         auto ghandle = external_opener(handle, "foo");
         write_scalar(ghandle, "index", 0, H5::PredType::NATIVE_DOUBLE);
     }
-    expect_hdf5_external_error(path, "foo", "expected integer", 1);
+    expect_hdf5_external_error(path, "foo", "external index at 'index' cannot be represented", 1);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);

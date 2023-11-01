@@ -278,7 +278,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             auto levhandle = ritsuko::hdf5::get_dataset(handle, "levels");
             auto levtype = levhandle.getDataType();
             if (levtype.getClass() != H5T_STRING) {
-                throw std::runtime_error("expected a string dataset at '" + ritsuko::hdf5::get_name(levhandle) + "'");
+                throw std::runtime_error("expected a string dataset for the levels at 'levels'");
             }
 
             int32_t levlen = ritsuko::hdf5::get_1d_length(levhandle.getSpace(), false);
@@ -382,19 +382,19 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
     } else if (object_type == "external") {
         auto ihandle = ritsuko::hdf5::get_dataset(handle, "index");
         if (ritsuko::hdf5::exceeds_integer_limit(ihandle, 32, true)) {
-            throw std::runtime_error("index at '" + ritsuko::hdf5::get_name(ihandle) + "' cannot be represented by a 32-bit signed integer");
+            throw std::runtime_error("external index at 'index' cannot be represented by a 32-bit signed integer");
         }
 
         auto ispace = ihandle.getSpace();
         int idims = ispace.getSimpleExtentNdims();
         if (idims != 0) {
-            throw std::runtime_error("expected scalar dataset at '" + ritsuko::hdf5::get_name(ihandle) + "'");
+            throw std::runtime_error("expected scalar dataset at 'index'");
         } 
 
         int32_t idx;
         ihandle.read(&idx, H5::PredType::NATIVE_INT32);
         if (idx < 0 || static_cast<size_t>(idx) >= ext.size()) {
-            throw std::runtime_error("external index out of range at '" + ritsuko::hdf5::get_name(ihandle) + "'");
+            throw std::runtime_error("external index out of range at 'index'");
         }
 
         output.reset(Provisioner::new_External(ext.get(idx)));

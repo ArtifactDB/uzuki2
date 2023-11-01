@@ -47,7 +47,7 @@ TEST(Hdf5NumberTest, SimpleLoading) {
      ********************************************/
 }
 
-TEST(Hdf5IntegerTest, BlockLoading) {
+TEST(Hdf5NumberTest, BlockLoading) {
     auto path = "TEST-string.h5";
 
     // Buffer size is 10000, so we make sure we have enough values to go through a few iterations.
@@ -135,6 +135,39 @@ TEST(Hdf5NumberTest, MissingValues) {
         EXPECT_EQ(bptr->size(), 5);
         EXPECT_EQ(bptr->base.values[2], -123456789);
     }
+}
+
+TEST(Hdf5NumberTest, ForbiddenTypes) {
+    auto path = "TEST-forbidden.h5";
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_UINT32);
+    }
+    expect_hdf5_error(path, "blub", "expected a floating-point dataset");
+
+    // Later versions can auto-cast an integer dataset into a float.
+    {
+        H5::H5File handle(path, H5F_ACC_RDWR);
+        add_version(handle.openGroup("blub"), "1.3");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+        auto iptr = static_cast<const DefaultNumberVector*>(parsed.get());
+        EXPECT_EQ(iptr->base.values[0], 1);
+        EXPECT_EQ(iptr->base.values[4], 5);
+    }
+
+    // Unless the integer t ype is too large.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT64);
+        add_version(handle.openGroup("blub"), "1.3");
+    }
+    expect_hdf5_error(path, "blub", "cannot be represented by 64-bit");
 }
 
 TEST(Hdf5NumberTest, CheckError) {
