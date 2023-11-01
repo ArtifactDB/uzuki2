@@ -52,7 +52,7 @@ void expect_hdf5_external_error(std::string path, std::string name, std::string 
     H5::H5File file(path, H5F_ACC_RDONLY); 
     EXPECT_ANY_THROW({
         try {
-            uzuki2::hdf5::validate(file.openGroup(name), name, num_expected);
+            uzuki2::hdf5::validate(file.openGroup(name), num_expected);
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
@@ -75,7 +75,7 @@ TEST(Hdf5ExternalTest, CheckErrors) {
         auto ghandle = external_opener(handle, "foo");
         write_scalar(ghandle, "index", 0, H5::PredType::NATIVE_DOUBLE);
     }
-    expect_hdf5_external_error(path, "foo", "expected integer", 1);
+    expect_hdf5_external_error(path, "foo", "external index at 'index' cannot be represented", 1);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);

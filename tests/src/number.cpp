@@ -47,7 +47,7 @@ TEST(Hdf5NumberTest, SimpleLoading) {
      ********************************************/
 }
 
-TEST(Hdf5IntegerTest, BlockLoading) {
+TEST(Hdf5NumberTest, BlockLoading) {
     auto path = "TEST-string.h5";
 
     // Buffer size is 10000, so we make sure we have enough values to go through a few iterations.
@@ -87,44 +87,47 @@ TEST(Hdf5NumberTest, MissingValues) {
     auto path = "TEST-number.h5";
 
     auto missing = ritsuko::r_missing_value();
+    auto nan = std::numeric_limits<double>::quiet_NaN();
     EXPECT_TRUE(std::isnan(missing));
 
     // Old version used the missing R value.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "number");
-        create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, 1 }, H5::PredType::NATIVE_DOUBLE);
+        create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, nan, 1 }, H5::PredType::NATIVE_DOUBLE);
     }
     {
         auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
         auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
-        EXPECT_EQ(bptr->size(), 5);
+        EXPECT_EQ(bptr->size(), 6);
         EXPECT_EQ(bptr->base.values[2], -123456789);
+        EXPECT_TRUE(std::isnan(bptr->base.values[4]));
     }
 
-    // This is no longer directly supported in the new version.
+    // This is no longer directly supported in the versions >= 1.1.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "number");
         add_version(vhandle, "1.1");
-        create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, 1 }, H5::PredType::NATIVE_DOUBLE);
+        create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, nan, 1 }, H5::PredType::NATIVE_DOUBLE);
     }
     {
         auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
         auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
-        EXPECT_EQ(bptr->size(), 5);
+        EXPECT_EQ(bptr->size(), 6);
         EXPECT_TRUE(std::isnan(bptr->base.values[2]));
+        EXPECT_TRUE(std::isnan(bptr->base.values[4]));
     }
 
-    // Unless we specify it.
+    // Unless we specify it in version 1.1-1.2.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "number");
         add_version(vhandle, "1.1");
 
-        auto dhandle = create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, 1 }, H5::PredType::NATIVE_DOUBLE);
+        auto dhandle = create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, nan, 1 }, H5::PredType::NATIVE_DOUBLE);
         auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
         ahandle.write(H5::PredType::NATIVE_DOUBLE, &missing);
     }
@@ -132,9 +135,83 @@ TEST(Hdf5NumberTest, MissingValues) {
         auto parsed = load_hdf5(path, "blub");
         EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
         auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
-        EXPECT_EQ(bptr->size(), 5);
+        EXPECT_EQ(bptr->size(), 6);
         EXPECT_EQ(bptr->base.values[2], -123456789);
+        EXPECT_TRUE(std::isnan(bptr->base.values[4]));
     }
+
+    // In version 1.3, the NaN payload is now ignored, as it's too fragile.
+    // This means that all NaNs are considered to be missing if the placeholder is an NaN of any kind.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        add_version(vhandle, "1.3");
+
+        auto dhandle = create_dataset<double>(vhandle, "data", { 1, 0, missing, 0, nan, 1 }, H5::PredType::NATIVE_DOUBLE);
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
+        ahandle.write(H5::PredType::NATIVE_DOUBLE, &missing);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+        auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
+        EXPECT_EQ(bptr->size(), 6);
+        EXPECT_EQ(bptr->base.values[2], -123456789);
+        EXPECT_EQ(bptr->base.values[4], -123456789);
+    }
+
+    // Of course, non-NaN placeholders are still properly respected.
+    auto inf = std::numeric_limits<double>::infinity();
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        add_version(vhandle, "1.3");
+
+        auto dhandle = create_dataset<double>(vhandle, "data", { 1, 0, inf, 0, nan, 1 }, H5::PredType::NATIVE_DOUBLE);
+        auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
+        ahandle.write(H5::PredType::NATIVE_DOUBLE, &inf);
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+        auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
+        EXPECT_EQ(bptr->size(), 6);
+        EXPECT_EQ(bptr->base.values[2], -123456789);
+        EXPECT_TRUE(std::isnan(bptr->base.values[4]));
+    }
+}
+
+TEST(Hdf5NumberTest, ForbiddenTypes) {
+    auto path = "TEST-forbidden.h5";
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_UINT32);
+    }
+    expect_hdf5_error(path, "blub", "expected a floating-point dataset");
+
+    // Later versions can auto-cast an integer dataset into a float.
+    {
+        H5::H5File handle(path, H5F_ACC_RDWR);
+        add_version(handle.openGroup("blub"), "1.3");
+    }
+    {
+        auto parsed = load_hdf5(path, "blub");
+        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+        auto iptr = static_cast<const DefaultNumberVector*>(parsed.get());
+        EXPECT_EQ(iptr->base.values[0], 1);
+        EXPECT_EQ(iptr->base.values[4], 5);
+    }
+
+    // Unless the integer type is too large.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "number");
+        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT64);
+        add_version(handle.openGroup("blub"), "1.3");
+    }
+    expect_hdf5_error(path, "blub", "cannot be represented by 64-bit");
 }
 
 TEST(Hdf5NumberTest, CheckError) {

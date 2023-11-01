@@ -41,35 +41,6 @@ TEST(Hdf5AttributeTest, CheckError) {
     expect_hdf5_error(path, "whee", "unknown vector type");
 }
 
-TEST(Hdf5IntegerTypeTest, Forbidden) {
-    auto path = "TEST-forbidden.h5";
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "blub", "integer");
-        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_UINT32);
-    }
-    expect_hdf5_error(path, "blub", "exceeds the range");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "blub", "integer");
-        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT64);
-    }
-    expect_hdf5_error(path, "blub", "exceeds the range");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "blub", "integer");
-        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_UINT16);
-    }
-    auto parsed = load_hdf5(path, "blub");
-    EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-    auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
-    EXPECT_EQ(iptr->base.values[0], 1);
-    EXPECT_EQ(iptr->base.values[4], 5);
-}
-
 class JsonFileTest : public ::testing::TestWithParam<std::tuple<int, bool> > {};
 
 TEST_P(JsonFileTest, Chunking) {
