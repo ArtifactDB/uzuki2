@@ -52,7 +52,7 @@ void expect_hdf5_external_error(std::string path, std::string name, std::string 
     H5::H5File file(path, H5F_ACC_RDONLY); 
     EXPECT_ANY_THROW({
         try {
-            uzuki2::hdf5::validate(file.openGroup(name), name, num_expected);
+            uzuki2::hdf5::validate(file.openGroup(name), num_expected);
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
