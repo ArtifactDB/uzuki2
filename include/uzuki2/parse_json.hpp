@@ -434,8 +434,10 @@ ParsedList parse(byteme::Reader& reader, Externals ext, Options options = Option
             if (vIt->second->type() != millijson::STRING) {
                 throw std::runtime_error("expected a string in 'version'");
             }
-            auto vptr = static_cast<const millijson::String*>(vIt->second.get());
-            version = parse_version_string(vptr->value);
+            const auto& vstr = static_cast<const millijson::String*>(vIt->second.get())->value;
+            auto vraw = ritsuko::parse_version_string(vstr.c_str(), vstr.size(), /* skip_patch = */ true);
+            version.major = vraw.major;
+            version.minor = vraw.minor;
         }
     }
 

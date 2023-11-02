@@ -460,7 +460,9 @@ ParsedList parse(const H5::Group& handle, Externals ext) {
     Version version;
     if (handle.attrExists("uzuki_version")) {
         auto ver_str = ritsuko::hdf5::load_scalar_string_attribute(handle, "uzuki_version");
-        version = parse_version_string(ver_str);
+        auto vraw = ritsuko::parse_version_string(ver_str.c_str(), ver_str.size(), /* skip_patch = */ true);
+        version.major = vraw.major;
+        version.minor = vraw.minor;
     }
 
     ExternalTracker etrack(std::move(ext));
