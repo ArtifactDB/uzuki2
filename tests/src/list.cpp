@@ -19,7 +19,7 @@ TEST(Hdf5ListTest, SimpleLoading) {
         create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
     {
-        auto parsed = load_hdf5(path, "foo");
+        auto parsed = load_hdf5_strict(path, "foo");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -41,7 +41,7 @@ TEST(Hdf5ListTest, SimpleLoading) {
         create_dataset(ghandle, "names", { "bruce", "alfred" });
     }
     {
-        auto parsed = load_hdf5(path, "foo");
+        auto parsed = load_hdf5_strict(path, "foo");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -66,7 +66,7 @@ TEST(Hdf5ListTest, NestedLoading) {
     }
 
     {
-        auto parsed = load_hdf5(path, "foo");
+        auto parsed = load_hdf5_strict(path, "foo");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -111,7 +111,7 @@ TEST(Hdf5ListTest, CheckError) {
 TEST(JsonListTest, SimpleLoading) {
     // Simple stuff works correctly.
     {
-        auto parsed = load_json("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ] }");
+        auto parsed = load_json_strict("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ] }");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -128,7 +128,7 @@ TEST(JsonListTest, SimpleLoading) {
 
     // Works with names.
     {
-        auto parsed = load_json("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ], \"names\": [ \"X\", \"Y\" ] }");
+        auto parsed = load_json_strict("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ], \"names\": [ \"X\", \"Y\" ] }");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
         auto stuff = static_cast<const DefaultList*>(parsed.get());
@@ -139,7 +139,7 @@ TEST(JsonListTest, SimpleLoading) {
 
     // Works if empty.
     {
-        auto parsed = load_json("{ \"type\":\"list\", \"values\": [] }");
+        auto parsed = load_json_strict("{ \"type\":\"list\", \"values\": [] }");
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
         auto stuff = static_cast<const DefaultList*>(parsed.get());
         EXPECT_EQ(stuff->size(), 0);
@@ -147,7 +147,7 @@ TEST(JsonListTest, SimpleLoading) {
 }
 
 TEST(JsonListTest, NestedLoading) {
-    auto parsed = load_json("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"list\", \"values\": [ { \"type\": \"nothing\" } ] } ] }");
+    auto parsed = load_json_strict("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"list\", \"values\": [ { \"type\": \"nothing\" } ] } ] }");
     EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
     auto stuff = static_cast<const DefaultList*>(parsed.get());

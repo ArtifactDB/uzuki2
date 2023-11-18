@@ -395,6 +395,11 @@ struct Options {
      * If true, an extra thread is used to avoid blocking I/O operations.
      */
     bool parallel = false;
+
+    /**
+     * Whether to throw an error if the top-level R object is not an R list.
+     */
+    bool strict_list = true;
 };
 
 /**
@@ -443,7 +448,12 @@ ParsedList parse(byteme::Reader& reader, Externals ext, Options options = Option
 
     ExternalTracker etrack(std::move(ext));
     auto output = parse_object<Provisioner>(contents.get(), etrack, "", version);
+
+    if (options.strict_list && output->type() != LIST) {
+        throw std::runtime_error("top-level object should represent an R list");
+    }
     etrack.validate();
+
     return ParsedList(std::move(output), std::move(version));
 }
 

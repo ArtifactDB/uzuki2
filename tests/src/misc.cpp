@@ -41,6 +41,20 @@ TEST(Hdf5AttributeTest, CheckError) {
     expect_hdf5_error(path, "whee", "unknown vector type");
 }
 
+TEST(TopLevelList, CheckErrors) {
+    auto path = "TEST-date.h5";
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        std::map<std::string, std::string> attrs;
+        attrs["uzuki_object"] = "nothing";
+        super_group_opener(handle, "whee", attrs);
+    }
+    expect_hdf5_error(path, "whee", "top-level object should represent an R list");
+
+    expect_json_error("{ \"type\":\"nothing\" }", "top-level object should represent an R list");
+}
+
 class JsonFileTest : public ::testing::TestWithParam<std::tuple<int, bool> > {};
 
 TEST_P(JsonFileTest, Chunking) {

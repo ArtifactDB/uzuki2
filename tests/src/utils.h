@@ -158,13 +158,26 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
 }
 
 inline auto load_hdf5(std::string name, std::string group) {
+    uzuki2::hdf5::Options opt;
+    opt.strict_list = false;
+    return uzuki2::hdf5::parse<DefaultProvisioner>(name, group, std::move(opt));
+}
+
+inline auto load_hdf5_strict(std::string name, std::string group) {
     return uzuki2::hdf5::parse<DefaultProvisioner>(name, group);
 }
 
 inline auto load_json(std::string x, bool parallel = false) {
     uzuki2::json::Options opt;
     opt.parallel = parallel;
-    return uzuki2::json::parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), opt);
+    opt.strict_list = false;
+    return uzuki2::json::parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), std::move(opt));
+}
+
+inline auto load_json_strict(std::string x, bool parallel = false) {
+    uzuki2::json::Options opt;
+    opt.parallel = parallel;
+    return uzuki2::json::parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), std::move(opt));
 }
 
 inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {

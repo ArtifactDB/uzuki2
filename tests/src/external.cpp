@@ -8,6 +8,8 @@
 
 TEST(Hdf5ExternalTest, SimpleLoading) {
     auto path = "TEST-external.h5";
+    uzuki2::hdf5::Options opt;
+    opt.strict_list = false;
 
     // Simple stuff works correctly.
     {
@@ -17,7 +19,7 @@ TEST(Hdf5ExternalTest, SimpleLoading) {
     }
     {
         DefaultExternals ext(1);
-        auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext);
+        auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext, opt);
         EXPECT_EQ(parsed->type(), uzuki2::EXTERNAL);
 
         auto stuff = static_cast<const DefaultExternal*>(parsed.get());
@@ -36,7 +38,7 @@ TEST(Hdf5ExternalTest, SimpleLoading) {
     }
     {
         DefaultExternals ext(2);
-        auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext);
+        auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext, opt);
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
         auto list = static_cast<const DefaultList*>(parsed.get());
 
@@ -50,9 +52,11 @@ TEST(Hdf5ExternalTest, SimpleLoading) {
 
 void expect_hdf5_external_error(std::string path, std::string name, std::string msg, int num_expected) {
     H5::H5File file(path, H5F_ACC_RDONLY); 
+    uzuki2::hdf5::Options opt;
+    opt.strict_list = false;
     EXPECT_ANY_THROW({
         try {
-            uzuki2::hdf5::validate(file.openGroup(name), num_expected);
+            uzuki2::hdf5::validate(file.openGroup(name), num_expected, std::move(opt));
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
@@ -105,7 +109,9 @@ TEST(Hdf5ExternalTest, CheckErrors) {
 
 auto load_json_with_externals(std::string x, int num_externals) {
     DefaultExternals ext(num_externals);
-    return uzuki2::json::parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), ext);
+    uzuki2::json::Options opt;
+    opt.strict_list = false;
+    return uzuki2::json::parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), ext, std::move(opt));
 }
 
 TEST(JsonExternalTest, SimpleLoading) {
