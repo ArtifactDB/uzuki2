@@ -211,14 +211,14 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         auto lptr = Provisioner::new_List(len, named);
         output.reset(lptr);
 
-        for (size_t i = 0; i < len; ++i) {
-            auto istr = std::to_string(i);
-            try {
+        try {
+            for (size_t i = 0; i < len; ++i) {
+                auto istr = std::to_string(i);
                 auto lhandle = ritsuko::hdf5::open_group(dhandle, istr.c_str());
                 lptr->set(i, parse_inner<Provisioner>(lhandle, ext, version, buffer_size));
-            } catch (std::exception& e) {
-                throw std::runtime_error("failed to parse list element at 'data/" + istr + "'; " + std::string(e.what()));
             }
+        } catch (std::exception& e) {
+            throw std::runtime_error("failed to parse list contents in 'data'; " + std::string(e.what()));
         }
 
         if (named) {
