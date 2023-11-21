@@ -41,17 +41,17 @@ namespace hdf5 {
 /**
  * @cond
  */
-inline H5::DataSet get_scalar_dataset(const H5::Group& handle, const std::string& name, H5T_class_t type_class) try {
-    auto dhandle = ritsuko::hdf5::open_dataset(handle, name.c_str());
-    if (dhandle.getTypeClass() != type_class) {
-        throw std::runtime_error("dataset has the wrong datatype class");
+inline H5::DataSet check_scalar_dataset(const H5::Group& handle, const char* name) {
+    if (handle.childObjType(name) != H5O_TYPE_DATASET) {
+        throw std::runtime_error("expected '" + std::string(name) + "' to be a dataset");
     }
+
+    auto dhandle = handle.openDataSet(name);
     if (!ritsuko::hdf5::is_scalar(dhandle)) {
-        throw std::runtime_error("dataset is not a scalar");
+        throw std::runtime_error("expected '" + std::string(name) + "'to be a scalar dataset");
     }
+
     return dhandle;
-} catch (std::exception& e) {
-    throw std::runtime_error("failed to load scalar dataset at '" + ritsuko::hdf5::get_name(handle) + "/" + name + "'; " + std::string(e.what()));
 }
 
 template<class Host, class Function>
@@ -204,9 +204,6 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
     std::shared_ptr<Base> output;
 
     if (object_type == "list") {
-        if (!handle.exists("data") || handle.childObjType("data") != H5O_TYPE_GROUP) {
-            throw std::runtime_error("expected a group at 'data'");
-        }
         auto dhandle = ritsuko::hdf5::open_group(handle, "data");
         size_t len = dhandle.getNumObjs();
 
@@ -216,11 +213,12 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
         for (size_t i = 0; i < len; ++i) {
             auto istr = std::to_string(i);
-            if (!dhandle.exists(istr) || dhandle.childObjType(istr) != H5O_TYPE_GROUP) {
-                throw std::runtime_error("expected a group at 'data/" + istr + "'");
+            try {
+                auto lhandle = ritsuko::hdf5::open_group(dhandle, istr.c_str());
+                lptr->set(i, parse_inner<Provisioner>(lhandle, ext, version, buffer_size));
+            } catch (std::exception& e) {
+                throw std::runtime_error("failed to parse list element at 'data/" + istr + "'; " + std::string(e.what()));
             }
-            auto lhandle = ritsuko::hdf5::open_group(dhandle, istr.c_str());
-            lptr->set(i, parse_inner<Provisioner>(lhandle, ext, version, buffer_size));
         }
 
         if (named) {
@@ -265,9 +263,12 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             if (vector_type == "ordered") {
                 ordered = true;
             } else if (handle.exists("ordered")) {
-                auto ohandle = get_scalar_dataset(handle, "ordered", H5T_INTEGER);
-                int tmp_ordered = 0;
-                ohandle.read(&tmp_ordered, H5::PredType::NATIVE_INT);
+                auto ohandle = check_scalar_dataset(handle, "ordered");
+                if (ritsuko::hdf5::exceeds_integer_limit(ohandle, 32, true)) {
+                    throw std::runtime_error("'ordered' value cannot be represented by a 32-bit integer");
+                }
+                int32_t tmp_ordered = 0;
+                ohandle.read(&tmp_ordered, H5::PredType::NATIVE_INT32);
                 ordered = tmp_ordered > 0;
             }
 
@@ -298,10 +299,13 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 } else if (vector_type == "date-time") {
                     format = StringVector::DATETIME;
                 }
+
             } else if (handle.exists("format")) {
-                auto fhandle = get_scalar_dataset(handle, "format", H5T_STRING);
-                ritsuko::hdf5::Stream1dStringDataset stream(&fhandle, 1, buffer_size);
-                auto x = stream.steal();
+                auto fhandle = check_scalar_dataset(handle, "format");
+                if (fhandle.getTypeClass() != H5T_STRING) {
+                    throw std::runtime_error("'format' dataset should have a string datatype class");
+                }
+                auto x = ritsuko::hdf5::Stream1dStringDataset(&fhandle, 1, buffer_size).steal();
                 if (x == "date") {
                     format = StringVector::DATE;
                 } else if (x == "date-time") {

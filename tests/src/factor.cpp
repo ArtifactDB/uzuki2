@@ -199,7 +199,7 @@ TEST(Hdf5FactorTest, CheckError) {
         create_dataset(vhandle, "levels", { "Malcolm", "Tony", "John" });
         write_scalar(vhandle, "ordered", 1.2, H5::PredType::NATIVE_DOUBLE);
     }
-    expect_hdf5_error(path, "blub", "wrong datatype");
+    expect_hdf5_error(path, "blub", "cannot be represented");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
