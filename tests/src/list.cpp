@@ -96,7 +96,7 @@ TEST(Hdf5ListTest, CheckError) {
         auto dhandle = ghandle.createGroup("data");
         nothing_opener(dhandle, "1");
     }
-    expect_hdf5_error(path, "foo", "expected a group at 'data/0'");
+    expect_hdf5_error(path, "foo", "expected a group at '0'");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -104,7 +104,7 @@ TEST(Hdf5ListTest, CheckError) {
         auto dhandle = ghandle.createGroup("data");
         create_dataset<int>(dhandle, "0", { 1, 2, 3 }, H5::PredType::NATIVE_INT);
     }
-    expect_hdf5_error(path, "foo", "expected a group at 'data/0'");
+    expect_hdf5_error(path, "foo", "expected a group at '0'");
 }
 
 
