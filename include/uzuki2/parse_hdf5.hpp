@@ -41,15 +41,6 @@ namespace hdf5 {
 /**
  * @cond
  */
-template<class Object_>
-std::string check_scalar_string_attribute(const Object_& handle, const char* name) {
-    auto attr = ritsuko::hdf5::open_attribute(handle, name);
-    if (!ritsuko::hdf5::is_scalar(attr) || attr.getTypeClass() != H5T_STRING) {
-        throw std::runtime_error("'" + std::string(name) + "' should be a scalar string attribute");
-    }
-    return ritsuko::hdf5::load_scalar_string_attribute(attr);
-}
-
 inline H5::DataSet check_scalar_dataset(const H5::Group& handle, const char* name) {
     if (handle.childObjType(name) != H5O_TYPE_DATASET) {
         throw std::runtime_error("expected '" + std::string(name) + "' to be a dataset");
@@ -75,7 +66,8 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, co
         const char* placeholder_name = "missing-value-placeholder";
         has_missing = handle.attrExists(placeholder_name);
         if (has_missing) {
-            auto attr = ritsuko::hdf5::open_missing_placeholder_attribute(handle, placeholder_name, /* type_class_only = */ version.lt(1, 2));
+            auto attr = handle.openAttribute(placeholder_name);
+            ritsuko::hdf5::check_missing_placeholder_attribute(handle, attr, /* type_class_only = */ version.lt(1, 2));
             attr.read(H5::PredType::NATIVE_INT32, &missing_value);
         }
     }
@@ -103,7 +95,7 @@ void parse_string_like(const H5::DataSet& handle, Host* ptr, Function check, hsi
         throw std::runtime_error("expected a string dataset");
     }
 
-    auto missingness = ritsuko::hdf5::load_string_missing_placeholder(handle, "missing-value-placeholder");
+    auto missingness = ritsuko::hdf5::open_and_load_optional_string_missing_placeholder(handle, "missing-value-placeholder");
     bool has_missing = missingness.first;
     std::string missing_val = missingness.second;
 
@@ -145,7 +137,8 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, Function check, const V
         const char* placeholder_name = "missing-value-placeholder";
         has_missing = handle.attrExists(placeholder_name);
         if (has_missing) {
-            auto attr = ritsuko::hdf5::open_missing_placeholder_attribute(handle, placeholder_name, /* type_class_only = */ version.lt(1, 2));
+            auto attr = handle.openAttribute(placeholder_name);
+            ritsuko::hdf5::check_missing_placeholder_attribute(handle, attr, /* type_class_only = */ version.lt(1, 2));
             attr.read(H5::PredType::NATIVE_DOUBLE, &missing_value);
         }
     }
@@ -207,7 +200,7 @@ void extract_names(const H5::Group& handle, Host* ptr, hsize_t buffer_size) try 
 template<class Provisioner, class Externals>
 std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const Version& version, hsize_t buffer_size) try {
     // Deciding what type we're dealing with.
-    auto object_type = check_scalar_string_attribute(handle, "uzuki_object");
+    auto object_type = ritsuko::hdf5::open_and_load_scalar_string_attribute(handle, "uzuki_object");
     std::shared_ptr<Base> output;
 
     if (object_type == "list") {
@@ -233,7 +226,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         }
 
     } else if (object_type == "vector") {
-        auto vector_type = check_scalar_string_attribute(handle, "uzuki_type");
+        auto vector_type = ritsuko::hdf5::open_and_load_scalar_string_attribute(handle, "uzuki_type");
 
         auto dhandle = ritsuko::hdf5::open_dataset(handle, "data");
         size_t len = ritsuko::hdf5::get_1d_length(dhandle.getSpace(), true);
@@ -455,7 +448,7 @@ template<class Provisioner, class Externals>
 ParsedList parse(const H5::Group& handle, Externals ext, Options options = Options()) {
     Version version;
     if (handle.attrExists("uzuki_version")) {
-        auto ver_str = check_scalar_string_attribute(handle, "uzuki_version");
+        auto ver_str = ritsuko::hdf5::open_and_load_scalar_string_attribute(handle, "uzuki_version");
         auto vraw = ritsuko::parse_version_string(ver_str.c_str(), ver_str.size(), /* skip_patch = */ true);
         version.major = vraw.major;
         version.minor = vraw.minor;
