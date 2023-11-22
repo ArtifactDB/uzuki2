@@ -312,7 +312,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 if (fhandle.getTypeClass() != H5T_STRING) {
                     throw std::runtime_error("'format' dataset should have a string datatype class");
                 }
-                auto x = ritsuko::hdf5::Stream1dStringDataset(&fhandle, 1, buffer_size).steal();
+                auto x = ritsuko::hdf5::load_scalar_string_dataset(fhandle);
                 if (x == "date") {
                     format = StringVector::DATE;
                 } else if (x == "date-time") {
