@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['external_0',['External',['../structuzuki2_1_1External.html',1,'uzuki2']]]
+  ['comparison_20to_20original_0',['Comparison to original',['../md__github_workspace_docs_specifications_compiled_misc.html',1,'']]]
 ];
