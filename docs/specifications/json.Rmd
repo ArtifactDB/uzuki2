@@ -16,8 +16,14 @@ cat("# JSON Specification (", as.character(.version), ")", sep="")
 All R objects are represented by JSON objects with a `type` property.
 Every R object should be nested inside an R list, i.e., the top-level JSON object should represent an R list.
 
-The top-level object may have a `version` property that contains the **uzuki2** specification version as a `"X.Y"` string for non-negative integers `X` and `Y`.
-The latest version of this specification is **1.2**; if missing, the version can be assumed to be **1.0**.
+The top-level object should have a `version` property that contains the **uzuki2** specification version. 
+```{r, echo=FALSE, results="asis"}
+if (.version == package_version("1.0")) {
+    cat("This should be a string containing the value \"1.0\".\nIf not present, the version is assumed to be \"1.0\" for back-compatibility purposes.")
+} else {
+    cat("This should be a string containing the value \"", as.character(.version), "\".", sep="")
+}
+```
 
 ### Names 
 

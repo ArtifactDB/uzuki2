@@ -18,9 +18,19 @@ Both of these are widely used formats and have complementary strengths for list 
 HDF5 supports random access into list components, which can provide optimization opportunities when the list is large and/or contains large atomic vectors.
 In contrast, JSON is easier to parse and has less storage overhead per list element.
 
-The full HDF5 specification is provided [here](docs/specifications/hdf5.md).
+Both the HDF5 and JSON specifications have multiple versions. 
+Links to the version-specific HDF5 specifications are listed below, along with the minimum version of the C++ library required to parse them:
 
-The full JSON specification is provided [here](docs/specifications/json.md).
+- [1.3](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_3.html), supported by **uzuki2** version ≥ 1.3.
+- [1.2](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_2.html), supported by **uzuki2** version ≥ 1.2.
+- [1.1](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_1.html), supported by **uzuki2** version ≥ 1.1.
+- [1.0](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_0.html), supported by **uzuki2** version ≥ 1.0.
+
+Similarly, different versions of the JSON specification are listed below:
+
+- [1.2](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_json_1_2.html), supported by **uzuki2** version ≥ 1.2.
+- [1.1](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_json_1_1.html), supported by **uzuki2** version ≥ 1.1.
+- [1.0](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_json_1_0.html), supported by **uzuki2** version ≥ 1.0.
 
 ## Validation
 
@@ -53,17 +63,7 @@ DefaultExternals ext(nexpected);
 auto ptr = uzuki2::hdf5::parse<DefaultProvisioner>(file_path, group_name, ext);
 ```
 
-The parser supports multiple specification versions,
-though note the version number of the specification has no direct relationship to the version number of the **uzuki2** library.
-
-|Library version|HDF5 version|JSON version|
-|---------------|------------|------------|
-|          1.0.x|         1.0|         1.0|
-|          1.1.x|   1.0 - 1.1|   1.0 - 1.1|
-|          1.2.x|   1.0 - 1.2|   1.0 - 1.2|
-|          1.3.x|   1.0 - 1.3|   1.0 - 1.2|
-
-Also see the [reference documentation](https://artifactdb.github.io/uzuki2) for more details.
+See the [reference documentation](https://artifactdb.github.io/uzuki2) for more details.
 
 ### Building projects
 

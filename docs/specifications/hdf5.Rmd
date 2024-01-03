@@ -19,9 +19,14 @@ In the descriptions below, we use `**/` as a placeholder for the name of the gro
 All R objects should be nested inside an R list.
 In other words, the top-level HDF5 group should represent an R list.
 
-The top-level group may have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
-This should be a scalar string dataset of the form `X.Y` for non-negative integers `X` and `Y`.
-The latest version of this specification is **1.3**; if not provided, it is assumed to be **1.0** for back-compatibility purposes.
+The top-level group should have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
+```{r, echo=FALSE, results="asis"}
+if (.version == package_version("1.0")) {
+    cat("This attribute should hold a scalar string dataset containing the value \"1.0\".\nIf not present, the version is assumed to be \"1.0\" for back-compatibility purposes.")
+} else {
+    cat("This attribute should hold a scalar string dataset containing the value \"", as.character(.version), "\".", sep="")
+}
+```
 
 ```{r, echo=FALSE, results="asis"}
 if (.version >= package_version("1.3")) {
