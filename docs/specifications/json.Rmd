@@ -1,14 +1,37 @@
-# JSON Specification
+```{r, results="hide", echo=FALSE}
+knitr::opts_chunk$set(error=FALSE)
+if (!exists(".version")) {
+    .version <- package_version("1.2")
+}
+```
 
-## General comments
+```{r, results="asis", echo=FALSE}
+cat("# JSON Specification (", as.character(.version), ")", sep="")
+```
+
+## Comments
+
+### General
 
 All R objects are represented by JSON objects with a `type` property.
-Every R object should be nested inside an R list.
+Every R object should be nested inside an R list, i.e., the top-level JSON object should represent an R list.
 
 The top-level object may have a `version` property that contains the **uzuki2** specification version as a `"X.Y"` string for non-negative integers `X` and `Y`.
 The latest version of this specification is **1.2**; if missing, the version can be assumed to be **1.0**.
 
-## Lists
+### Names 
+
+Some R objects may have a `names` property in the JSON object.
+If `names` is supplied, its contents should always be non-missing.
+Each name is allowed to be any string, including an empty string.
+
+It is technically permitted to provide duplicate names in `names`, consistent with how R itself supports duplicate names in its lists and vectors.
+However, this is not recommended as other frameworks may wish to use representations that assume unique names, e.g., using Python dictionaries to represent named lists.
+By providing unique names, users can improve interoperability with native data structures in other frameworks.
+
+## Object types
+
+### Lists
 
 An R list is represented as a JSON object with the following properties:
 
@@ -16,9 +39,8 @@ An R list is represented as a JSON object with the following properties:
 - `values`, an array of JSON objects corresponding to nested R objects.
   Each JSON object may follow any of the formats described in this specification.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
-  See also the [comments on names](misc.md#comments-on-names).
 
-## Atomic vectors
+### Atomic vectors
 
 An atomic vector is represented as a JSON object with the following properties:
 
@@ -29,7 +51,6 @@ An atomic vector is represented as a JSON object with the following properties:
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
   If `values` is a scalar, `names` should have length 1.
-  See also the [comments on names](misc.md#comments-on-names).
 
 The contents of `values` is subject to some constraints:
 
@@ -38,50 +59,71 @@ The contents of `values` is subject to some constraints:
   IEEE special values can be represented by strings, i.e., `NaN`, `Inf`, `-Inf`.
 - `"integer"`: values should be JSON numbers that can be represented by a 32-bit signed integer.
   Missing values may be represented by `null`.
-  - **(for version 1.0)** missing integers could also be represented by the special value -2147483648.
+```{r, echo=FALSE, results="asis"}
+if (.version == package_version("1.0")) {
+    cat("  Missing integers may also be represented by the special value -2147483648.")
+}
+```
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
 
-**(for version >= 1.1)** 
-For `type` of `"string"`, the object may optionally have a `format` property that constrains the `values`:
+```{r, echo=FALSE, results="asis"}
+if (.version >= package_version("1.1")) {
+    cat('For `type` of `"string"`, the object may optionally have a `format` property that constrains the `values`:
   
 - `"date"`: values should be JSON strings following a `YYYY-MM-DD` format.
   `null` is also allowed and represents a missing value.
 - `"date-time"`: values should be JSON strings following the Internet Date/Time format.
-  `null` is also allowed and represents a missing value.
+  `null` is also allowed and represents a missing value.')
+}
+```
 
 Vectors of length 1 may also be represented as scalars of the appropriate type.
 While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
 
-## Factors
+### Factors
 
 A factor is represented as a JSON object with the following properties:
 
-- `type`, set to `"factor"`. 
-  - **(for version 1.0)** `type` can also be set to `"ordered"` for ordered levels.
+```{r, echo=FALSE, results="asis"}
+if (.version >= package_version("1.0")) {
+    cat('- `type`, set to `"factor"` or `"ordered"`.')
+} else {
+    cat('- `type`, set to `"factor"`.')
+}
+```
 - `values`, an array of 0-based integer indices for the factor.
   These should be non-negative JSON numbers that can fit into a 32-bit signed integer.
   They should also be less than the length of `levels`.
   Missing values are represented by `null`.
-  - **(for version 1.0)** missing values could also be represented by the special value -2147483648.
+```{r, echo=FALSE, results="asis"}
+if (.version == package_version("1.0")) {
+    cat("  Missing integers may also be represented by the special value -2147483648.")
+}
+```
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
-  See also the [comments on names](misc.md#comments-on-names).
-- **(for version >= 1.1)** (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
-  If absent, levels are assumed to be non-ordered.
+```{r, echo=FALSE, results="asis"}
+if (.version >= package_version("1.1")) {
+    cat("- (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
+  If absent, levels are assumed to be non-ordered.")
+}
+```
 
-## Nothing
+### Nothing
 
 A "nothing" (a.k.a., "null", "none") value is represented as a JSON object with the following properties:
 
 - `type`, set to `"nothing"`.
 
-## External object
+### External object
 
 Each external object is represented as a JSON object with the following properties:
 
 - `type`, set to `"index"`.
 - `index`, a non-negative JSON number that can fit into a 32-bit signed integer.
   This identifies this external object uniquely within the entire list.
-  See the equivalent in the HDF5 specification for more details.
+
+By indexing some external metadata with the value of `index`, we can restore the external object in its appropriate location in the R list.
+The exact mechanism by which this restoration occurs is implementation-defined.

@@ -794,7 +794,8 @@ INPUT                  = ../include/uzuki2/parse_json.hpp \
                          ../include/uzuki2/parse_hdf5.hpp \
                          ../include/uzuki2/interfaces.hpp \
                          ../include/uzuki2/uzuki2.hpp \
-                         ../README.md
+                         ../README.md \
+                         specifications/compiled
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

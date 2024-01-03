@@ -6,8 +6,28 @@ on:
 name: Build documentation
 
 jobs:
+  build-spec:
+    runs-on: ubuntu-latest
+    container: bioconductor/bioconductor_docker:devel
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Compile markdown
+      run: |
+        cd docs/specifications
+        R -f build.R
+
+    - name: Upload markdown
+      uses: actions/upload-artifact@v3
+      with:
+        name: built-spec
+        path: docs/specifications/compiled
+
   docs:
     runs-on: ubuntu-latest
+    needs: build-spec
     steps:
     - uses: actions/checkout@v3
 
@@ -15,6 +35,12 @@ jobs:
       uses: wei/wget@v1
       with:
         args: -O docs/doxygen-awesome.css https://raw.githubusercontent.com/jothepro/doxygen-awesome-css/main/doxygen-awesome.css
+
+    - name: Download markdown
+      uses: actions/download-artifact@v3
+      with:
+        name: built-spec
+        path: docs/specifications/compiled
 
     - name: Doxygen Action
       uses: mattnotmitt/doxygen-action@v1

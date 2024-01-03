@@ -1,14 +1,4 @@
-# Comments on names
-
-Both HDF5 and JSON support naming of the vector elements, typically via the `names` group/property.
-If `names` are supplied, their contents should always be non-missing (e.g., not `null` in JSON, no `missing-value-placeholder` in HDF5).
-Each name is allowed to be any string, including an empty string.
-
-It is technically permitted to provide duplicate names in `names`, consistent with how R itself supports duplicate names in its lists and vectors.
-However, this is not recommended as other frameworks may wish to use representations that assume unique names, e.g., using Python dictionaries to represent named lists.
-By providing unique names, users can improve interoperability with native data structures in other frameworks.
-
-# Comparison to version 1
+# Comparison to original 
 
 **uzuki2** involves some major changes from the original [**uzuki**](https://github.com/LTLA/uzuki) library.
 Most obviously, we added support for HDF5 alongside the JSON format.
