@@ -8,15 +8,11 @@ FetchContent_Declare(
   GIT_TAG master
 )
 
-FetchContent_MakeAvailable(byteme)
-
 FetchContent_Declare(
   millijson 
   GIT_REPOSITORY https://github.com/ArtifactDB/millijson
   GIT_TAG master
 )
-
-FetchContent_MakeAvailable(millijson)
 
 FetchContent_Declare(
   ritsuko 
@@ -24,4 +20,6 @@ FetchContent_Declare(
   GIT_TAG master
 )
 
+FetchContent_MakeAvailable(byteme)
+FetchContent_MakeAvailable(millijson)
 FetchContent_MakeAvailable(ritsuko)
