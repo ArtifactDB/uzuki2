@@ -21,16 +21,16 @@ In contrast, JSON is easier to parse and has less storage overhead per list elem
 Both the HDF5 and JSON specifications have multiple versions. 
 Links to the version-specific HDF5 specifications are listed below, along with the minimum version of the C++ library required to parse them:
 
-- [1.3](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_3.html), supported by **uzuki2** version ≥ 1.3.
-- [1.2](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_2.html), supported by **uzuki2** version ≥ 1.2.
-- [1.1](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_1.html), supported by **uzuki2** version ≥ 1.1.
-- [1.0](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_hdf5_1_0.html), supported by **uzuki2** version ≥ 1.0.
+- [1.3](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.3.md), supported by **uzuki2** version ≥ 1.3.
+- [1.2](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.2.md), supported by **uzuki2** version ≥ 1.2.
+- [1.1](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.1.md), supported by **uzuki2** version ≥ 1.1.
+- [1.0](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.0.md), supported by **uzuki2** version ≥ 1.0.
 
 Similarly, different versions of the JSON specification are listed below:
 
-- [1.2](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_json_1_2.html), supported by **uzuki2** version ≥ 1.2.
-- [1.1](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_json_1_1.html), supported by **uzuki2** version ≥ 1.1.
-- [1.0](https://artifactdb.github.io/uzuki2/md__github_workspace_docs_specifications_compiled_json_1_0.html), supported by **uzuki2** version ≥ 1.0.
+- [1.2](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/json-1.2.md), supported by **uzuki2** version ≥ 1.2.
+- [1.1](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/json-1.1.md), supported by **uzuki2** version ≥ 1.1.
+- [1.0](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/json-1.0.md), supported by **uzuki2** version ≥ 1.0.
 
 ## Validation
 

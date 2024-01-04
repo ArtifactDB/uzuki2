@@ -40,16 +40,19 @@ jobs:
       with:
         args: -O docs/doxygen-awesome.css https://raw.githubusercontent.com/jothepro/doxygen-awesome-css/main/doxygen-awesome.css
 
-    - name: Download markdown
-      uses: actions/download-artifact@v3
-      with:
-        name: built-spec
-        path: docs/specifications/compiled
-
     - name: Doxygen Action
       uses: mattnotmitt/doxygen-action@v1
       with:
         working-directory: docs/
+
+    - name: Change permissions
+      run: sudo chmod 777 docs/html
+
+    - name: Download markdown
+      uses: actions/download-artifact@v3
+      with:
+        name: built-spec
+        path: docs/html/specifications
 
     - name: GH Pages Deployment
       uses: JamesIves/github-pages-deploy-action@v4
