@@ -91,7 +91,7 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, co
 template<class Host, class Function>
 void parse_string_like(const H5::DataSet& handle, Host* ptr, Function check, hsize_t buffer_size) try {
     if (!ritsuko::hdf5::is_utf8_string(handle)) {
-        throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
+        throw std::runtime_error("expected a datatype that can be represented by a UTF-8 encoded string");
     }
 
     auto missingness = ritsuko::hdf5::open_and_load_optional_string_missing_placeholder(handle, "missing-value-placeholder");
@@ -178,7 +178,7 @@ void extract_names(const H5::Group& handle, Host* ptr, hsize_t buffer_size) try 
 
     auto nhandle = handle.openDataSet("names");
     if (!ritsuko::hdf5::is_utf8_string(nhandle)) {
-        throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
+        throw std::runtime_error("expected a datatype that can be represented by a UTF-8 encoded string");
     }
 
     size_t len = ptr->size();
@@ -252,7 +252,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         } else if (vector_type == "factor" || (version.equals(1, 0) && vector_type == "ordered")) {
             auto levhandle = ritsuko::hdf5::open_dataset(handle, "levels");
             if (!ritsuko::hdf5::is_utf8_string(levhandle)) {
-                throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
+                throw std::runtime_error("expected a datatype that can be represented by a UTF-8 encoded string");
             }
 
             int32_t levlen = ritsuko::hdf5::get_1d_length(levhandle.getSpace(), false);
@@ -300,7 +300,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             } else if (handle.exists("format")) {
                 auto fhandle = check_scalar_dataset(handle, "format");
                 if (!ritsuko::hdf5::is_utf8_string(fhandle)) {
-                    throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
+                    throw std::runtime_error("expected a datatype that can be represented by a UTF-8 encoded string");
                 }
                 auto x = ritsuko::hdf5::load_scalar_string_dataset(fhandle);
                 if (x == "date") {

@@ -175,7 +175,7 @@ TEST(Hdf5DateTest, CheckError) {
         vhandle.createDataSet("format", H5::PredType::NATIVE_INT, H5S_SCALAR);
         create_dataset(vhandle, "data", { "harry", "ron", "hermoine" });
     }
-    expect_hdf5_error(path, "foo", "string datatype");
+    expect_hdf5_error(path, "foo", "can be represented by a UTF-8 encoded string");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);

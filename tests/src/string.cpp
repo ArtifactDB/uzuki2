@@ -164,7 +164,7 @@ TEST(Hdf5StringTest, CheckError) {
         auto ghandle = vector_opener(handle, "foo", "string");
         create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
-    expect_hdf5_error(path, "foo", "expected a string");
+    expect_hdf5_error(path, "foo", "UTF-8 encoded string");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
