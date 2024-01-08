@@ -90,9 +90,8 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, co
 
 template<class Host, class Function>
 void parse_string_like(const H5::DataSet& handle, Host* ptr, Function check, hsize_t buffer_size) try {
-    auto dtype = handle.getDataType();
-    if (dtype.getClass() != H5T_STRING) {
-        throw std::runtime_error("expected a string dataset");
+    if (!ritsuko::hdf5::is_utf8_string(handle)) {
+        throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
     }
 
     auto missingness = ritsuko::hdf5::open_and_load_optional_string_missing_placeholder(handle, "missing-value-placeholder");
@@ -178,9 +177,8 @@ void extract_names(const H5::Group& handle, Host* ptr, hsize_t buffer_size) try 
     }
 
     auto nhandle = handle.openDataSet("names");
-    auto dtype = nhandle.getDataType();
-    if (dtype.getClass() != H5T_STRING) {
-        throw std::runtime_error("expected a string dataset");
+    if (!ritsuko::hdf5::is_utf8_string(nhandle)) {
+        throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
     }
 
     size_t len = ptr->size();
@@ -253,9 +251,8 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
         } else if (vector_type == "factor" || (version.equals(1, 0) && vector_type == "ordered")) {
             auto levhandle = ritsuko::hdf5::open_dataset(handle, "levels");
-            auto levtype = levhandle.getDataType();
-            if (levtype.getClass() != H5T_STRING) {
-                throw std::runtime_error("expected a string dataset for the levels at 'levels'");
+            if (!ritsuko::hdf5::is_utf8_string(levhandle)) {
+                throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
             }
 
             int32_t levlen = ritsuko::hdf5::get_1d_length(levhandle.getSpace(), false);
@@ -302,8 +299,8 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
             } else if (handle.exists("format")) {
                 auto fhandle = check_scalar_dataset(handle, "format");
-                if (fhandle.getTypeClass() != H5T_STRING) {
-                    throw std::runtime_error("'format' dataset should have a string datatype class");
+                if (!ritsuko::hdf5::is_utf8_string(fhandle)) {
+                    throw std::runtime_error("expected a string datatype with a UTF-8 compatible encoding");
                 }
                 auto x = ritsuko::hdf5::load_scalar_string_dataset(fhandle);
                 if (x == "date") {

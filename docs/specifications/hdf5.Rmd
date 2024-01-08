@@ -22,11 +22,13 @@ In other words, the top-level HDF5 group should represent an R list.
 The top-level group should have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
 ```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.0")) {
-    cat("This attribute should hold a scalar string dataset containing the value \"1.0\".\nIf not present, the version is assumed to be \"1.0\" for back-compatibility purposes.")
+    cat("This attribute should hold a scalar string dataset containing the value \"1.0\".
+If not present, the version is assumed to be \"1.0\" for back-compatibility purposes.")
 } else {
     cat("This attribute should hold a scalar string dataset containing the value \"", as.character(.version), "\".", sep="")
 }
 ```
+This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 ```{r, echo=FALSE, results="asis"}
 if (.version >= package_version("1.3")) {
@@ -55,6 +57,7 @@ By providing unique names, users can improve interoperability with native data s
 An R list is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"list"`.
+  This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 This group should contain a subgroup `**/data` that contains the list elements.
 Each list element is itself represented by a subgroup that is named after its 0-based position in the list, e.g., `**/data/0` for the first list element.
@@ -62,12 +65,14 @@ One subgroup should be present for each integer in `[0, N)`, given a list of len
 Each list element may be any of the objects described in this specification, including further nested lists.
 
 If the list is named, there will additionally be a 1-dimensional `**/names` string dataset of length equal to the number of elements in `**/data`.
+This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 ### Atomic vectors
 
 An atomic vector is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
+  This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 ```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.0")) {
     cat('- `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"`, `"string"`, `"date"` or `"date-time"`.')
@@ -75,6 +80,7 @@ if (.version == package_version("1.0")) {
     cat('- `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"` or `"string"`.')
 }
 ```
+  This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 The group should contain an 1-dimensional dataset at `**/data`.
 Vectors of length 1 may also be represented as a scalar dataset.
@@ -90,11 +96,13 @@ if (.version == package_version("1.0")) {
     cat('- `"number"`: any type of `H5T_FLOAT` or `H5T_INTEGER` that can be represented exactly by a double-precision (64-bit) float.')
 }
 ```
-- `"string"`: any type of `H5T_STRING` that can be represented by a UTF-8 encoded string.
+- `"string"`: a HDF5 string datatype that can be represented by a UTF-8 encoded string.
 ```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.0")) {
-    cat('- `"date"`: any type of `H5T_STRING` where the srings are in the `YYYY-MM-DD` format, or are equal to a missing placeholder value.
-- `"date-time"`: any type of `H5T_STRING` where the srings are Internet Date/Time format, or are equal to a missing placeholder value.')
+    cat('- `"date"`: a HDF5 string datatype that can be represented by a UTF-8 encoded string,
+  where the strings are in the `YYYY-MM-DD` format or are equal to a missing placeholder value.
+- `"date-time"`: a HDF5 string datatype that can be represented by a UTF-8 encoded string,
+  where the strings are Internet Date/Time format, or are equal to a missing placeholder value.')
 }
 ```
 
@@ -106,11 +114,14 @@ if (.version >= package_version("1.1")) {
 This should be a scalar string dataset that specifies constraints to the format of the values in `**/data`:
 
 - `"date"`: strings should be `YYYY-MM-DD` dates or the placeholder value.
-- `"date-time"`: strings should be in the Internet Date/Time format ([RFC 3339, Section 5.6](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)) or the placeholder value.')
+- `"date-time"`: strings should be in the Internet Date/Time format ([RFC 3339, Section 5.6](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)) or the placeholder value.
+
+This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.')
 }
 ```
 
 The atomic vector's group may also contain `**/names`, a 1-dimensional string dataset of length equal to that of `**/data`.
+This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 If `**/data` is a scalar, `**/names` should have length 1.
 
 ### Representing missing values
@@ -124,13 +135,13 @@ If no such attribute is present, it can be assumed that there are no missing val
 }
 
 if (.version >= package_version("1.2")) {
-    cat('The data type of the placeholder attribute should be exactly the same as that of `**/data`, so as to avoid unexpected results upon casting.
-The only exception is when `**/data` is a string, in which case the placeholder type may be of any string type;
+    cat('The datatype of the placeholder attribute should be exactly the same as that of `**/data`, so as to avoid unexpected results upon casting.
+The only exception is when `**/data` is a string, in which case the placeholder may be of any string datatype that is compatible with the UTF-8 encoding.
 it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.')
 }
 
 if (.version >= package_version("1.1")) {
-    cat('The data type of the placeholder attribute should have the same data type class as `**/data`.')
+    cat('The datatype of the placeholder attribute should have the same datatype class as `**/data`.')
 }
 
 if (.version >= package_version("1.3")) {
@@ -159,6 +170,7 @@ If no such attribute is present, it can be assumed that there are no missing val
 A factor is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
+  This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 ```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.0")) {
     cat('- `uzuki_type`, a scalar string dataset containing `"factor"` or `"ordered"`.')
@@ -166,6 +178,7 @@ if (.version == package_version("1.0")) {
     cat('- `uzuki_type`, a scalar string dataset containing `"factor"`.')
 }
 ```
+  This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
 This should be type of `H5T_INTEGER` that can be represented by a 32-bit signed integer.
@@ -177,9 +190,10 @@ Values in `**/levels` should be unique.
 Values in `**/data` should be non-negative (missing values excepted) and less than the length of `**/levels`.
 Note that the type constraints on `**/data` suggest that there should not be more than 2147483647 levels;
 beyond that count, the levels cannot be indexed by elements of `**/data`.
+`**/levels` should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
-See also the [comments on names](misc.md#comments-on-names).
+This should use a HDF5 string datatype is compatible with the UTF-8 encoding.
 
 ```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.1")) {
@@ -193,12 +207,14 @@ This should be interpreted as a boolean where a non-zero value specifies that we
 A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"nothing"`.
+  This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 ### External object
 
 Each external object is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"external"`.
+  This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 This should contain an `**/index` scalar dataset, containing an index that identifies this external object uniquely within the entire list.
 `**/index` should start at zero and be incremented whenever an external object is encountered. 
