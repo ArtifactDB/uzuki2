@@ -96,16 +96,17 @@ A factor is represented as a HDF5 group (`**/`) with the following attributes:
   This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 
 The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
-This should be any HDF5 integer datatype that can be represented by a 32-bit signed integer.
+This should use a HDF5 integer datatype that can be represented by a 32-bit signed integer.
 (Admittedly, this should have been an unsigned integer, but we started with a signed integer and we'll just keep it so for back-compatibility.)
 Missing values are represented as described above for atomic vectors.
 
-The group should also contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `**/data`.
+The group should contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `**/data`.
+This should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
 Values in `**/levels` should be unique.
+
 Values in `**/data` should be non-negative (missing values excepted) and less than the length of `**/levels`.
-Note that the datatype constraints on `**/data` suggest that there should not be more than 2147483647 levels;
-beyond that count, the levels cannot be indexed by elements of `**/data`.
-`**/levels` should use a HDF5 string datatype that is compatible with the UTF-8 encoding.
+Note that the datatype constraints on `**/data` suggest that there should not be more than 2147483647 levels,
+as beyond that, the levels cannot be indexed by elements of `**/data`.
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
 This should use a HDF5 string datatype is compatible with the UTF-8 encoding.
