@@ -84,8 +84,16 @@ If `**/data` is a scalar, `**/names` should have length 1.
 Each `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
-If no such attribute is present, it can be assumed that there are no missing values.The datatype of the placeholder attribute should have the same datatype class as `**/data`.Floating-point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
+If no such attribute is present, it can be assumed that there are no missing values.
+
+The datatype of the placeholder attribute should have the same datatype class as `**/data`.
+
+Floating-point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
 Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with `memcmp`) to ensure that the payload is taken into account.
+
+
+
+
 
 ### Factors
 

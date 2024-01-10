@@ -88,11 +88,19 @@ If `**/data` is a scalar, `**/names` should have length 1.
 Each `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
-If no such attribute is present, it can be assumed that there are no missing values.The datatype of the placeholder attribute should be exactly the same as that of `**/data`, so as to avoid unexpected results upon casting.
+If no such attribute is present, it can be assumed that there are no missing values.
+
+The datatype of the placeholder attribute should be exactly the same as that of `**/data`, so as to avoid unexpected results upon casting.
 The only exception is when `**/data` is a string, in which case the placeholder may be of any string datatype that can be represented by a UTF-8 encoded string.
-it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.The datatype of the placeholder attribute should have the same datatype class as `**/data`.Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
+it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.
+
+Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
 No casting should be performed to a lower-precision type, as this may cause a non-missing value to become equal to the placeholder.
 If the placeholder is NaN, all NaNs in the dataset should be considered missing, regardless of the exact bit representation in the NaN payload.
+
+
+
+Check out the [HDF5 policy draft (v0.1.0)](https://github.com/ArtifactDB/Bioc-HDF5-policy/tree/v0.1.0). for more details.
 
 ### Factors
 

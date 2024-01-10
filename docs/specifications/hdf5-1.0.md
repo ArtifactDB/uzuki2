@@ -79,12 +79,20 @@ If `**/data` is a scalar, `**/names` should have length 1.
 
 ### Representing missing values
 
+
+
+
+
+
+
 Integer or boolean values of -2147483648 are treated as missing.
 Missing floats are represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
 For strings, each `**/data` dataset may contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar string dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values.
+
+
 
 ### Factors
 
