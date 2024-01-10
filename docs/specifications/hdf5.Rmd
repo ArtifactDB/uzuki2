@@ -133,28 +133,30 @@ If present, this should be a scalar dataset that specifies the placeholder for m
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values.')
 }
+```
 
+```{r, echo=FALSE, results="asis"}
 if (.version >= package_version("1.2")) {
     cat('The datatype of the placeholder attribute should be exactly the same as that of `**/data`, so as to avoid unexpected results upon casting.
 The only exception is when `**/data` is a string, in which case the placeholder may be of any string datatype that can be represented by a UTF-8 encoded string.
 it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.')
-}
-
-if (.version >= package_version("1.1")) {
+} else if (.version >= package_version("1.1")) {
     cat('The datatype of the placeholder attribute should have the same datatype class as `**/data`.')
 }
+```
 
+```{r, echo=FALSE, results="asis"}
 if (.version >= package_version("1.3")) {
     cat('Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
 No casting should be performed to a lower-precision type, as this may cause a non-missing value to become equal to the placeholder.
 If the placeholder is NaN, all NaNs in the dataset should be considered missing, regardless of the exact bit representation in the NaN payload.')
-}
-
-if (.version >= package_version("1.1") && .version < package_version("1.3")) {
+} else if (.version >= package_version("1.1")) {
     cat('Floating-point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
 Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with `memcmp`) to ensure that the payload is taken into account.')
 }
+```
 
+```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.0")) {
     cat("Integer or boolean values of -2147483648 are treated as missing.
 Missing floats are represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
@@ -162,6 +164,12 @@ For strings, each `**/data` dataset may contain a `missing-value-placeholder` at
 If present, this should be a scalar string dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values.")
+}
+```
+
+```{r, echo=FALSE, results="asis"}
+if (.version >= package_version("1.3")) {
+    cat("Check out the [HDF5 policy draft (v0.1.0)](https://github.com/ArtifactDB/Bioc-HDF5-policy/tree/v0.1.0). for more details.")
 }
 ```
 
