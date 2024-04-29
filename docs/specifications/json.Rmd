@@ -73,6 +73,8 @@ The contents of `values` is subject to some constraints:
 ```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.0")) {
     cat("  Missing integers may also be represented by the special value -2147483648.")
+} else {
+    cat("  <!--- -->")
 }
 ```
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
@@ -111,6 +113,8 @@ if (.version == package_version("1.0")) {
 ```{r, echo=FALSE, results="asis"}
 if (.version == package_version("1.0")) {
     cat("  Missing integers may also be represented by the special value -2147483648.")
+} else {
+    cat("  <!--- -->")
 }
 ```
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
@@ -119,6 +123,8 @@ if (.version == package_version("1.0")) {
 if (.version >= package_version("1.1")) {
     cat("- (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
   If absent, levels are assumed to be non-ordered.")
+} else {
+    cat(" <!--- -->")
 }
 ```
 

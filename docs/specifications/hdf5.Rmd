@@ -103,6 +103,8 @@ if (.version == package_version("1.0")) {
   where the strings are in the `YYYY-MM-DD` format or are equal to a missing placeholder value.
 - `"date-time"`: a HDF5 string datatype that can be represented by a UTF-8 encoded string,
   where the strings are Internet Date/Time format, or are equal to a missing placeholder value.')
+} else {
+    cat("  <!--- -->")
 }
 ```
 
