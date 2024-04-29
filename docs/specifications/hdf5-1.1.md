@@ -63,7 +63,7 @@ The allowed HDF5 datatype for `**/data` depends on `uzuki_type`:
   Note that the converse is not required, i.e., the datatype does not need to be 32-bit if no such values are present in the dataset.
 - `"number"`: a HDF5 integer or float datatype that can be represented exactly by a double-precision (64-bit) float.
 - `"string"`: a HDF5 string datatype that can be represented by a UTF-8 encoded string.
-<!--- -->
+  <!--- -->
 
 For `boolean` type, values in `**/data` should be one of 0 (false) or non-zero (true).
 

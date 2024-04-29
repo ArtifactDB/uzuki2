@@ -74,7 +74,7 @@ A factor is represented as a JSON object with the following properties:
   Missing integers may also be represented by the special value -2147483648.
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
-<!--- -->
+ <!--- -->
 
 ### Nothing
 

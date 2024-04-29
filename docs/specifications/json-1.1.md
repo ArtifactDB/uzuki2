@@ -51,7 +51,7 @@ The contents of `values` is subject to some constraints:
   IEEE special values can be represented by strings, i.e., `NaN`, `Inf`, `-Inf`.
 - `"integer"`: values should be JSON numbers that can be represented by a 32-bit signed integer.
   Missing values may be represented by `null`.
-<!--- -->
+  <!--- -->
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
@@ -70,12 +70,12 @@ While R makes no distinction between scalars and length-1 vectors, this may be u
 
 A factor is represented as a JSON object with the following properties:
 
-- `type`, set to `"factor"` or `"ordered"`.
+- `type`, set to `"factor"`.
 - `values`, an array of 0-based integer indices for the factor.
   These should be non-negative JSON numbers that can fit into a 32-bit signed integer.
   They should also be less than the length of `levels`.
   Missing values are represented by `null`.
-<!--- -->
+  <!--- -->
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
 - (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.
