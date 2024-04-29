@@ -50,9 +50,14 @@ An R list is represented as a JSON object with the following properties:
 
 An atomic vector is represented as a JSON object with the following properties:
 
-- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, `"string"`.
-  - **(for version 1.0)** `type` could also be set to `"date"` or `"date-time"`.
-    This specifies strings in the date or Internet Date/Time format.
+- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, 
+```{r, echo=FALSE, results="asis"}
+if (.version == package_version("1.0")) {
+    cat('  `"string"`, `"date"`, or `"date-time"`. The last two specify strings in the date or Internet Date/Time format.')
+} else {
+    cat('  or `"string"`.')
+}
+```
 - `values`, an array of values for the vector (see below).
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
@@ -93,7 +98,7 @@ While R makes no distinction between scalars and length-1 vectors, this may be u
 A factor is represented as a JSON object with the following properties:
 
 ```{r, echo=FALSE, results="asis"}
-if (.version >= package_version("1.0")) {
+if (.version == package_version("1.0")) {
     cat('- `type`, set to `"factor"` or `"ordered"`.')
 } else {
     cat('- `type`, set to `"factor"`.')
