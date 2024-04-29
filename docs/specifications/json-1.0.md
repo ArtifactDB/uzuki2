@@ -38,9 +38,8 @@ An R list is represented as a JSON object with the following properties:
 
 An atomic vector is represented as a JSON object with the following properties:
 
-- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, `"string"`.
-  - **(for version 1.0)** `type` could also be set to `"date"` or `"date-time"`.
-    This specifies strings in the date or Internet Date/Time format.
+- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, 
+  `"string"`, date"`, or `"date-time"`. The last two specify strings in the date or Internet Date/Time format.
 - `values`, an array of values for the vector (see below).
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
@@ -75,7 +74,7 @@ A factor is represented as a JSON object with the following properties:
   Missing integers may also be represented by the special value -2147483648.
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
-
+<!--- -->
 
 ### Nothing
 

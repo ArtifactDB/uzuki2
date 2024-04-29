@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['options_0',['Options',['../structuzuki2_1_1hdf5_1_1Options.html',1,'uzuki2::hdf5::Options'],['../structuzuki2_1_1json_1_1Options.html',1,'uzuki2::json::Options']]]
+  ['list_0',['List',['../structuzuki2_1_1List.html',1,'uzuki2']]],
+  ['lists_20to_20hdf5_20or_20json_1',['R lists to HDF5 or JSON',['../index.html',1,'']]]
 ];

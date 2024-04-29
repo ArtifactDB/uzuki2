@@ -1,12 +1,21 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="5,80,100,105"/>
-<area shape="rect" id="node2" href="$structuzuki2_1_1External.html" title="Interface for unsupported objects." alt="" coords="148,5,259,31"/>
-<area shape="rect" id="node3" href="$structuzuki2_1_1List.html" title="Interface for lists." alt="" coords="160,55,247,80"/>
-<area shape="rect" id="node4" href="$structuzuki2_1_1Nothing.html" title="Representation of R&#39;s NULL." alt="" coords="148,104,259,129"/>
-<area shape="rect" id="node5" href="$structuzuki2_1_1Vector.html" title="Interface for vector&#45;like objects." alt="" coords="152,153,255,179"/>
-<area shape="rect" id="node6" href="$structuzuki2_1_1BooleanVector.html" title="Interface for a boolean vector." alt="" coords="307,55,457,80"/>
-<area shape="rect" id="node7" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="331,104,433,129"/>
-<area shape="rect" id="node8" href="$structuzuki2_1_1IntegerVector.html" title="Interface for integer vectors." alt="" coords="311,153,453,179"/>
-<area shape="rect" id="node9" href="$structuzuki2_1_1NumberVector.html" title="Interface for a double&#45;precision vector." alt="" coords="307,203,457,228"/>
-<area shape="rect" id="node10" href="$structuzuki2_1_1StringVector.html" title="Interface for a string vector." alt="" coords="313,252,451,277"/>
+<area shape="rect" id="Node000000" href="$structuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="5,80,100,106"/>
+<area shape="rect" id="Node000001" href="$structuzuki2_1_1External.html" title="Interface for unsupported objects." alt="" coords="148,5,258,31"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="90,70,146,40,169,29,172,34,149,45,92,74"/>
+<area shape="rect" id="Node000002" href="$structuzuki2_1_1List.html" title="Interface for lists." alt="" coords="160,55,246,80"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="115,80,159,72,160,77,116,85"/>
+<area shape="rect" id="Node000003" href="$structuzuki2_1_1Nothing.html" title="Representation of R&#39;s NULL." alt="" coords="148,104,258,130"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="115,100,148,105,147,111,115,105"/>
+<area shape="rect" id="Node000004" href="$structuzuki2_1_1Vector.html" title="Interface for vector&#45;like objects." alt="" coords="152,153,254,179"/>
+<area shape="poly" id="edge4_Node000000_Node000004" title=" " alt="" coords="93,111,149,140,172,150,169,155,146,145,90,116"/>
+<area shape="rect" id="Node000005" href="$structuzuki2_1_1BooleanVector.html" title="Interface for a boolean vector." alt="" coords="306,55,455,80"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="251,144,256,140,271,127,280,115,289,102,305,89,326,79,329,83,307,94,293,106,284,118,274,131,260,144,254,148"/>
+<area shape="rect" id="Node000006" href="$structuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="330,104,431,130"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="266,146,331,128,332,133,267,151"/>
+<area shape="rect" id="Node000007" href="$structuzuki2_1_1IntegerVector.html" title="Interface for integer vectors." alt="" coords="310,153,452,179"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="270,164,309,164,309,169,270,169"/>
+<area shape="rect" id="Node000008" href="$structuzuki2_1_1NumberVector.html" title="Interface for a double&#45;precision vector." alt="" coords="307,203,455,228"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="267,181,332,199,331,205,266,186"/>
+<area shape="rect" id="Node000009" href="$structuzuki2_1_1StringVector.html" title="Interface for a string vector." alt="" coords="313,252,449,278"/>
+<area shape="poly" id="edge9_Node000004_Node000009" title=" " alt="" coords="232,187,267,214,307,238,332,249,330,254,305,243,264,218,229,191"/>
 </map>

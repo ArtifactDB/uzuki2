@@ -37,9 +37,8 @@ An R list is represented as a JSON object with the following properties:
 
 An atomic vector is represented as a JSON object with the following properties:
 
-- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, `"string"`.
-  - **(for version 1.0)** `type` could also be set to `"date"` or `"date-time"`.
-    This specifies strings in the date or Internet Date/Time format.
+- `type`, set to one of `"integer"`, `"boolean"`, `"number"`, 
+  or `"string"`.
 - `values`, an array of values for the vector (see below).
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
@@ -52,7 +51,7 @@ The contents of `values` is subject to some constraints:
   IEEE special values can be represented by strings, i.e., `NaN`, `Inf`, `-Inf`.
 - `"integer"`: values should be JSON numbers that can be represented by a 32-bit signed integer.
   Missing values may be represented by `null`.
-
+<!--- -->
 - `"boolean"`: values should be JSON booleans or `null` (for missing values).
 - `string`: values should be JSON strings.
   `null` is also allowed and represents a missing value.
@@ -76,7 +75,7 @@ A factor is represented as a JSON object with the following properties:
   These should be non-negative JSON numbers that can fit into a 32-bit signed integer.
   They should also be less than the length of `levels`.
   Missing values are represented by `null`.
-
+<!--- -->
 - `levels`, an array of unique strings containing the levels for the indices in `values`.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
 - (optional) `ordered`, a boolean indicating whether to assume that the levels are ordered.

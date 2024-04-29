@@ -1,4 +1,5 @@
 <map id="uzuki2::List" name="uzuki2::List">
-<area shape="rect" id="node1" title="Interface for lists." alt="" coords="9,79,96,104"/>
-<area shape="rect" id="node2" href="$structuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="5,5,100,31"/>
+<area shape="rect" id="Node000001" title="Interface for lists." alt="" coords="9,79,96,105"/>
+<area shape="rect" id="Node000002" href="$structuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="5,5,100,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,46,55,79,50,79,50,46"/>
 </map>
