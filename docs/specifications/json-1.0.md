@@ -39,7 +39,7 @@ An R list is represented as a JSON object with the following properties:
 An atomic vector is represented as a JSON object with the following properties:
 
 - `type`, set to one of `"integer"`, `"boolean"`, `"number"`, 
-  `"string"`, date"`, or `"date-time"`. The last two specify strings in the date or Internet Date/Time format.
+  `"string"`, `"date"`, or `"date-time"`. The last two specify strings in the date or Internet Date/Time format.
 - `values`, an array of values for the vector (see below).
   This may also be a scalar of the same type as the array contents.
 - (optional) `"names"`, an array of length equal to `values`, containing the names of the list elements.
