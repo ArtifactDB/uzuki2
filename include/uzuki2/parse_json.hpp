@@ -15,6 +15,7 @@
 #include "byteme/SomeFileReader.hpp"
 #include "byteme/SomeBufferReader.hpp"
 #include "millijson/millijson.hpp"
+#include "ritsuko/ritsuko.hpp"
 
 #include "interfaces.hpp"
 #include "Dummy.hpp"
