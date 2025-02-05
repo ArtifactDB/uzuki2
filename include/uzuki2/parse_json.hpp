@@ -42,6 +42,7 @@ namespace json {
 /**
  * @cond
  */
+[[gnu::no_dangling]]
 inline const std::vector<std::shared_ptr<millijson::Base> >& extract_array(
     const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, 
     const std::string& name, 
