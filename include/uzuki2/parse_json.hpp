@@ -42,9 +42,7 @@ namespace json {
 /**
  * @cond
  */
-inline
-[[gnu::no_dangling]]
-const std::vector<std::shared_ptr<millijson::Base> >& extract_array(
+inline const std::vector<std::shared_ptr<millijson::Base> >& extract_array(
     const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, 
     const std::string& name, 
     const std::string& path) 
@@ -236,7 +234,10 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
             }
         }
 
-        const auto& lvals = extract_array(map, "levels", path);
+        const auto& lvals = [&]{
+            std::string name = "levels";
+            return extract_array(map, name, path);
+        }();
         int32_t nlevels = lvals.size();
         auto fptr = process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
             auto ptr = Provisioner::new_Factor(vals.size(), named, scalar, nlevels, ordered);
@@ -367,7 +368,10 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
         auto names_ptr = has_names(map, path);
         bool has_names = names_ptr != NULL;
 
-        const auto& vals = extract_array(map, "values", path);
+        const auto& vals = [&]{
+            std::string name = "values";
+            return extract_array(map, name, path);
+        }();
         auto ptr = Provisioner::new_List(vals.size(), has_names);
         output.reset(ptr);
 
