@@ -366,7 +366,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals& e
         auto names_ptr = has_names(map, path);
         bool has_names = names_ptr != NULL;
 
-        std::string values_name = "values"; // avoid dangling reference from casting of string literal.
+        const std::string values_name = "values"; // avoid dangling reference from casting of string literal.
         const auto& vals = extract_array(map, values_name, path);
         auto ptr = Provisioner::new_List(vals.size(), has_names);
         output.reset(ptr);
