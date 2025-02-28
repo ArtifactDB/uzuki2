@@ -173,7 +173,7 @@ TEST(Hdf5StringTest, CheckError) {
         auto dhandle = create_dataset(ghandle, "data", { "michael", "gabriel", "raphael", "lucifer" });
         dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
     }
-    expect_hdf5_error(path, "foo", "same type class as");
+    expect_hdf5_error(path, "foo", "string datatype");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

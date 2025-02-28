@@ -67,7 +67,7 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, co
         has_missing = handle.attrExists(placeholder_name);
         if (has_missing) {
             auto attr = handle.openAttribute(placeholder_name);
-            ritsuko::hdf5::check_missing_placeholder_attribute(handle, attr, /* type_class_only = */ version.lt(1, 2));
+            ritsuko::hdf5::check_numeric_missing_placeholder_attribute(handle, attr, /* type_class_only = */ version.lt(1, 2));
             attr.read(H5::PredType::NATIVE_INT32, &missing_value);
         }
     }
@@ -95,14 +95,12 @@ void parse_string_like(const H5::DataSet& handle, Host* ptr, Function check, hsi
     }
 
     auto missingness = ritsuko::hdf5::open_and_load_optional_string_missing_placeholder(handle, "missing-value-placeholder");
-    bool has_missing = missingness.first;
-    std::string missing_val = missingness.second;
 
     hsize_t full_length = ptr->size();
     ritsuko::hdf5::Stream1dStringDataset stream(&handle, full_length, buffer_size);
     for (hsize_t i = 0; i < full_length; ++i, stream.next()) {
         auto x = stream.steal();
-        if (has_missing && x == missing_val) {
+        if (missingness.has_value() && x == *missingness) {
             ptr->set_missing(i);
         } else {
             check(x);
@@ -137,7 +135,7 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, Function check, const V
         has_missing = handle.attrExists(placeholder_name);
         if (has_missing) {
             auto attr = handle.openAttribute(placeholder_name);
-            ritsuko::hdf5::check_missing_placeholder_attribute(handle, attr, /* type_class_only = */ version.lt(1, 2));
+            ritsuko::hdf5::check_numeric_missing_placeholder_attribute(handle, attr, /* type_class_only = */ version.lt(1, 2));
             attr.read(H5::PredType::NATIVE_DOUBLE, &missing_value);
         }
     }
