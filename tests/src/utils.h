@@ -99,15 +99,7 @@ H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, con
     }
 
     auto dhandle = parent.createDataSet(name, dtype, dspace, cplist);
-
-    if constexpr(std::is_same<T, int>::value) {
-        dhandle.write(values.data(), H5::PredType::NATIVE_INT);
-    } else if constexpr(std::is_same<T, double>::value) {
-        dhandle.write(values.data(), H5::PredType::NATIVE_DOUBLE);
-    } else {
-        throw std::runtime_error("unknown type!");
-    }
-
+    dhandle.write(values.data(), ritsuko::hdf5::as_numeric_datatype<T>());
     return dhandle;
 }
 
