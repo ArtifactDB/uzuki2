@@ -213,6 +213,37 @@ This should be interpreted as a boolean where a non-zero value specifies that we
 }
 ```
 
+```{r, results="asis", echo=FALSE}
+if (.version >= package_version("1.4")) {
+cat('## Variable length strings
+
+Arrays of strings can be stored in [**ritsuko**\'s custom variable length string (VLS) array](https://github.com/ArtifactDB/ritsuko).
+This is represented as a HDF5 group (`**/`) with the following attributes:
+
+- `uzuki_object`, a scalar string dataset containing the value `"vector"`.
+  This should use a datatype that can be represented by a UTF-8 encoded string.
+- `uzuki_type`, a scalar string dataset containing `"vls"`.
+
+This group should contain the `pointers` and `heap` datasets.
+
+- The `**/data` dataset should be a 1-dimensional or scalar dataset of a compound datatype of 2 members, `"offset"` and `"length"`.
+  Each member should be of a datatype that can be represented by an unsigned 64-bit integer.
+- The `**/heap` dataset should be a 1-dimensional dataset of unsigned 8-bit integers.
+
+Each entry of `**/data` refers to a slice `[offset, offset + length)` of the `**/heap` dataset.
+This slice defines a variable-length UTF-8 encoded string of length `length` - unless the slice contains a null terminator, in which case the string is defined as the interval to the first null. 
+Pointers may be in any order, overlapping or non-contiguous, as long as `[offset, offset + length)` lies within the boundaries of the heap.
+
+A `missing-value-placeholder` attribute on the `**/data` dataset may be present, defining a placeholder for missing values.
+The attribute should be a scalar and should be of any HDF5 string datatype that can be represented by a UTF-8 encoded string.
+An entry of `**/data` should be considered as missing if its corresponding string is equal to the placeholder.
+
+The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `**/data`.
+This should use a datatype that can be represented by a UTF-8 encoded string.
+If `**/data` is a scalar, `**/names` should have length 1.
+')
+```
+
 ### Nothing
 
 A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:
