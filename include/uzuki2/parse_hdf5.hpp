@@ -54,7 +54,7 @@ inline H5::DataSet check_scalar_dataset(const H5::Group& handle, const char* nam
 }
 
 template<class Host, class Function>
-void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, const Version& version, hsize_t buffer_size) try {
+void parse_integer_like(const H5::DataSet& handle, Host* ptr, bool is_scalar, Function check, const Version& version, hsize_t buffer_size) try {
     if (ritsuko::hdf5::exceeds_integer_limit(handle, 32, true)) {
         throw std::runtime_error("dataset cannot be represented by 32-bit signed integers");
     }
@@ -73,15 +73,24 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, co
         }
     }
 
-    hsize_t full_length = ptr->size();
-    ritsuko::hdf5::Stream1dNumericDataset<int32_t> stream(&handle, full_length, buffer_size);
-    for (hsize_t i = 0; i < full_length; ++i, stream.next()) {
-        auto current = stream.get();
-        if (has_missing && current == missing_value) {
+    auto set = [&](hsize_t i, int32_t x) -> void {
+        if (has_missing && x == missing_value) {
             ptr->set_missing(i);
         } else {
-            check(current);
-            ptr->set(i, current);
+            check(x);
+            ptr->set(i, x);
+        }
+    };
+
+    if (is_scalar) {
+        int32_t value;
+        handle.read(&value, H5::PredType::NATIVE_INT32);
+        set(0, value);
+    } else {
+        hsize_t full_length = ptr->size();
+        ritsuko::hdf5::Stream1dNumericDataset<int32_t> stream(&handle, full_length, buffer_size);
+        for (hsize_t i = 0; i < full_length; ++i, stream.next()) {
+            set(i, stream.get());
         }
     }
 
@@ -90,22 +99,29 @@ void parse_integer_like(const H5::DataSet& handle, Host* ptr, Function check, co
 }
 
 template<class Host, class Function>
-void parse_string_like(const H5::DataSet& handle, Host* ptr, Function check, hsize_t buffer_size) try {
+void parse_string_like(const H5::DataSet& handle, Host* ptr, bool is_scalar, Function check, hsize_t buffer_size) try {
     if (!ritsuko::hdf5::is_utf8_string(handle)) {
         throw std::runtime_error("expected a datatype that can be represented by a UTF-8 encoded string");
     }
 
     auto missingness = ritsuko::hdf5::open_and_load_optional_string_missing_placeholder(handle, "missing-value-placeholder");
-
-    hsize_t full_length = ptr->size();
-    ritsuko::hdf5::Stream1dStringDataset stream(&handle, full_length, buffer_size);
-    for (hsize_t i = 0; i < full_length; ++i, stream.next()) {
-        auto x = stream.steal();
+    auto set = [&](hsize_t i, std::string x) -> void { 
         if (missingness.has_value() && x == *missingness) {
             ptr->set_missing(i);
         } else {
             check(x);
             ptr->set(i, std::move(x));
+        }
+    };
+
+    if (is_scalar) {
+        auto x = ritsuko::hdf5::load_scalar_string_dataset(handle);
+        set(0, std::move(x));
+    } else {
+        hsize_t full_length = ptr->size();
+        ritsuko::hdf5::Stream1dStringDataset stream(&handle, full_length, buffer_size);
+        for (hsize_t i = 0; i < full_length; ++i, stream.next()) {
+            set(i, stream.steal());
         }
     }
 
@@ -114,7 +130,7 @@ void parse_string_like(const H5::DataSet& handle, Host* ptr, Function check, hsi
 }
 
 template<class Host, class Function>
-void parse_numbers(const H5::DataSet& handle, Host* ptr, Function check, const Version& version, hsize_t buffer_size) try {
+void parse_numbers(const H5::DataSet& handle, Host* ptr, bool is_scalar, Function check, const Version& version, hsize_t buffer_size) try {
     if (version.lt(1, 3)) {
         if (handle.getTypeClass() != H5T_FLOAT) {
             throw std::runtime_error("expected a floating-point dataset");
@@ -127,7 +143,6 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, Function check, const V
 
     bool has_missing = false;
     double missing_value = 0;
-
     if (version.equals(1, 0)) {
         has_missing = true;
         missing_value = ritsuko::r_missing_value();
@@ -153,15 +168,24 @@ void parse_numbers(const H5::DataSet& handle, Host* ptr, Function check, const V
         }
     };
 
-    hsize_t full_length = ptr->size();
-    ritsuko::hdf5::Stream1dNumericDataset<double> stream(&handle, full_length, buffer_size);
-    for (hsize_t i = 0; i < full_length; ++i, stream.next()) {
-        auto current = stream.get();
-        if (has_missing && is_missing_value(current)) {
+    auto set = [&](hsize_t i, double x) -> void {
+        if (has_missing && is_missing_value(x)) {
             ptr->set_missing(i);
         } else {
-            check(current);
-            ptr->set(i, current);
+            check(x);
+            ptr->set(i, x);
+        }
+    };
+
+    if (is_scalar) {
+        double val;
+        handle.read(&val, H5::PredType::NATIVE_DOUBLE);
+        set(0, val);
+    } else {
+        hsize_t full_length = ptr->size();
+        ritsuko::hdf5::Stream1dNumericDataset<double> stream(&handle, full_length, buffer_size);
+        for (hsize_t i = 0; i < full_length; ++i, stream.next()) {
+            set(i, stream.get());
         }
     }
 
@@ -237,16 +261,30 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
         if (vector_type == "integer") {
             auto iptr = Provisioner::new_Integer(len, named, is_scalar);
             output.reset(iptr);
-            parse_integer_like(dhandle, iptr, [](int32_t) -> void {}, version, buffer_size);
+            parse_integer_like(
+                dhandle,
+                iptr,
+                is_scalar,
+                [](int32_t) -> void {},
+                version,
+                buffer_size
+            );
 
         } else if (vector_type == "boolean") {
             auto bptr = Provisioner::new_Boolean(len, named, is_scalar);
             output.reset(bptr);
-            parse_integer_like(dhandle, bptr, [&](int32_t x) -> void { 
-                if (x != 0 && x != 1) {
-                     throw std::runtime_error("boolean values should be 0 or 1");
-                }
-            }, version, buffer_size);
+            parse_integer_like(
+                dhandle,
+                bptr,
+                is_scalar,
+                [&](int32_t x) -> void { 
+                    if (x != 0 && x != 1) {
+                        throw std::runtime_error("boolean values should be 0 or 1");
+                    }
+                },
+                version,
+                buffer_size
+            );
 
         } else if (vector_type == "factor" || (version.equals(1, 0) && vector_type == "ordered")) {
             auto levhandle = ritsuko::hdf5::open_dataset(handle, "levels");
@@ -270,11 +308,18 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
 
             auto fptr = Provisioner::new_Factor(len, named, is_scalar, levlen, ordered);
             output.reset(fptr);
-            parse_integer_like(dhandle, fptr, [&](int32_t x) -> void { 
-                if (x < 0 || x >= levlen) {
-                     throw std::runtime_error("factor codes should be non-negative and less than the number of levels");
-                }
-            }, version, buffer_size);
+            parse_integer_like(
+                dhandle,
+                fptr,
+                is_scalar,
+                [&](int32_t x) -> void { 
+                    if (x < 0 || x >= levlen) {
+                        throw std::runtime_error("factor codes should be non-negative and less than the number of levels");
+                    }
+                },
+                version,
+                buffer_size
+            );
 
             std::unordered_set<std::string> present;
             ritsuko::hdf5::Stream1dStringDataset stream(&levhandle, levlen, buffer_size);
@@ -356,27 +401,52 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
             auto sptr = Provisioner::new_String(len, named, is_scalar, format);
             output.reset(sptr);
             if (format == StringVector::NONE) {
-                parse_string_like(dhandle, sptr, [](const std::string&) -> void {}, buffer_size);
+                parse_string_like(
+                    dhandle,
+                    sptr,
+                    is_scalar,
+                    [](const std::string&) -> void {},
+                    buffer_size
+                );
 
             } else if (format == StringVector::DATE) {
-                parse_string_like(dhandle, sptr, [&](const std::string& x) -> void {
-                    if (!ritsuko::is_date(x.c_str(), x.size())) {
-                         throw std::runtime_error("dates should follow YYYY-MM-DD formatting");
-                    }
-                }, buffer_size);
+                parse_string_like(
+                    dhandle,
+                    sptr,
+                    is_scalar,
+                    [&](const std::string& x) -> void {
+                        if (!ritsuko::is_date(x.c_str(), x.size())) {
+                             throw std::runtime_error("dates should follow YYYY-MM-DD formatting");
+                        }
+                    },
+                    buffer_size
+                );
 
             } else if (format == StringVector::DATETIME) {
-                parse_string_like(dhandle, sptr, [&](const std::string& x) -> void {
-                    if (!ritsuko::is_rfc3339(x.c_str(), x.size())) {
-                         throw std::runtime_error("date-times should follow the Internet Date/Time format");
-                    }
-                }, buffer_size);
+                parse_string_like(
+                    dhandle,
+                    sptr,
+                    is_scalar,
+                    [&](const std::string& x) -> void {
+                        if (!ritsuko::is_rfc3339(x.c_str(), x.size())) {
+                             throw std::runtime_error("date-times should follow the Internet Date/Time format");
+                        }
+                    },
+                    buffer_size
+                );
             }
 
         } else if (vector_type == "number") {
             auto dptr = Provisioner::new_Number(len, named, is_scalar);
             output.reset(dptr);
-            parse_numbers(dhandle, dptr, [](double) -> void {}, version, buffer_size);
+            parse_numbers(
+                dhandle,
+                dptr,
+                is_scalar,
+                [](double) -> void {},
+                version,
+                buffer_size
+            );
 
         } else {
             throw std::runtime_error("unknown vector type '" + vector_type + "'");
