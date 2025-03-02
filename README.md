@@ -21,6 +21,7 @@ In contrast, JSON is easier to parse and has less storage overhead per list elem
 Both the HDF5 and JSON specifications have multiple versions. 
 Links to the version-specific HDF5 specifications are listed below, along with the minimum version of the C++ library required to parse them:
 
+- [1.4](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.4.md), supported by **uzuki2** version ≥ 1.5.
 - [1.3](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.3.md), supported by **uzuki2** version ≥ 1.3.
 - [1.2](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.2.md), supported by **uzuki2** version ≥ 1.2.
 - [1.1](https://github.com/ArtifactDB/uzuki2/tree/gh-pages/docs/specifications/hdf5-1.1.md), supported by **uzuki2** version ≥ 1.1.
