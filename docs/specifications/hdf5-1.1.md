@@ -79,9 +79,9 @@ The atomic vector's group may also contain `**/names`, a 1-dimensional string da
 This should use a datatype that can be represented by a UTF-8 encoded string.
 If `**/data` is a scalar, `**/names` should have length 1.
 
-### Representing missing values
+#### Representing missing values
 
-Each `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
+The `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar dataset that specifies the placeholder for missing values.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values.
@@ -105,20 +105,27 @@ A factor is represented as a HDF5 group (`**/`) with the following attributes:
   This should use a datatype that can be represented by a UTF-8 encoded string.
 
 The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
-This should use a HDF5 integer datatype that can be represented by a 32-bit signed integer.
-(Admittedly, this should have been an unsigned integer, but we started with a signed integer and we'll just keep it so for back-compatibility.)
-Missing values are represented as described above for atomic vectors.
+Vectors of length 1 may also be represented as a scalar dataset.
+(While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.)
+
+The `**/data` dataset should use a HDF5 integer datatype that can be represented by a 32-bit signed integer.
+Admittedly, this should have been an unsigned integer, but we started with a signed integer and we'll just keep it so for back-compatibility.
 
 The group should contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `**/data`.
 This should use a datatype that can be represented by a UTF-8 encoded string.
 Values in `**/levels` should be unique.
 
-Values in `**/data` should be non-negative (missing values excepted) and less than the length of `**/levels`.
+Values in `**/data` should be non-negative (missing value placeholders excepted) and less than the length of `**/levels`.
 Note that the datatype constraints on `**/data` suggest that there should not be more than 2147483647 levels,
 as beyond that, the levels cannot be indexed by elements of `**/data`.
 
+Missing values in the factor are represented by a placeholder, as described [above](representing-missing-values) for atomic integer vectors.
+Specifically, the `**/data` dataset may contain an optional `missing-value-placeholder` attribute,
+which contains the placeholder used to represent missing values inside `**/data`.
+
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
 This should use a datatype that can be represented by a UTF-8 encoded string.
+If `**/data` is a scalar, `**/names` should have length 1.
 
 The group may optionally contain `**/ordered`, a scalar integer dataset.
 This should be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.
