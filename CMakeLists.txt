@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(uzuki2
-    VERSION 1.4.1
+    VERSION 1.5.0
     DESCRIPTION "Storing simple R lists inside HDF5 or JSON"
     LANGUAGES CXX)
 
