@@ -1,6 +1,6 @@
 
 
-# HDF5 Specification (1.2)
+# HDF5 Specification (1.4)
 
 ## Comments
 
@@ -13,10 +13,14 @@ All R objects should be nested inside an R list.
 In other words, the top-level HDF5 group should represent an R list.
 
 The top-level group should have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
-This attribute should hold a scalar string dataset containing the value "1.2".
+This attribute should hold a scalar string dataset containing the value "1.4".
 This should use a datatype that can be represented by a UTF-8 encoded string.
 
+### Datatypes
 
+The HDF5 datatype specification used by each R object is based on the [HDF5 policy draft (v0.1.0)](https://github.com/ArtifactDB/Bioc-HDF5-policy/tree/v0.1.0).
+This aims to provide readers with a guaranteed type for faithfully representing the data in memory.
+The draft also describes the use of placeholders to represent missing values within HDF5 datasets.
 
 ### Names 
 
@@ -90,12 +94,13 @@ The datatype of the placeholder attribute should be exactly the same as that of 
 The only exception is when `**/data` is a string, in which case the placeholder may be of any string datatype that can be represented by a UTF-8 encoded string.
 it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.
 
-Floating-point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.
-Comparisons on NaN placeholders should be performed in a bytewise manner (e.g., with `memcmp`) to ensure that the payload is taken into account.
+Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
+No casting should be performed to a lower-precision type, as this may cause a non-missing value to become equal to the placeholder.
+If the placeholder is NaN, all NaNs in the dataset should be considered missing, regardless of the exact bit representation in the NaN payload.
 
 
 
-
+Check out the [HDF5 policy draft (v0.1.0)](https://github.com/ArtifactDB/Bioc-HDF5-policy/tree/v0.1.0). for more details.
 
 ### Factors
 
@@ -124,7 +129,33 @@ This should use a datatype that can be represented by a UTF-8 encoded string.
 
 
 
+### Variable length string arrays
 
+Arrays of strings can be stored in [**ritsuko**'s custom variable length string (VLS) array](https://github.com/ArtifactDB/ritsuko).
+This is represented as a HDF5 group (`**/`) with the following attributes:
+
+- `uzuki_object`, a scalar string dataset containing the value `"vector"`.
+  This should use a datatype that can be represented by a UTF-8 encoded string.
+- `uzuki_type`, a scalar string dataset containing `"vls"`.
+
+This group should contain the `pointers` and `heap` datasets.
+
+- The `**/data` dataset should be a 1-dimensional or scalar dataset of a compound datatype of 2 members, `"offset"` and `"length"`.
+  Each member should be of a datatype that can be represented by an unsigned 64-bit integer.
+  If the dataset is scalar, the length of the VLS array is defined as 1.
+- The `**/heap` dataset should be a 1-dimensional dataset of unsigned 8-bit integers.
+
+Each entry of `**/data` refers to a slice `[offset, offset + length)` of the `**/heap` dataset.
+This slice defines a variable-length UTF-8 encoded string of length `length` - unless the slice contains a null terminator, in which case the string is defined as the interval to the first null. 
+Pointers may be in any order, overlapping or non-contiguous, as long as `[offset, offset + length)` lies within the boundaries of the heap.
+
+A `missing-value-placeholder` attribute on the `**/data` dataset may be present, defining a placeholder for missing values.
+The attribute should be a scalar and should be of any HDF5 string datatype that can be represented by a UTF-8 encoded string.
+An entry of `**/data` should be considered as missing if its corresponding string is equal to the placeholder.
+
+The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `**/data`.
+This should use a datatype that can be represented by a UTF-8 encoded string.
+If `**/data` is a scalar, `**/names` should have length 1.
 
 ### Nothing
 

@@ -121,6 +121,8 @@ This should use a datatype that can be represented by a UTF-8 encoded string.
 
 
 
+
+
 ### Nothing
 
 A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:

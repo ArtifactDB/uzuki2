@@ -123,6 +123,8 @@ This should use a datatype that can be represented by a UTF-8 encoded string.
 The group may optionally contain `**/ordered`, a scalar integer dataset.
 This should be interpreted as a boolean where a non-zero value specifies that we should assume that the levels are ordered.
 
+
+
 ### Nothing
 
 A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:
