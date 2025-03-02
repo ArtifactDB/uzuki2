@@ -215,7 +215,7 @@ This should be interpreted as a boolean where a non-zero value specifies that we
 
 ```{r, results="asis", echo=FALSE}
 if (.version >= package_version("1.4")) {
-cat('## Variable length strings
+cat('### Variable length string arrays
 
 Arrays of strings can be stored in [**ritsuko**\'s custom variable length string (VLS) array](https://github.com/ArtifactDB/ritsuko).
 This is represented as a HDF5 group (`**/`) with the following attributes:
@@ -228,6 +228,7 @@ This group should contain the `pointers` and `heap` datasets.
 
 - The `**/data` dataset should be a 1-dimensional or scalar dataset of a compound datatype of 2 members, `"offset"` and `"length"`.
   Each member should be of a datatype that can be represented by an unsigned 64-bit integer.
+  If the dataset is scalar, the length of the VLS array is defined as 1.
 - The `**/heap` dataset should be a 1-dimensional dataset of unsigned 8-bit integers.
 
 Each entry of `**/data` refers to a slice `[offset, offset + length)` of the `**/heap` dataset.
@@ -242,6 +243,7 @@ The group may also contain `**/names`, a 1-dimensional string dataset of length 
 This should use a datatype that can be represented by a UTF-8 encoded string.
 If `**/data` is a scalar, `**/names` should have length 1.
 ')
+}
 ```
 
 ### Nothing
