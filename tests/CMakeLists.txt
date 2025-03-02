@@ -23,6 +23,7 @@ add_executable(
     src/factor.cpp
     src/number.cpp
     src/string.cpp
+    src/vls.cpp
     src/date.cpp
     src/datetime.cpp
     src/external.cpp

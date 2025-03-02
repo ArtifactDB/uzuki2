@@ -20,6 +20,7 @@
 
 #include "ritsuko/ritsuko.hpp"
 #include "ritsuko/hdf5/hdf5.hpp"
+#include "ritsuko/hdf5/vls/vls.hpp"
 
 /**
  * @file parse_hdf5.hpp
@@ -284,6 +285,48 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals& ext, const
                 }
                 fptr->set_level(i, x); 
                 present.insert(std::move(x));
+            }
+
+        } else if (vector_type == "vls" && !version.lt(1, 4)) {
+            ritsuko::hdf5::vls::validate_pointer_datatype(dhandle.getCompType(), 64, 64);
+            auto hhandle = ritsuko::hdf5::vls::open_heap(handle, "heap");
+            auto missingness = ritsuko::hdf5::open_and_load_optional_string_missing_placeholder(dhandle, "missing-value-placeholder");
+
+            auto ptr = Provisioner::new_String(len, named, is_scalar, StringVector::NONE);
+            output.reset(ptr);
+
+            if (is_scalar) {
+                ritsuko::hdf5::vls::Pointer<uint64_t, uint64_t> vlsptr;
+                dhandle.read(&vlsptr, ritsuko::hdf5::vls::define_pointer_datatype<uint64_t, uint64_t>());
+
+                hsize_t len = vlsptr.length;
+                H5::DataSpace mspace(1, &len);
+                hsize_t offset = vlsptr.offset;
+                hsize_t hlen = ritsuko::hdf5::get_1d_length(hhandle, false);
+                H5::DataSpace dspace(1, &hlen);
+                dspace.selectHyperslab(H5S_SELECT_SET, &len, &offset);
+
+                std::vector<uint8_t> buffer(vlsptr.length);
+                hhandle.read(buffer.data(), H5::PredType::NATIVE_UINT8, mspace, dspace);
+                auto cptr = reinterpret_cast<const char*>(buffer.data());
+                std::string str(cptr, cptr + ritsuko::hdf5::find_string_length(cptr, vlsptr.length));
+
+                if (missingness.has_value() && str == *missingness) {
+                    ptr->set_missing(0);
+                } else {
+                    ptr->set(0, std::move(str));
+                }
+
+            } else {
+                ritsuko::hdf5::vls::Stream1dArray<uint64_t, uint64_t> stream(&dhandle, &hhandle, len, buffer_size);
+                for (hsize_t i = 0; i < len; ++i, stream.next()) {
+                    auto x = stream.steal();
+                    if (missingness.has_value() && x == *missingness) {
+                        ptr->set_missing(i);
+                    } else {
+                        ptr->set(i, std::move(x));
+                    }
+                }
             }
 
         } else if (vector_type == "string" || (version.equals(1, 0) && (vector_type == "date" || vector_type == "date-time"))) {
