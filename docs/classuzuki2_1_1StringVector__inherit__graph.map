@@ -1,0 +1,7 @@
+<map id="uzuki2::StringVector" name="uzuki2::StringVector">
+<area shape="rect" id="Node000001" title="Interface for a string vector." alt="" coords="5,153,142,178"/>
+<area shape="rect" id="Node000002" href="$classuzuki2_1_1Vector.html" title="Interface for vector&#45;like objects." alt="" coords="22,79,125,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,120,76,152,71,152,71,120"/>
+<area shape="rect" id="Node000003" href="$classuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="26,5,121,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="76,46,76,79,71,79,71,46"/>
+</map>

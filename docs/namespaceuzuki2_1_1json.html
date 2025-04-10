@@ -165,20 +165,20 @@ template&lt;class Provisioner , class Externals &gt; </div>
 <p>Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given an arbitrary input source of bytes.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details. </td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details. </td></tr>
     <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">reader</td><td>Instance of a <code>byteme::Reader</code> providing the contents of the JSON file. </td></tr>
+    <tr><td class="paramname">reader</td><td>Source of input bytes representing the contents of the JSON file. </td></tr>
     <tr><td class="paramname">ext</td><td>Instance of an external reference resolver class. </td></tr>
     <tr><td class="paramname">options</td><td><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for parsing.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
 <p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
 
 </div>
@@ -206,7 +206,7 @@ template&lt;class Provisioner &gt; </div>
 <p>Overload of <code><a class="el" href="#a93eaeba4d87e2c0198e7471b42c9af2f">json::parse()</a></code> assuming that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -217,7 +217,7 @@ template&lt;class Provisioner &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
 <p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
 
 </div>
@@ -255,7 +255,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
 <p>Parse a buffer containing JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details. </td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details. </td></tr>
     <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
   </table>
   </dd>
@@ -269,7 +269,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
 <p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
 
 </div>
@@ -302,7 +302,7 @@ template&lt;class Provisioner &gt; </div>
 <p>Overload of <code><a class="el" href="#afc1a0d4cd584d0d005e819e1edf41be1">json::parse_buffer()</a></code> assuming that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -314,7 +314,7 @@ template&lt;class Provisioner &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
 <p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
 
 </div>
@@ -347,7 +347,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
 <p>Parse JSON file contents using the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the file path.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details. </td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details. </td></tr>
     <tr><td class="paramname">Externals</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
   </table>
   </dd>
@@ -360,7 +360,7 @@ template&lt;class Provisioner , class Externals &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
 <p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
 
 </div>
@@ -388,7 +388,7 @@ template&lt;class Provisioner &gt; </div>
 <p>Overload of <code><a class="el" href="#a8ba190735981274470383bae279c8ea1">json::parse_file()</a></code> assuming that there are no external references.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
+    <tr><td class="paramname">Provisioner</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a66c01cda30115f3cfe2bd3397e5d51c2">hdf5::parse()</a></code> for more details.</td></tr>
   </table>
   </dd>
 </dl>
@@ -399,7 +399,7 @@ template&lt;class Provisioner &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="structuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code>ParsedList</code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner</code>, this may contain references to all nested objects.</dd></dl>
 <p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
 
 </div>

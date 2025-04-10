@@ -123,166 +123,181 @@ $(function(){ initResizable(false); });
 </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
 <div class="foldopen" id="foldopen00050" data-start="{" data-end="};">
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Base.html">   50</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1Base.html">Base</a> {</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keyword">virtual</span> <a class="code hl_struct" href="structuzuki2_1_1Base.html">~Base</a>() {}</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">   62</a></span>    <span class="keyword">virtual</span> <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">type</a>() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>};</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Base.html">   50</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a> {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>(<a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>&amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>(<span class="keyword">const</span> <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>&amp; operator=(<a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>&amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>&amp; operator=(<span class="keyword">const</span> <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a>&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keyword">virtual</span> <a class="code hl_class" href="classuzuki2_1_1Base.html">~Base</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">   68</a></span>    <span class="keyword">virtual</span> <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">type</a>() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>};</div>
 </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="foldopen" id="foldopen00068" data-start="{" data-end="};">
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Vector.html">   68</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1Vector.html">Vector</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Base.html">Base</a> {</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2">   72</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="structuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2">size</a> () <span class="keyword">const</span> = 0;</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f">   81</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f">set_name</a>(<span class="keywordtype">size_t</span> i, std::string n) = 0;</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41">   88</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41">set_missing</a>(<span class="keywordtype">size_t</span> i) = 0;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>};</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="foldopen" id="foldopen00074" data-start="{" data-end="};">
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Vector.html">   74</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1Vector.html">Vector</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a> {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2">   79</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2">size</a> () <span class="keyword">const</span> = 0;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f">   88</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f">set_name</a>(<span class="keywordtype">size_t</span> i, std::string n) = 0;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41">   95</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41">set_missing</a>(<span class="keywordtype">size_t</span> i) = 0;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>};</div>
 </div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="foldopen" id="foldopen00094" data-start="{" data-end="};">
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="structuzuki2_1_1IntegerVector.html">   94</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1IntegerVector.html">IntegerVector</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Vector.html">Vector</a> {</div>
-<div class="foldopen" id="foldopen00095" data-start="{" data-end="}">
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="structuzuki2_1_1IntegerVector.html#a54a45807198d1947c9ed2a49ec772d60">   95</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1IntegerVector.html#a54a45807198d1947c9ed2a49ec772d60">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <span class="keywordflow">return</span> INTEGER;</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    }</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="foldopen" id="foldopen00101" data-start="{" data-end="};">
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="classuzuki2_1_1IntegerVector.html">  101</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1IntegerVector.html">IntegerVector</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Vector.html">Vector</a> {</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00103" data-start="{" data-end="}">
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="classuzuki2_1_1IntegerVector.html#a54a45807198d1947c9ed2a49ec772d60">  103</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1IntegerVector.html#a54a45807198d1947c9ed2a49ec772d60">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <span class="keywordflow">return</span> INTEGER;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    }</div>
 </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="structuzuki2_1_1IntegerVector.html#ad6806f779fa8d4a41cc97b14765c80b3">  105</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1IntegerVector.html#ad6806f779fa8d4a41cc97b14765c80b3">set</a>(<span class="keywordtype">size_t</span> i, int32_t v) = 0;</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>};</div>
-</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
-<div class="foldopen" id="foldopen00111" data-start="{" data-end="};">
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="structuzuki2_1_1NumberVector.html">  111</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1NumberVector.html">NumberVector</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Vector.html">Vector</a> {</div>
-<div class="foldopen" id="foldopen00112" data-start="{" data-end="}">
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="structuzuki2_1_1NumberVector.html#a41ff944db6e679a3dc685130d215d322">  112</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1NumberVector.html#a41ff944db6e679a3dc685130d215d322">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="keywordflow">return</span> NUMBER;</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    }</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="classuzuki2_1_1IntegerVector.html#ad6806f779fa8d4a41cc97b14765c80b3">  113</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1IntegerVector.html#ad6806f779fa8d4a41cc97b14765c80b3">set</a>(<span class="keywordtype">size_t</span> i, int32_t v) = 0;</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>};</div>
 </div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="structuzuki2_1_1NumberVector.html#aeaa2342479571f738e039600accef8b5">  122</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1NumberVector.html#aeaa2342479571f738e039600accef8b5">set</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">double</span> v) = 0;</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>};</div>
+<div class="foldopen" id="foldopen00119" data-start="{" data-end="};">
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="classuzuki2_1_1NumberVector.html">  119</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1NumberVector.html">NumberVector</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Vector.html">Vector</a> {</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00121" data-start="{" data-end="}">
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="classuzuki2_1_1NumberVector.html#a41ff944db6e679a3dc685130d215d322">  121</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1NumberVector.html#a41ff944db6e679a3dc685130d215d322">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">return</span> NUMBER;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    }</div>
 </div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
-<div class="foldopen" id="foldopen00128" data-start="{" data-end="};">
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="structuzuki2_1_1StringVector.html">  128</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1StringVector.html">StringVector</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Vector.html">Vector</a> {</div>
-<div class="foldopen" id="foldopen00129" data-start="{" data-end="}">
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="structuzuki2_1_1StringVector.html#a2f366149232cd6df0dea2e2f0000c7c9">  129</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1StringVector.html#a2f366149232cd6df0dea2e2f0000c7c9">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keywordflow">return</span> STRING;</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    }</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="classuzuki2_1_1NumberVector.html#aeaa2342479571f738e039600accef8b5">  131</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1NumberVector.html#aeaa2342479571f738e039600accef8b5">set</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">double</span> v) = 0;</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>};</div>
 </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="structuzuki2_1_1StringVector.html#aa2f0f5ebb2988b6c819286b44ba344a5">  139</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1StringVector.html#aa2f0f5ebb2988b6c819286b44ba344a5">set</a>(<span class="keywordtype">size_t</span> i, std::string v) = 0;</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
-<div class="foldopen" id="foldopen00148" data-start="{" data-end="};">
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno"><a class="line" href="structuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">  148</a></span>    <span class="keyword">enum</span> <a class="code hl_enumeration" href="structuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">Format</a> {</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        NONE,</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        DATE,</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        DATETIME</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    };</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
+<div class="foldopen" id="foldopen00137" data-start="{" data-end="};">
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno"><a class="line" href="classuzuki2_1_1StringVector.html">  137</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1StringVector.html">StringVector</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Vector.html">Vector</a> {</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00139" data-start="{" data-end="}">
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="classuzuki2_1_1StringVector.html#a2f366149232cd6df0dea2e2f0000c7c9">  139</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1StringVector.html#a2f366149232cd6df0dea2e2f0000c7c9">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        <span class="keywordflow">return</span> STRING;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    }</div>
 </div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>};</div>
-</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno"><a class="line" href="classuzuki2_1_1StringVector.html#aa2f0f5ebb2988b6c819286b44ba344a5">  149</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1StringVector.html#aa2f0f5ebb2988b6c819286b44ba344a5">set</a>(<span class="keywordtype">size_t</span> i, std::string v) = 0;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span> </div>
 <div class="foldopen" id="foldopen00158" data-start="{" data-end="};">
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno"><a class="line" href="structuzuki2_1_1BooleanVector.html">  158</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1BooleanVector.html">BooleanVector</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Vector.html">Vector</a> {</div>
-<div class="foldopen" id="foldopen00159" data-start="{" data-end="}">
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="structuzuki2_1_1BooleanVector.html#a6408d4f39ad93f71ca2b8b7b0e3770ff">  159</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1BooleanVector.html#a6408d4f39ad93f71ca2b8b7b0e3770ff">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        <span class="keywordflow">return</span> BOOLEAN;</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    }</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno"><a class="line" href="classuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">  158</a></span>    <span class="keyword">enum</span> <a class="code hl_enumeration" href="classuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">Format</a> {</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        NONE,</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        DATE,</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        DATETIME</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    };</div>
 </div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span> </div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno"><a class="line" href="structuzuki2_1_1BooleanVector.html#a57c21c43d4c7404f7f61eb98a1cc9d50">  169</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1BooleanVector.html#a57c21c43d4c7404f7f61eb98a1cc9d50">set</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">bool</span> v) = 0;</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>};</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>};</div>
 </div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
-<div class="foldopen" id="foldopen00178" data-start="{" data-end="};">
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Factor.html">  178</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1Factor.html">Factor</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Vector.html">Vector</a> {</div>
-<div class="foldopen" id="foldopen00179" data-start="{" data-end="}">
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476">  179</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        <span class="keywordflow">return</span> FACTOR;</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    }</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="foldopen" id="foldopen00168" data-start="{" data-end="};">
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno"><a class="line" href="classuzuki2_1_1BooleanVector.html">  168</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1BooleanVector.html">BooleanVector</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Vector.html">Vector</a> {</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00170" data-start="{" data-end="}">
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno"><a class="line" href="classuzuki2_1_1BooleanVector.html#a6408d4f39ad93f71ca2b8b7b0e3770ff">  170</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1BooleanVector.html#a6408d4f39ad93f71ca2b8b7b0e3770ff">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        <span class="keywordflow">return</span> BOOLEAN;</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    }</div>
+</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno"><a class="line" href="classuzuki2_1_1BooleanVector.html#a57c21c43d4c7404f7f61eb98a1cc9d50">  180</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1BooleanVector.html#a57c21c43d4c7404f7f61eb98a1cc9d50">set</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">bool</span> v) = 0;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>};</div>
 </div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f">  189</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f">set</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> v) = 0;</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740">  197</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740">set_level</a>(<span class="keywordtype">size_t</span> il, std::string vl) = 0;</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>};</div>
+<div class="foldopen" id="foldopen00189" data-start="{" data-end="};">
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Factor.html">  189</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1Factor.html">Factor</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Vector.html">Vector</a> {</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00191" data-start="{" data-end="}">
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476">  191</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        <span class="keywordflow">return</span> FACTOR;</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    }</div>
 </div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span> </div>
-<div class="foldopen" id="foldopen00203" data-start="{" data-end="};">
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Nothing.html">  203</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1Nothing.html">Nothing</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Base.html">Base</a> {</div>
-<div class="foldopen" id="foldopen00204" data-start="{" data-end="}">
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno"><a class="line" href="structuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439">  204</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>        <span class="keywordflow">return</span> NOTHING;</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    }</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f">  201</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f">set</a>(<span class="keywordtype">size_t</span> i, <span class="keywordtype">size_t</span> v) = 0;</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740">  209</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740">set_level</a>(<span class="keywordtype">size_t</span> il, std::string vl) = 0;</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>};</div>
 </div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>};</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span> </div>
+<div class="foldopen" id="foldopen00215" data-start="{" data-end="};">
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Nothing.html">  215</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1Nothing.html">Nothing</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a> {</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00217" data-start="{" data-end="}">
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno"><a class="line" href="classuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439">  217</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>        <span class="keywordflow">return</span> NOTHING;</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    }</div>
 </div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span> </div>
-<div class="foldopen" id="foldopen00214" data-start="{" data-end="};">
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno"><a class="line" href="structuzuki2_1_1External.html">  214</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1External.html">External</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Base.html">Base</a> {</div>
-<div class="foldopen" id="foldopen00215" data-start="{" data-end="}">
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno"><a class="line" href="structuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095">  215</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>        <span class="keywordflow">return</span> EXTERNAL;</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    }</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>};</div>
 </div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>};</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
+<div class="foldopen" id="foldopen00227" data-start="{" data-end="};">
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno"><a class="line" href="classuzuki2_1_1External.html">  227</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1External.html">External</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a> {</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00229" data-start="{" data-end="}">
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno"><a class="line" href="classuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095">  229</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        <span class="keywordflow">return</span> EXTERNAL;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    }</div>
 </div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span> </div>
-<div class="foldopen" id="foldopen00223" data-start="{" data-end="};">
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno"><a class="line" href="structuzuki2_1_1List.html">  223</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1List.html">List</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structuzuki2_1_1Base.html">Base</a> {</div>
-<div class="foldopen" id="foldopen00224" data-start="{" data-end="}">
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno"><a class="line" href="structuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181">  224</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="structuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181">type</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        <span class="keywordflow">return</span> LIST;</div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    }</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>};</div>
 </div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span> </div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno"><a class="line" href="structuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba">  231</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="structuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba">size</a>() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span> </div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno"><a class="line" href="structuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82">  239</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82">set</a>(<span class="keywordtype">size_t</span> i, std::shared_ptr&lt;Base&gt; v) = 0;</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span> </div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno"><a class="line" href="structuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff">  248</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff">set_name</a>(<span class="keywordtype">size_t</span> i, std::string n) = 0;</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>};</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span> </div>
+<div class="foldopen" id="foldopen00237" data-start="{" data-end="};">
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno"><a class="line" href="classuzuki2_1_1List.html">  237</a></span><span class="keyword">class </span><a class="code hl_class" href="classuzuki2_1_1List.html">List</a> : <span class="keyword">public</span> <a class="code hl_class" href="classuzuki2_1_1Base.html">Base</a> {</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00239" data-start="{" data-end="}">
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno"><a class="line" href="classuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181">  239</a></span>    <a class="code hl_enumeration" href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">Type</a> <a class="code hl_function" href="classuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181">type</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        <span class="keywordflow">return</span> LIST;</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    }</div>
 </div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>}</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span> </div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="anamespaceuzuki2_html"><div class="ttname"><a href="namespaceuzuki2.html">uzuki2</a></div><div class="ttdoc">Parse an R list from a HDF5 or JSON file.</div><div class="ttdef"><b>Definition</b> parse_json.hpp:30</div></div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span> </div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno"><a class="line" href="classuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba">  246</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code hl_function" href="classuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba">size</a>() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno"><a class="line" href="classuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82">  254</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82">set</a>(<span class="keywordtype">size_t</span> i, std::shared_ptr&lt;Base&gt; v) = 0;</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span> </div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno"><a class="line" href="classuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff">  263</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff">set_name</a>(<span class="keywordtype">size_t</span> i, std::string n) = 0;</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>};</div>
+</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span> </div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>}</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclassuzuki2_1_1Base_html"><div class="ttname"><a href="classuzuki2_1_1Base.html">uzuki2::Base</a></div><div class="ttdoc">Base interface for all R objects.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:50</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Base_html_a37447b97260aa3a4dd591a71aaad70b8"><div class="ttname"><a href="classuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">uzuki2::Base::type</a></div><div class="ttdeci">virtual Type type() const =0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1BooleanVector_html"><div class="ttname"><a href="classuzuki2_1_1BooleanVector.html">uzuki2::BooleanVector</a></div><div class="ttdoc">Interface for a boolean vector.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:168</div></div>
+<div class="ttc" id="aclassuzuki2_1_1BooleanVector_html_a57c21c43d4c7404f7f61eb98a1cc9d50"><div class="ttname"><a href="classuzuki2_1_1BooleanVector.html#a57c21c43d4c7404f7f61eb98a1cc9d50">uzuki2::BooleanVector::set</a></div><div class="ttdeci">virtual void set(size_t i, bool v)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1BooleanVector_html_a6408d4f39ad93f71ca2b8b7b0e3770ff"><div class="ttname"><a href="classuzuki2_1_1BooleanVector.html#a6408d4f39ad93f71ca2b8b7b0e3770ff">uzuki2::BooleanVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:170</div></div>
+<div class="ttc" id="aclassuzuki2_1_1External_html"><div class="ttname"><a href="classuzuki2_1_1External.html">uzuki2::External</a></div><div class="ttdoc">Interface for unsupported objects.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:227</div></div>
+<div class="ttc" id="aclassuzuki2_1_1External_html_af6b8774268202cee6e8718714b13a095"><div class="ttname"><a href="classuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095">uzuki2::External::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:229</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Factor_html"><div class="ttname"><a href="classuzuki2_1_1Factor.html">uzuki2::Factor</a></div><div class="ttdoc">Interface for a factor.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:189</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Factor_html_a4e76f892adf9041b6f01cedb0e12f740"><div class="ttname"><a href="classuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740">uzuki2::Factor::set_level</a></div><div class="ttdeci">virtual void set_level(size_t il, std::string vl)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Factor_html_a5e9e95109053bfcbb91a30aad6fb5476"><div class="ttname"><a href="classuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476">uzuki2::Factor::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:191</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Factor_html_a8ef2ea4bf336ab2527afb1b89d01711f"><div class="ttname"><a href="classuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f">uzuki2::Factor::set</a></div><div class="ttdeci">virtual void set(size_t i, size_t v)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1IntegerVector_html"><div class="ttname"><a href="classuzuki2_1_1IntegerVector.html">uzuki2::IntegerVector</a></div><div class="ttdoc">Interface for integer vectors.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:101</div></div>
+<div class="ttc" id="aclassuzuki2_1_1IntegerVector_html_a54a45807198d1947c9ed2a49ec772d60"><div class="ttname"><a href="classuzuki2_1_1IntegerVector.html#a54a45807198d1947c9ed2a49ec772d60">uzuki2::IntegerVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:103</div></div>
+<div class="ttc" id="aclassuzuki2_1_1IntegerVector_html_ad6806f779fa8d4a41cc97b14765c80b3"><div class="ttname"><a href="classuzuki2_1_1IntegerVector.html#ad6806f779fa8d4a41cc97b14765c80b3">uzuki2::IntegerVector::set</a></div><div class="ttdeci">virtual void set(size_t i, int32_t v)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1List_html"><div class="ttname"><a href="classuzuki2_1_1List.html">uzuki2::List</a></div><div class="ttdoc">Interface for lists.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:237</div></div>
+<div class="ttc" id="aclassuzuki2_1_1List_html_a16d57dcda0cb9c8ffa7724d16473a4ff"><div class="ttname"><a href="classuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff">uzuki2::List::set_name</a></div><div class="ttdeci">virtual void set_name(size_t i, std::string n)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1List_html_a308225edf101962afc751caa321f5f82"><div class="ttname"><a href="classuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82">uzuki2::List::set</a></div><div class="ttdeci">virtual void set(size_t i, std::shared_ptr&lt; Base &gt; v)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1List_html_a89494054001ac9e355d65596eb692181"><div class="ttname"><a href="classuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181">uzuki2::List::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:239</div></div>
+<div class="ttc" id="aclassuzuki2_1_1List_html_a8ffb41fd40c9578911b82d7463642cba"><div class="ttname"><a href="classuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba">uzuki2::List::size</a></div><div class="ttdeci">virtual size_t size() const =0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Nothing_html"><div class="ttname"><a href="classuzuki2_1_1Nothing.html">uzuki2::Nothing</a></div><div class="ttdoc">Representation of R's NULL.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:215</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Nothing_html_a61876879ffc5fe14f31252d6b9aee439"><div class="ttname"><a href="classuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439">uzuki2::Nothing::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:217</div></div>
+<div class="ttc" id="aclassuzuki2_1_1NumberVector_html"><div class="ttname"><a href="classuzuki2_1_1NumberVector.html">uzuki2::NumberVector</a></div><div class="ttdoc">Interface for a double-precision vector.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:119</div></div>
+<div class="ttc" id="aclassuzuki2_1_1NumberVector_html_a41ff944db6e679a3dc685130d215d322"><div class="ttname"><a href="classuzuki2_1_1NumberVector.html#a41ff944db6e679a3dc685130d215d322">uzuki2::NumberVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:121</div></div>
+<div class="ttc" id="aclassuzuki2_1_1NumberVector_html_aeaa2342479571f738e039600accef8b5"><div class="ttname"><a href="classuzuki2_1_1NumberVector.html#aeaa2342479571f738e039600accef8b5">uzuki2::NumberVector::set</a></div><div class="ttdeci">virtual void set(size_t i, double v)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1StringVector_html"><div class="ttname"><a href="classuzuki2_1_1StringVector.html">uzuki2::StringVector</a></div><div class="ttdoc">Interface for a string vector.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:137</div></div>
+<div class="ttc" id="aclassuzuki2_1_1StringVector_html_a19642038725cf2a60f158245c876cab6"><div class="ttname"><a href="classuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">uzuki2::StringVector::Format</a></div><div class="ttdeci">Format</div><div class="ttdef"><b>Definition</b> interfaces.hpp:158</div></div>
+<div class="ttc" id="aclassuzuki2_1_1StringVector_html_a2f366149232cd6df0dea2e2f0000c7c9"><div class="ttname"><a href="classuzuki2_1_1StringVector.html#a2f366149232cd6df0dea2e2f0000c7c9">uzuki2::StringVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:139</div></div>
+<div class="ttc" id="aclassuzuki2_1_1StringVector_html_aa2f0f5ebb2988b6c819286b44ba344a5"><div class="ttname"><a href="classuzuki2_1_1StringVector.html#aa2f0f5ebb2988b6c819286b44ba344a5">uzuki2::StringVector::set</a></div><div class="ttdeci">virtual void set(size_t i, std::string v)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Vector_html"><div class="ttname"><a href="classuzuki2_1_1Vector.html">uzuki2::Vector</a></div><div class="ttdoc">Interface for vector-like objects.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:74</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Vector_html_a42f996bcbb75853274f004a29fe2da8f"><div class="ttname"><a href="classuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f">uzuki2::Vector::set_name</a></div><div class="ttdeci">virtual void set_name(size_t i, std::string n)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Vector_html_aa03f82a088edd3c3280be33c6a8c9c41"><div class="ttname"><a href="classuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41">uzuki2::Vector::set_missing</a></div><div class="ttdeci">virtual void set_missing(size_t i)=0</div></div>
+<div class="ttc" id="aclassuzuki2_1_1Vector_html_abd47d52bccdf710e1f4958585736d6a2"><div class="ttname"><a href="classuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2">uzuki2::Vector::size</a></div><div class="ttdeci">virtual size_t size() const =0</div></div>
+<div class="ttc" id="anamespaceuzuki2_html"><div class="ttname"><a href="namespaceuzuki2.html">uzuki2</a></div><div class="ttdoc">Parse an R list from a HDF5 or JSON file.</div><div class="ttdef"><b>Definition</b> parse_json.hpp:28</div></div>
 <div class="ttc" id="anamespaceuzuki2_html_a20eb2837279aae2ade751f07c62b3736"><div class="ttname"><a href="namespaceuzuki2.html#a20eb2837279aae2ade751f07c62b3736">uzuki2::Type</a></div><div class="ttdeci">Type</div><div class="ttdef"><b>Definition</b> interfaces.hpp:28</div></div>
 <div class="ttc" id="anamespaceuzuki2_html_a66472c68f697e7f6e1ea576a56cb2de8"><div class="ttname"><a href="namespaceuzuki2.html#a66472c68f697e7f6e1ea576a56cb2de8">uzuki2::is_vector</a></div><div class="ttdeci">bool is_vector(Type t)</div><div class="ttdef"><b>Definition</b> interfaces.hpp:43</div></div>
-<div class="ttc" id="astructuzuki2_1_1Base_html"><div class="ttname"><a href="structuzuki2_1_1Base.html">uzuki2::Base</a></div><div class="ttdoc">Base interface for all R objects.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:50</div></div>
-<div class="ttc" id="astructuzuki2_1_1Base_html_a37447b97260aa3a4dd591a71aaad70b8"><div class="ttname"><a href="structuzuki2_1_1Base.html#a37447b97260aa3a4dd591a71aaad70b8">uzuki2::Base::type</a></div><div class="ttdeci">virtual Type type() const =0</div></div>
-<div class="ttc" id="astructuzuki2_1_1BooleanVector_html"><div class="ttname"><a href="structuzuki2_1_1BooleanVector.html">uzuki2::BooleanVector</a></div><div class="ttdoc">Interface for a boolean vector.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:158</div></div>
-<div class="ttc" id="astructuzuki2_1_1BooleanVector_html_a57c21c43d4c7404f7f61eb98a1cc9d50"><div class="ttname"><a href="structuzuki2_1_1BooleanVector.html#a57c21c43d4c7404f7f61eb98a1cc9d50">uzuki2::BooleanVector::set</a></div><div class="ttdeci">virtual void set(size_t i, bool v)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1BooleanVector_html_a6408d4f39ad93f71ca2b8b7b0e3770ff"><div class="ttname"><a href="structuzuki2_1_1BooleanVector.html#a6408d4f39ad93f71ca2b8b7b0e3770ff">uzuki2::BooleanVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:159</div></div>
-<div class="ttc" id="astructuzuki2_1_1External_html"><div class="ttname"><a href="structuzuki2_1_1External.html">uzuki2::External</a></div><div class="ttdoc">Interface for unsupported objects.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:214</div></div>
-<div class="ttc" id="astructuzuki2_1_1External_html_af6b8774268202cee6e8718714b13a095"><div class="ttname"><a href="structuzuki2_1_1External.html#af6b8774268202cee6e8718714b13a095">uzuki2::External::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:215</div></div>
-<div class="ttc" id="astructuzuki2_1_1Factor_html"><div class="ttname"><a href="structuzuki2_1_1Factor.html">uzuki2::Factor</a></div><div class="ttdoc">Interface for a factor.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:178</div></div>
-<div class="ttc" id="astructuzuki2_1_1Factor_html_a4e76f892adf9041b6f01cedb0e12f740"><div class="ttname"><a href="structuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740">uzuki2::Factor::set_level</a></div><div class="ttdeci">virtual void set_level(size_t il, std::string vl)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1Factor_html_a5e9e95109053bfcbb91a30aad6fb5476"><div class="ttname"><a href="structuzuki2_1_1Factor.html#a5e9e95109053bfcbb91a30aad6fb5476">uzuki2::Factor::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:179</div></div>
-<div class="ttc" id="astructuzuki2_1_1Factor_html_a8ef2ea4bf336ab2527afb1b89d01711f"><div class="ttname"><a href="structuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f">uzuki2::Factor::set</a></div><div class="ttdeci">virtual void set(size_t i, size_t v)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1IntegerVector_html"><div class="ttname"><a href="structuzuki2_1_1IntegerVector.html">uzuki2::IntegerVector</a></div><div class="ttdoc">Interface for integer vectors.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:94</div></div>
-<div class="ttc" id="astructuzuki2_1_1IntegerVector_html_a54a45807198d1947c9ed2a49ec772d60"><div class="ttname"><a href="structuzuki2_1_1IntegerVector.html#a54a45807198d1947c9ed2a49ec772d60">uzuki2::IntegerVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:95</div></div>
-<div class="ttc" id="astructuzuki2_1_1IntegerVector_html_ad6806f779fa8d4a41cc97b14765c80b3"><div class="ttname"><a href="structuzuki2_1_1IntegerVector.html#ad6806f779fa8d4a41cc97b14765c80b3">uzuki2::IntegerVector::set</a></div><div class="ttdeci">virtual void set(size_t i, int32_t v)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1List_html"><div class="ttname"><a href="structuzuki2_1_1List.html">uzuki2::List</a></div><div class="ttdoc">Interface for lists.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:223</div></div>
-<div class="ttc" id="astructuzuki2_1_1List_html_a16d57dcda0cb9c8ffa7724d16473a4ff"><div class="ttname"><a href="structuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff">uzuki2::List::set_name</a></div><div class="ttdeci">virtual void set_name(size_t i, std::string n)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1List_html_a308225edf101962afc751caa321f5f82"><div class="ttname"><a href="structuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82">uzuki2::List::set</a></div><div class="ttdeci">virtual void set(size_t i, std::shared_ptr&lt; Base &gt; v)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1List_html_a89494054001ac9e355d65596eb692181"><div class="ttname"><a href="structuzuki2_1_1List.html#a89494054001ac9e355d65596eb692181">uzuki2::List::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:224</div></div>
-<div class="ttc" id="astructuzuki2_1_1List_html_a8ffb41fd40c9578911b82d7463642cba"><div class="ttname"><a href="structuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba">uzuki2::List::size</a></div><div class="ttdeci">virtual size_t size() const =0</div></div>
-<div class="ttc" id="astructuzuki2_1_1Nothing_html"><div class="ttname"><a href="structuzuki2_1_1Nothing.html">uzuki2::Nothing</a></div><div class="ttdoc">Representation of R's NULL.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:203</div></div>
-<div class="ttc" id="astructuzuki2_1_1Nothing_html_a61876879ffc5fe14f31252d6b9aee439"><div class="ttname"><a href="structuzuki2_1_1Nothing.html#a61876879ffc5fe14f31252d6b9aee439">uzuki2::Nothing::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:204</div></div>
-<div class="ttc" id="astructuzuki2_1_1NumberVector_html"><div class="ttname"><a href="structuzuki2_1_1NumberVector.html">uzuki2::NumberVector</a></div><div class="ttdoc">Interface for a double-precision vector.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:111</div></div>
-<div class="ttc" id="astructuzuki2_1_1NumberVector_html_a41ff944db6e679a3dc685130d215d322"><div class="ttname"><a href="structuzuki2_1_1NumberVector.html#a41ff944db6e679a3dc685130d215d322">uzuki2::NumberVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:112</div></div>
-<div class="ttc" id="astructuzuki2_1_1NumberVector_html_aeaa2342479571f738e039600accef8b5"><div class="ttname"><a href="structuzuki2_1_1NumberVector.html#aeaa2342479571f738e039600accef8b5">uzuki2::NumberVector::set</a></div><div class="ttdeci">virtual void set(size_t i, double v)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1StringVector_html"><div class="ttname"><a href="structuzuki2_1_1StringVector.html">uzuki2::StringVector</a></div><div class="ttdoc">Interface for a string vector.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:128</div></div>
-<div class="ttc" id="astructuzuki2_1_1StringVector_html_a19642038725cf2a60f158245c876cab6"><div class="ttname"><a href="structuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">uzuki2::StringVector::Format</a></div><div class="ttdeci">Format</div><div class="ttdef"><b>Definition</b> interfaces.hpp:148</div></div>
-<div class="ttc" id="astructuzuki2_1_1StringVector_html_a2f366149232cd6df0dea2e2f0000c7c9"><div class="ttname"><a href="structuzuki2_1_1StringVector.html#a2f366149232cd6df0dea2e2f0000c7c9">uzuki2::StringVector::type</a></div><div class="ttdeci">Type type() const</div><div class="ttdef"><b>Definition</b> interfaces.hpp:129</div></div>
-<div class="ttc" id="astructuzuki2_1_1StringVector_html_aa2f0f5ebb2988b6c819286b44ba344a5"><div class="ttname"><a href="structuzuki2_1_1StringVector.html#aa2f0f5ebb2988b6c819286b44ba344a5">uzuki2::StringVector::set</a></div><div class="ttdeci">virtual void set(size_t i, std::string v)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1Vector_html"><div class="ttname"><a href="structuzuki2_1_1Vector.html">uzuki2::Vector</a></div><div class="ttdoc">Interface for vector-like objects.</div><div class="ttdef"><b>Definition</b> interfaces.hpp:68</div></div>
-<div class="ttc" id="astructuzuki2_1_1Vector_html_a42f996bcbb75853274f004a29fe2da8f"><div class="ttname"><a href="structuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f">uzuki2::Vector::set_name</a></div><div class="ttdeci">virtual void set_name(size_t i, std::string n)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1Vector_html_aa03f82a088edd3c3280be33c6a8c9c41"><div class="ttname"><a href="structuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41">uzuki2::Vector::set_missing</a></div><div class="ttdeci">virtual void set_missing(size_t i)=0</div></div>
-<div class="ttc" id="astructuzuki2_1_1Vector_html_abd47d52bccdf710e1f4958585736d6a2"><div class="ttname"><a href="structuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2">uzuki2::Vector::size</a></div><div class="ttdeci">virtual size_t size() const =0</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

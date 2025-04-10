@@ -1,0 +1,15 @@
+<map id="uzuki2::Vector" name="uzuki2::Vector">
+<area shape="rect" id="Node000001" title="Interface for vector&#45;like objects." alt="" coords="148,104,250,130"/>
+<area shape="rect" id="Node000003" href="$classuzuki2_1_1BooleanVector.html" title="Interface for a boolean vector." alt="" coords="298,5,447,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="224,92,257,65,297,40,322,29,324,34,299,45,260,69,227,96"/>
+<area shape="rect" id="Node000004" href="$classuzuki2_1_1Factor.html" title="Interface for a factor." alt="" coords="322,55,423,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="261,97,324,78,325,84,262,102"/>
+<area shape="rect" id="Node000005" href="$classuzuki2_1_1IntegerVector.html" title="Interface for integer vectors." alt="" coords="302,104,444,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="266,114,301,114,301,120,266,120"/>
+<area shape="rect" id="Node000006" href="$classuzuki2_1_1NumberVector.html" title="Interface for a double&#45;precision vector." alt="" coords="298,153,447,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="262,132,325,150,324,155,261,137"/>
+<area shape="rect" id="Node000007" href="$classuzuki2_1_1StringVector.html" title="Interface for a string vector." alt="" coords="304,203,441,228"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="227,138,260,164,299,189,324,200,322,205,297,194,257,169,224,142"/>
+<area shape="rect" id="Node000002" href="$classuzuki2_1_1Base.html" title="Base interface for all R objects." alt="" coords="5,104,100,130"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,114,147,114,147,120,115,120"/>
+</map>
