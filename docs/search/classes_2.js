@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['factor_0',['Factor',['../classuzuki2_1_1Factor.html',1,'uzuki2']]]
+  ['dummyexternals_0',['DummyExternals',['../classuzuki2_1_1DummyExternals.html',1,'uzuki2']]]
 ];

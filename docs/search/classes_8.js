@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['vector_0',['Vector',['../classuzuki2_1_1Vector.html',1,'uzuki2']]]
+  ['nothing_0',['Nothing',['../classuzuki2_1_1Nothing.html',1,'uzuki2']]],
+  ['numbervector_1',['NumberVector',['../classuzuki2_1_1NumberVector.html',1,'uzuki2']]]
 ];

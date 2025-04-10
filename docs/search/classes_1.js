@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['external_0',['External',['../classuzuki2_1_1External.html',1,'uzuki2']]]
+  ['chunkedbufferreader_0',['ChunkedBufferReader',['https://ltla.github.io/byteme/classbyteme_1_1ChunkedBufferReader.html',1,'byteme']]]
 ];

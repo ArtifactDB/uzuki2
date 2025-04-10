@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['uzuki2_0',['uzuki2',['../namespaceuzuki2.html',1,'']]],
-  ['uzuki2_2ehpp_1',['uzuki2.hpp',['../uzuki2_8hpp.html',1,'']]],
-  ['uzuki2_3a_3ahdf5_2',['hdf5',['../namespaceuzuki2_1_1hdf5.html',1,'uzuki2']]],
-  ['uzuki2_3a_3ajson_3',['json',['../namespaceuzuki2_1_1json.html',1,'uzuki2']]]
+  ['options_0',['Options',['../structuzuki2_1_1hdf5_1_1Options.html',1,'uzuki2::hdf5::Options'],['../structuzuki2_1_1json_1_1Options.html',1,'uzuki2::json::Options']]],
+  ['or_20json_1',['R lists to HDF5 or JSON',['../index.html',1,'']]],
+  ['ostreamwriter_2',['OstreamWriter',['https://ltla.github.io/byteme/classbyteme_1_1OstreamWriter.html',1,'byteme::OstreamWriter&lt; class Pointer_ &gt;'],['https://ltla.github.io/byteme/classbyteme_1_1OstreamWriter.html#a3cbc4a7eec70e40dd6a1c370f165084c',1,'byteme::OstreamWriter::OstreamWriter()']]],
+  ['ostreamwriter_2ehpp_3',['OstreamWriter.hpp',['https://ltla.github.io/byteme/OstreamWriter_8hpp.html',1,'']]]
 ];

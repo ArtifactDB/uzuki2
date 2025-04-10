@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['strict_5flist_0',['strict_list',['../structuzuki2_1_1json_1_1Options.html#a81e2aaee989fdceb801cd0069f0d2b1a',1,'uzuki2::json::Options::strict_list'],['../structuzuki2_1_1hdf5_1_1Options.html#a93ab8f17a23f6677921101b86626541e',1,'uzuki2::hdf5::Options::strict_list']]]
+  ['compression_5flevel_0',['compression_level',['https://ltla.github.io/byteme/structbyteme_1_1GzipFileWriterOptions.html#a9072c378aefb629c314f80ff8b77a964',1,'byteme::GzipFileWriterOptions::compression_level'],['https://ltla.github.io/byteme/structbyteme_1_1ZlibBufferWriterOptions.html#a31ad029c8bd29c6edfe6e1228ee2aab7',1,'byteme::ZlibBufferWriterOptions::compression_level']]]
 ];
