@@ -11,9 +11,7 @@
 #include <unordered_set>
 #include <type_traits>
 
-#include "byteme/PerByte.hpp"
-#include "byteme/SomeFileReader.hpp"
-#include "byteme/SomeBufferReader.hpp"
+#include "byteme/byteme.hpp"
 #include "millijson/millijson.hpp"
 #include "ritsuko/ritsuko.hpp"
 
@@ -413,7 +411,7 @@ struct Options {
  * @tparam Externals Class describing how to resolve external references for type `EXTERNAL`.
  * See `hdf5::parse()` for more details. 
  *
- * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
+ * @param reader Source of input bytes representing the contents of the JSON file.
  * @param ext Instance of an external reference resolver class.
  * @param options Options for parsing.
  *
@@ -424,14 +422,13 @@ struct Options {
  */
 template<class Provisioner, class Externals>
 ParsedList parse(byteme::Reader& reader, Externals ext, Options options = Options()) {
-    std::shared_ptr<millijson::Base> contents;
+    std::unique_ptr<byteme::PerByteInterface<char> > pb;
     if (options.parallel) {
-        byteme::PerByte bytestream(&reader);
-        contents = millijson::parse(bytestream);
+        pb.reset(new byteme::PerByteSerial<char, byteme::Reader*>(&reader));
     } else {
-        byteme::PerByteParallel bytestream(&reader);
-        contents = millijson::parse(bytestream);
+        pb.reset(new byteme::PerByteParallel<char, byteme::Reader*>(&reader));
     }
+    auto contents = millijson::parse(*pb);
 
     Version version;
     if (contents->type() == millijson::OBJECT) {
@@ -499,7 +496,7 @@ ParsedList parse(byteme::Reader& reader, Options options = Options()) {
  */
 template<class Provisioner, class Externals>
 ParsedList parse_file(const std::string& file, Externals ext, Options options = Options()) {
-    byteme::SomeFileReader reader(file.c_str());
+    byteme::SomeFileReader reader(file.c_str(), {});
     return parse<Provisioner>(reader, std::move(ext), std::move(options));
 }
 
@@ -543,7 +540,7 @@ ParsedList parse_file(const std::string& file, Options options = Options()) {
  */
 template<class Provisioner, class Externals>
 ParsedList parse_buffer(const unsigned char* buffer, size_t len, Externals ext, Options options = Options()) {
-    byteme::SomeBufferReader reader(buffer, len);
+    byteme::SomeBufferReader reader(buffer, len, {});
     return parse<Provisioner>(reader, std::move(ext), std::move(options));
 }
 

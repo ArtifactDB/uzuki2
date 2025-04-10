@@ -71,7 +71,11 @@ TEST_P(JsonFileTest, Chunking) {
 
     // Checking parsing is fine with different block types.
     {
-        byteme::SomeFileReader reader(path, block_size);
+        byteme::SomeFileReader reader(path, [&]{
+            byteme::SomeFileReaderOptions opts;
+            opts.buffer_size = block_size;
+            return opts;
+        }());
         auto parsed = uzuki2::json::parse<DefaultProvisioner>(reader, opt);
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
@@ -92,7 +96,11 @@ TEST_P(JsonFileTest, Chunking) {
 
     // Checking that validation works fine.
     {
-        byteme::SomeFileReader reader(path, block_size);
+        byteme::SomeFileReader reader(path, [&]{
+            byteme::SomeFileReaderOptions opts;
+            opts.buffer_size = block_size;
+            return opts;
+        }());
         EXPECT_NO_THROW(uzuki2::json::validate(reader));
     }
 
@@ -103,7 +111,11 @@ TEST_P(JsonFileTest, Chunking) {
     }
 
     {
-        byteme::SomeFileReader reader(path, block_size);
+        byteme::SomeFileReader reader(path, [&]{
+            byteme::SomeFileReaderOptions opts;
+            opts.buffer_size = block_size;
+            return opts;
+        }());
         DefaultExternals ext(2);
         auto parsed = uzuki2::json::parse<DefaultProvisioner>(reader, std::move(ext));
         EXPECT_EQ(parsed->type(), uzuki2::LIST);
@@ -119,7 +131,11 @@ TEST_P(JsonFileTest, Chunking) {
 
     // Checking that validation works fine.
     {
-        byteme::SomeFileReader reader(path, block_size);
+        byteme::SomeFileReader reader(path, [&]{
+            byteme::SomeFileReaderOptions opts;
+            opts.buffer_size = block_size;
+            return opts;
+        }());
         EXPECT_NO_THROW(uzuki2::json::validate(reader, 2));
     }
 }
