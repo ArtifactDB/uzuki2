@@ -8,9 +8,16 @@
 
 #include "interfaces.hpp"
 
+/**
+ * @file Dummy.hpp
+ * @brief Dummy classes for parsing without storing the results.
+ */
+
 namespace uzuki2 {
 
-/** Defining the simple vectors first. **/
+/**
+ * @cond
+ */
 
 class DummyIntegerVector final : public IntegerVector {
 public:
@@ -109,9 +116,28 @@ struct DummyProvisioner {
     template<class ... Args_>
     static Factor* new_Factor(Args_&& ... args) { return (new DummyFactor(std::forward<Args_>(args)...)); }
 };
+/**
+ * @endcond
+ */
 
+/**
+ * @brief Dummy class satisfying the `Externals_` interface of `hdf5::parse()`.
+ *
+ * Users should only create an instance of this class with the default constructor.
+ * This can then be used as the `ext` argument in `json::parse()` and `hdf5::parse()`.
+ * Doing so will indicate that no external references are expected during parsing.
+ */
 class DummyExternals {
 public:
+    DummyExternals() : DummyExternals(0) {}
+
+private:
+    size_t my_number;
+
+public:
+    /**
+     * @cond
+     */
     DummyExternals(size_t n) : my_number(n) {}
 
     void* get(size_t) const {
@@ -121,9 +147,9 @@ public:
     size_t size() const {
         return my_number;
     }
-
-private:
-    size_t my_number;
+    /**
+     * @endcond
+     */
 };
 
 }

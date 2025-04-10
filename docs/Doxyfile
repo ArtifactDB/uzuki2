@@ -793,6 +793,7 @@ WARN_LOGFILE           =
 INPUT                  = ../include/uzuki2/parse_json.hpp \
                          ../include/uzuki2/parse_hdf5.hpp \
                          ../include/uzuki2/interfaces.hpp \
+                         ../include/uzuki2/Dummy.hpp \
                          ../include/uzuki2/uzuki2.hpp \
                          ../README.md
 
