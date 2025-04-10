@@ -12,77 +12,76 @@ namespace uzuki2 {
 
 /** Defining the simple vectors first. **/
 
-struct DummyIntegerVector : public IntegerVector {
-    DummyIntegerVector(size_t l, bool, bool) : length(l) {}
-
-    size_t size() const { return length; }
-    size_t length;
-
+class DummyIntegerVector final : public IntegerVector {
+public:
+    DummyIntegerVector(size_t l, bool, bool) : my_length(l) {}
+    size_t size() const { return my_length; }
     void set(size_t, int32_t) {}
     void set_missing(size_t) {}
     void set_name(size_t, std::string) {}
+private:
+    size_t my_length;
 };
 
-struct DummyNumberVector : public NumberVector {
-    DummyNumberVector(size_t l, bool, bool) : length(l) {}
-
-    size_t size() const { return length; }
-    size_t length;
-
+class DummyNumberVector final : public NumberVector {
+public:
+    DummyNumberVector(size_t l, bool, bool) : my_length(l) {}
+    size_t size() const { return my_length; }
     void set(size_t, double) {}
     void set_missing(size_t) {}
     void set_name(size_t, std::string) {}
+private:
+    size_t my_length;
 };
 
-struct DummyStringVector : public StringVector {
-    DummyStringVector(size_t l, bool, bool, StringVector::Format) : length(l) {}
-
-    size_t size() const { return length; }
-    size_t length;
-
+class DummyStringVector final : public StringVector {
+public:
+    DummyStringVector(size_t l, bool, bool, StringVector::Format) : my_length(l) {}
+    size_t size() const { return my_length; }
     void set(size_t, std::string) {}
     void set_missing(size_t) {}
     void set_name(size_t, std::string) {}
+private:
+    size_t my_length;
 };
 
-struct DummyBooleanVector : public BooleanVector {
-    DummyBooleanVector(size_t l, bool, bool) : length(l) {}
-
-    size_t size() const { return length; }
-    size_t length;
-
+class DummyBooleanVector final : public BooleanVector {
+public:
+    DummyBooleanVector(size_t l, bool, bool) : my_length(l) {}
+    size_t size() const { return my_length; }
     void set(size_t, bool) {}
     void set_missing(size_t) {}
     void set_name(size_t, std::string) {}
+private:
+    size_t my_length;
 };
 
-struct DummyFactor : public Factor {
-    DummyFactor(size_t l, bool, bool, size_t, bool) : length(l) {}
-
-    size_t size() const { return length; }
-    size_t length;
-
+class DummyFactor final : public Factor {
+public:
+    DummyFactor(size_t l, bool, bool, size_t, bool) : my_length(l) {}
+    size_t size() const { return my_length; }
     void set(size_t, size_t) {}
     void set_missing(size_t) {}
     void set_name(size_t, std::string) {}
-
     void set_level(size_t, std::string) {}
+private:
+    size_t my_length;
 };
 
 /** Defining the structural elements. **/
 
-struct DummyNothing : public Nothing {};
+class DummyNothing final : public Nothing {};
 
-struct DummyExternal : public External {};
+class DummyExternal final : public External {};
 
-struct DummyList : public List {
-    DummyList(size_t n, bool) : length(n) {}
-
-    size_t size() const { return length; }
-    size_t length;
-
+class DummyList final : public List {
+public:
+    DummyList(size_t n, bool) : my_length(n) {}
+    size_t size() const { return my_length; }
     void set(size_t, std::shared_ptr<Base>) {}
     void set_name(size_t, std::string) {}
+private:
+    size_t my_length;
 };
 
 /** Dummy provisioner. **/
@@ -111,18 +110,20 @@ struct DummyProvisioner {
     static Factor* new_Factor(Args_&& ... args) { return (new DummyFactor(std::forward<Args_>(args)...)); }
 };
 
-struct DummyExternals {
-    DummyExternals(size_t n) : number(n) {}
+class DummyExternals {
+public:
+    DummyExternals(size_t n) : my_number(n) {}
 
     void* get(size_t) const {
         return nullptr;
     }
 
     size_t size() const {
-        return number;
+        return my_number;
     }
 
-    size_t number;
+private:
+    size_t my_number;
 };
 
 }

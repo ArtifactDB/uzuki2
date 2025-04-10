@@ -140,7 +140,7 @@ TEST(JsonExternalTest, SimpleLoading) {
 void expect_json_external_error(std::string x, std::string msg, int num_expected) {
     EXPECT_ANY_THROW({
         try {
-            uzuki2::json::validate_buffer(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), num_expected);
+            uzuki2::json::validate_buffer(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), num_expected, {});
         } catch (std::exception& e) {
             EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
             throw;
