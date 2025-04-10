@@ -514,7 +514,7 @@ $(function(){ initResizable(false); });
 <div class="foldopen" id="foldopen00478" data-start="{" data-end="}">
 <div class="line"><a id="l00478" name="l00478"></a><span class="lineno"><a class="line" href="namespaceuzuki2_1_1json.html#ae55e948302f34d1c87bfa273ff82a287">  478</a></span>ParsedList <a class="code hl_function" href="namespaceuzuki2_1_1json.html#ae55e948302f34d1c87bfa273ff82a287">parse_file</a>(<span class="keyword">const</span> std::string&amp; file, Externals_ ext, <span class="keyword">const</span> <a class="code hl_struct" href="structuzuki2_1_1json_1_1Options.html">Options</a>&amp; options) {</div>
 <div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>    byteme::SomeFileReader reader(file.c_str(), {});</div>
-<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceuzuki2_1_1json.html#a416088ee97d2e5cc206beae48499a5fb">parse&lt;Provisioner_&gt;</a>(reader, std::move(ext), std::move(options));</div>
+<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceuzuki2_1_1json.html#a416088ee97d2e5cc206beae48499a5fb">parse&lt;Provisioner_&gt;</a>(reader, std::move(ext), options);</div>
 <div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span>}</div>
 </div>
 <div class="line"><a id="l00482" name="l00482"></a><span class="lineno">  482</span> </div>
@@ -522,7 +522,7 @@ $(function(){ initResizable(false); });
 <div class="foldopen" id="foldopen00502" data-start="{" data-end="}">
 <div class="line"><a id="l00502" name="l00502"></a><span class="lineno"><a class="line" href="namespaceuzuki2_1_1json.html#aa8e32ee9c2facc04314af9042c446173">  502</a></span>ParsedList <a class="code hl_function" href="namespaceuzuki2_1_1json.html#aa8e32ee9c2facc04314af9042c446173">parse_buffer</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> len, Externals_ ext, <span class="keyword">const</span> <a class="code hl_struct" href="structuzuki2_1_1json_1_1Options.html">Options</a>&amp; options) {</div>
 <div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>    byteme::SomeBufferReader reader(buffer, len, {});</div>
-<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceuzuki2_1_1json.html#a416088ee97d2e5cc206beae48499a5fb">parse&lt;Provisioner_&gt;</a>(reader, std::move(ext), std::move(options));</div>
+<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceuzuki2_1_1json.html#a416088ee97d2e5cc206beae48499a5fb">parse&lt;Provisioner_&gt;</a>(reader, std::move(ext), options);</div>
 <div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>}</div>
 </div>
 <div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span> </div>
