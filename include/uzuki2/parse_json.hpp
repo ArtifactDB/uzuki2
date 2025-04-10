@@ -401,6 +401,13 @@ struct Options {
      * Whether to throw an error if the top-level R object is not an R list.
      */
     bool strict_list = true;
+
+    /**
+     * Size of the buffer to use for reading and decompressing bytes.
+     * Larger values may improve speed at the cost of memory usage.
+     * Only relevant to the `json::parse()` overloads that do not accept a `byteme::Reader` object.
+     */
+    size_t buffer_size = 65536;
 };
 
 /**
@@ -476,7 +483,11 @@ ParsedList parse(byteme::Reader& reader, Externals_ ext, const Options& options)
  */
 template<class Provisioner_, class Externals_>
 ParsedList parse_file(const std::string& file, Externals_ ext, const Options& options) {
-    byteme::SomeFileReader reader(file.c_str(), {});
+    byteme::SomeFileReader reader(file.c_str(), [&]{
+        byteme::SomeFileReaderOptions sopt;
+        sopt.buffer_size = options.buffer_size;
+        return sopt;
+    }());
     return parse<Provisioner_>(reader, std::move(ext), options);
 }
 
@@ -500,7 +511,11 @@ ParsedList parse_file(const std::string& file, Externals_ ext, const Options& op
  */
 template<class Provisioner_, class Externals_>
 ParsedList parse_buffer(const unsigned char* buffer, size_t len, Externals_ ext, const Options& options) {
-    byteme::SomeBufferReader reader(buffer, len, {});
+    byteme::SomeBufferReader reader(buffer, len, [&]{
+        byteme::SomeBufferReaderOptions sopt;
+        sopt.buffer_size = options.buffer_size;
+        return sopt;
+    }());
     return parse<Provisioner_>(reader, std::move(ext), options);
 }
 
