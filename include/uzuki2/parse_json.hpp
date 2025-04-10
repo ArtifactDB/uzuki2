@@ -423,7 +423,7 @@ struct Options {
  * @param options Options for parsing.
  *
  * @return A `ParsedList` containing a pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
+ * Depending on `Provisioner_`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
  */
@@ -477,7 +477,7 @@ ParsedList parse(byteme::Reader& reader, Externals_ ext, const Options& options)
  * @param options Options for parsing.
  *
  * @return A `ParsedList` containing a pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
+ * Depending on `Provisioner_`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
  */
@@ -505,7 +505,7 @@ ParsedList parse_file(const std::string& file, Externals_ ext, const Options& op
  * @param options Options for parsing.
  *
  * @return A `ParsedList` containing a pointer to the root `Base` object.
- * Depending on `Provisioner`, this may contain references to all nested objects.
+ * Depending on `Provisioner_`, this may contain references to all nested objects.
  *
  * Any invalid representations in `reader` will cause an error to be thrown.
  */
