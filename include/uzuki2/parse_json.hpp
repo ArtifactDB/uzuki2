@@ -405,7 +405,6 @@ struct Options {
     /**
      * Size of the buffer to use for reading and decompressing bytes.
      * Larger values may improve speed at the cost of memory usage.
-     * Only relevant to the `json::parse()` overloads that do not accept a `byteme::Reader` object.
      */
     size_t buffer_size = 65536;
 };
