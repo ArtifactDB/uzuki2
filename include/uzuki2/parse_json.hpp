@@ -55,7 +55,7 @@ inline const std::vector<std::shared_ptr<millijson::Base> >& extract_array(
         throw std::runtime_error("expected an array in '" + path + "." + name + "'"); 
     }
 
-    return static_cast<const millijson::Array*>(values_ptr.get())->values;
+    return static_cast<const millijson::Array*>(values_ptr.get())->value();
 }
 
 inline const millijson::Array* has_names(const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, const std::string& path) {
@@ -73,7 +73,7 @@ inline const millijson::Array* has_names(const std::unordered_map<std::string, s
 
 template<class Destination_>
 void fill_names(const millijson::Array* names_ptr, Destination_* dest, const std::string& path) {
-    const auto& names = names_ptr->values;
+    const auto& names = names_ptr->value();
     if (names.size() != dest->size()) {
         throw std::runtime_error("length of 'names' and 'values' should be the same in '" + path + "'"); 
     }
@@ -82,7 +82,7 @@ void fill_names(const millijson::Array* names_ptr, Destination_* dest, const std
         if (names[i]->type() != millijson::STRING) {
             throw std::runtime_error("expected a string at '" + path + ".names[" + std::to_string(i) + "]'");
         }
-        dest->set_name(i, static_cast<const millijson::String*>(names[i].get())->value);
+        dest->set_name(i, static_cast<const millijson::String*>(names[i].get())->value());
     }
 }
 
@@ -104,7 +104,7 @@ auto process_array_or_scalar_values(
 
     const auto& values_ptr = vIt->second;
     if (values_ptr->type() == millijson::ARRAY) {
-        out_ptr = fun(static_cast<const millijson::Array*>(values_ptr.get())->values, has_names, false);
+        out_ptr = fun(static_cast<const millijson::Array*>(values_ptr.get())->value(), has_names, false);
     } else {
         std::vector<std::shared_ptr<millijson::Base> > temp { values_ptr };
         out_ptr = fun(temp, has_names, true);
@@ -128,7 +128,7 @@ void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& valu
             throw std::runtime_error("expected a number at '" + path + ".values[" + std::to_string(i) + "]'");
         }
 
-        auto val = static_cast<const millijson::Number*>(values[i].get())->value;
+        auto val = static_cast<const millijson::Number*>(values[i].get())->value();
         if (val != std::floor(val)) {
             throw std::runtime_error("expected an integer at '" + path + ".values[" + std::to_string(i) + "]'");
         }
@@ -162,7 +162,7 @@ void extract_strings(const std::vector<std::shared_ptr<millijson::Base> >& value
             throw std::runtime_error("expected a string at '" + path + ".values[" + std::to_string(i) + "]'");
         }
 
-        const auto& str = static_cast<const millijson::String*>(values[i].get())->value;
+        const auto& str = static_cast<const millijson::String*>(values[i].get())->value();
         check(str);
         dest->set(i, str);
     }
@@ -173,9 +173,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
     if (contents->type() != millijson::OBJECT) {
         throw std::runtime_error("each R object should be represented by a JSON object at '" + path + "'");
     }
-
-    auto optr = static_cast<const millijson::Object*>(contents);
-    const auto& map = optr->values;
+    const auto& map = static_cast<const millijson::Object*>(contents)->value();
 
     auto tIt = map.find("type");
     if (tIt == map.end()) {
@@ -185,7 +183,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
     if (type_ptr->type() != millijson::STRING) {
         throw std::runtime_error("expected a string at '" + path + ".type'");
     }
-    const auto& type = static_cast<const millijson::String*>(type_ptr.get())->value;
+    const auto& type = static_cast<const millijson::String*>(type_ptr.get())->value();
 
     std::shared_ptr<Base> output;
     if (type == "nothing") {
@@ -200,7 +198,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
         if (index_ptr->type() != millijson::NUMBER) {
             throw std::runtime_error("expected a number at '" + path + ".index'");
         }
-        auto index = static_cast<const millijson::Number*>(index_ptr.get())->value;
+        auto index = static_cast<const millijson::Number*>(index_ptr.get())->value();
 
         if (index != std::floor(index)) {
             throw std::runtime_error("expected an integer at '" + path + ".index'");
@@ -227,8 +225,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                 if (oIt->second->type() != millijson::BOOLEAN) {
                     throw std::runtime_error("expected a boolean at '" + path + ".ordered'");
                 }
-                auto optr = static_cast<const millijson::Boolean*>((oIt->second).get());
-                ordered = optr->value;
+                ordered = static_cast<const millijson::Boolean*>((oIt->second).get())->value();
             }
         }
 
@@ -252,7 +249,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                 throw std::runtime_error("expected strings at '" + path + ".levels[" + std::to_string(l) + "]'");
             }
 
-            const auto& level = static_cast<const millijson::String*>(lvals[l].get())->value;
+            const auto& level = static_cast<const millijson::String*>(lvals[l].get())->value();
             if (existing.find(level) != existing.end()) {
                 throw std::runtime_error("detected duplicate string at '" + path + ".levels[" + std::to_string(l) + "]'");
             }
@@ -274,7 +271,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                 if (vals[i]->type() != millijson::BOOLEAN) {
                     throw std::runtime_error("expected a boolean at '" + path + ".values[" + std::to_string(i) + "]'");
                 }
-                ptr->set(i, static_cast<const millijson::Boolean*>(vals[i].get())->value);
+                ptr->set(i, static_cast<const millijson::Boolean*>(vals[i].get())->value());
             }
 
             return ptr;
@@ -292,9 +289,9 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                 }
 
                 if (vals[i]->type() == millijson::NUMBER) {
-                    ptr->set(i, static_cast<const millijson::Number*>(vals[i].get())->value);
+                    ptr->set(i, static_cast<const millijson::Number*>(vals[i].get())->value());
                 } else if (vals[i]->type() == millijson::STRING) {
-                    auto str = static_cast<const millijson::String*>(vals[i].get())->value;
+                    auto str = static_cast<const millijson::String*>(vals[i].get())->value();
                     if (str == "NaN") {
                         ptr->set(i, std::numeric_limits<double>::quiet_NaN());
                     } else if (str == "Inf") {
@@ -327,12 +324,12 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                     throw std::runtime_error("expected a string at '" + path + ".format'");
                 }
                 auto fptr = static_cast<const millijson::String*>(fIt->second.get());
-                if (fptr->value == "date") {
+                if (fptr->value() == "date") {
                     format = StringVector::DATE;
-                } else if (fptr->value == "date-time") {
+                } else if (fptr->value() == "date-time") {
                     format = StringVector::DATETIME;
                 } else {
-                    throw std::runtime_error("unsupported format '" + fptr->value + "' at '" + path + ".format'");
+                    throw std::runtime_error("unsupported format '" + fptr->value() + "' at '" + path + ".format'");
                 }
             }
         }
@@ -438,14 +435,13 @@ ParsedList parse(byteme::Reader& reader, Externals_ ext, const Options& options)
 
     Version version;
     if (contents->type() == millijson::OBJECT) {
-        auto optr = static_cast<const millijson::Object*>(contents.get());
-        const auto& map = optr->values;
+        const auto& map = static_cast<const millijson::Object*>(contents.get())->value();
         auto vIt = map.find("version");
         if (vIt != map.end()) {
             if (vIt->second->type() != millijson::STRING) {
                 throw std::runtime_error("expected a string in 'version'");
             }
-            const auto& vstr = static_cast<const millijson::String*>(vIt->second.get())->value;
+            const auto& vstr = static_cast<const millijson::String*>(vIt->second.get())->value();
             auto vraw = ritsuko::parse_version_string(vstr.c_str(), vstr.size(), /* skip_patch = */ true);
             version.major = vraw.major;
             version.minor = vraw.minor;
