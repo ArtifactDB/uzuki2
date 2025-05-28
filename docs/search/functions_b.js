@@ -5,6 +5,6 @@ var searchData=
   ['set_5fmissing_2',['set_missing',['../classuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41',1,'uzuki2::Vector']]],
   ['set_5fname_3',['set_name',['../classuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f',1,'uzuki2::Vector::set_name()'],['../classuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff',1,'uzuki2::List::set_name()']]],
   ['size_4',['size',['../classuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2',1,'uzuki2::Vector::size()'],['../classuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba',1,'uzuki2::List::size()']]],
-  ['somebufferreader_5',['SomeBufferReader',['https://ltla.github.io/byteme/classbyteme_1_1SomeBufferReader.html#a08a5a4a1af849dc94a64c88002bde548',1,'byteme::SomeBufferReader']]],
+  ['somebufferreader_5',['SomeBufferReader',['https://ltla.github.io/byteme/classbyteme_1_1SomeBufferReader.html#a42b6d367e5f83e2b59eba87f29f4000f',1,'byteme::SomeBufferReader']]],
   ['somefilereader_6',['SomeFileReader',['https://ltla.github.io/byteme/classbyteme_1_1SomeFileReader.html#a68b58b4cdeb04b1747db643b69880787',1,'byteme::SomeFileReader']]]
 ];

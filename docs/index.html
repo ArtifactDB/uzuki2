@@ -155,7 +155,8 @@ $(function(){ initResizable(false); });
 <div class="line"> </div>
 <div class="line"># For libaries</div>
 <div class="line">target_link_libraries(mylib INTERFACE uzuki2)</div>
-</div><!-- fragment --><h3>CMake with <code>find_package()</code></h3>
+</div><!-- fragment --><p>By default, this will use <code>FetchContent</code> to fetch all external dependencies. Applications are advised to pin the versions of all dependencies themselves - see <a href="extern/CMakeLists.txt"><code>extern/CMakeLists.txt</code></a> for suggested versions. If you want to install them manually, use <code>-DUZUKI2_FETCH_EXTERN=OFF</code>.</p>
+<h3>CMake with <code>find_package()</code></h3>
 <p>You can install the library by cloning a suitable version of this repository and running the following commands:</p>
 <div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div>
 <div class="line">cmake .. -DUZUKI2_TESTS=OFF</div>
@@ -163,7 +164,8 @@ $(function(){ initResizable(false); });
 </div><!-- fragment --><p>Then you can use <code>find_package()</code> as usual:</p>
 <div class="fragment"><div class="line">find_package(artifactdb_uzuki2 CONFIG REQUIRED)</div>
 <div class="line">target_link_libraries(mylib INTERFACE artifactdb::uzuki2)</div>
-</div><!-- fragment --><h3>Manual</h3>
+</div><!-- fragment --><p>Again, this will use <code>FetchContent</code> to fetch dependencies, see comments above.</p>
+<h3>Manual</h3>
 <p>If you're not using CMake, the simple approach is to just copy the files in the <code>include/</code> subdirectory - either directly or with Git submodules - and include their path during compilation with, e.g., GCC's <code>-I</code>. You will also need to link to the dependencies listed in the <a href="extern/CMakeLists.txt"><code>extern/CMakeLists.txt</code></a> directory, along with the HDF5 and Zlib libraries.</p>
 <h1>Further comments</h1>
 <p>See <a href="docs/specifications/misc.md#comparison-to-version-1">here</a> for a list of changes from the original <a href="https://github.com/LTLA/uzuki"><b>uzuki</b></a> library.</p>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['uzuki2_2ehpp_0',['uzuki2.hpp',['../uzuki2_8hpp.html',1,'']]]
+  ['writer_2ehpp_0',['Writer.hpp',['https://ltla.github.io/byteme/Writer_8hpp.html',1,'']]]
 ];

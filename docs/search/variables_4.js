@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['parallel_0',['parallel',['../structuzuki2_1_1json_1_1Options.html#a9e42303766d0747c2b47e6f5f60d3443',1,'uzuki2::json::Options']]],
-  ['ptr_1',['ptr',['https://ltla.github.io/byteme/classbyteme_1_1PerByteInterface.html#a3caa25b9f0daa42d425de8c98c70a59d',1,'byteme::PerByteInterface::ptr'],['../structuzuki2_1_1ParsedList.html#a59daad773fe543ae299ff51ce78b2f5e',1,'uzuki2::ParsedList::ptr']]]
+  ['mode_0',['mode',['https://ltla.github.io/byteme/structbyteme_1_1ZlibBufferReaderOptions.html#a4b41fdc7bbf4749d4dd3c70c783dc32b',1,'byteme::ZlibBufferReaderOptions::mode'],['https://ltla.github.io/byteme/structbyteme_1_1ZlibBufferWriterOptions.html#a58534c4abd7686ce1c7ae7a0c32c140c',1,'byteme::ZlibBufferWriterOptions::mode']]]
 ];
