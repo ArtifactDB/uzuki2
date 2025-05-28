@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(uzuki2
-    VERSION 1.5.0
+    VERSION 2.0.0
     DESCRIPTION "Storing simple R lists inside HDF5 or JSON"
     LANGUAGES CXX)
 
@@ -19,9 +19,9 @@ option(UZUKI2_FETCH_EXTERN "Automatically fetch uzuki2's external dependencies."
 if(UZUKI2_FETCH_EXTERN)
     add_subdirectory(extern)
 else()
-    find_package(ltla_byteme CONFIG REQUIRED)
-    find_package(ltla_millijson CONFIG REQUIRED)
-    find_package(artifactdb_ritsuko CONFIG REQUIRED)
+    find_package(ltla_byteme 2.0.0 CONFIG REQUIRED)
+    find_package(ltla_millijson 2.0.0 CONFIG REQUIRED)
+    find_package(artifactdb_ritsuko 0.6.0 CONFIG REQUIRED)
 endif()
 
 target_link_libraries(uzuki2 INTERFACE ltla::byteme ltla::millijson artifactdb::ritsuko)
@@ -66,6 +66,10 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/artifactdb_uzuki2Config.cmake"
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/artifactdb_uzuki2)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/artifactdb_uzuki2Config.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/artifactdb_uzuki2)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/artifactdb_uzuki2ConfigVersion.cmake"
+    COMPATIBILITY SameMajorVersion)
 
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/artifactdb_uzuki2Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/artifactdb_uzuki2ConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/artifactdb_uzuki2)

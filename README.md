@@ -106,6 +106,10 @@ target_link_libraries(myexe uzuki2)
 target_link_libraries(mylib INTERFACE uzuki2)
 ```
 
+By default, this will use `FetchContent` to fetch all external dependencies.
+Applications are advised to pin the versions of all dependencies themselves - see [`extern/CMakeLists.txt`](extern/CMakeLists.txt) for suggested versions.
+If you want to install them manually, use `-DUZUKI2_FETCH_EXTERN=OFF`.
+
 #### CMake with `find_package()`
 
 You can install the library by cloning a suitable version of this repository and running the following commands:
@@ -122,6 +126,8 @@ Then you can use `find_package()` as usual:
 find_package(artifactdb_uzuki2 CONFIG REQUIRED)
 target_link_libraries(mylib INTERFACE artifactdb::uzuki2)
 ```
+
+Again, this will use `FetchContent` to fetch dependencies, see comments above.
 
 #### Manual
 
