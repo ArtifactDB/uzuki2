@@ -86,7 +86,7 @@ A "nothing" (a.k.a., "null", "none") value is represented as a JSON object with 
 
 Each external object is represented as a JSON object with the following properties:
 
-- `type`, set to `"index"`.
+- `type`, set to `"external"`.
 - `index`, a non-negative JSON number that can fit into a 32-bit signed integer.
   This identifies this external object uniquely within the entire list.
 
