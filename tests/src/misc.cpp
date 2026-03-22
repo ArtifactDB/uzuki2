@@ -1,14 +1,18 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <fstream>
+#include <optional>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "uzuki2/parse_hdf5.hpp"
 
 #include "test_subclass.h"
 #include "utils.h"
 
-TEST(Hdf5AttributeTest, CheckError) {
+TEST(Hdf5Attribute, CheckError) {
     auto path = "TEST-date.h5";
 
     {
@@ -55,31 +59,67 @@ TEST(TopLevelList, CheckErrors) {
     expect_json_error("{ \"type\":\"nothing\" }", "top-level object should represent an R list");
 }
 
-class JsonFileTest : public ::testing::TestWithParam<std::tuple<int, bool> > {};
+TEST(Version, Error) {
+    expect_json_error("{ version: true }", "expected a string");
+}
 
-TEST_P(JsonFileTest, Chunking) {
-    auto path = "TEST.json";
-    auto param = GetParam();
-    size_t block_size = std::get<0>(param);
-    uzuki2::json::Options opt;
-    opt.parallel = std::get<1>(param);
-
-    {
-        std::ofstream ohandle(path);
-        ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ], \n\t\"names\": [ \"X\", \"Y\" ] }";
+class ParseOverloadTest : public ::testing::TestWithParam<std::tuple<int, bool, std::pair<bool, int> > > {
+protected:
+    static std::string dump_file(const std::string& payload, int mode) {
+        std::string path = "TEST.json";
+        std::unique_ptr<byteme::Writer> writer;
+        if (mode == 0) {
+            writer.reset(new byteme::RawFileWriter(path.c_str(), {}));
+        } else {
+            path += ".gz";
+            writer.reset(new byteme::GzipFileWriter(path.c_str(), {}));
+        }
+        writer->write(reinterpret_cast<const unsigned char*>(payload.c_str()), payload.size());
+        return path;
     }
 
-    // Checking parsing is fine with different block types.
-    {
-        byteme::SomeFileReader reader(path, [&]{
-            byteme::SomeFileReaderOptions opts;
-            opts.buffer_size = block_size;
-            return opts;
-        }());
-        auto parsed = uzuki2::json::parse<DefaultProvisioner>(reader, uzuki2::DummyExternals(0), opt);
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
+    static std::vector<unsigned char> dump_buffer(const std::string& payload, int mode) {
+        if (mode == 0) {
+            byteme::RawBufferWriter writer({});
+            writer.write(reinterpret_cast<const unsigned char*>(payload.c_str()), payload.size());
+            writer.finish();
+            return std::move(writer.get_output());
+        } else {
+            byteme::ZlibBufferWriterOptions opts;
+            opts.mode = (mode == 1 ? byteme::ZlibCompressionMode::ZLIB : byteme::ZlibCompressionMode::GZIP);
+            byteme::ZlibBufferWriter writer(opts);
+            writer.write(reinterpret_cast<const unsigned char*>(payload.c_str()), payload.size());
+            writer.finish();
+            return std::move(writer.get_output());
+        }
+    }
+};
 
-        auto stuff = static_cast<const DefaultList*>(parsed.get());
+TEST_P(ParseOverloadTest, Basic) {
+    auto param = GetParam();
+    uzuki2::json::Options opt;
+    opt.buffer_size = std::get<0>(param);
+    opt.parallel = std::get<1>(param);
+    bool use_buffer = std::get<2>(param).first;
+    int compression = std::get<2>(param).second;
+
+    {
+        std::optional<uzuki2::ParsedList> parsed;
+        std::string payload = "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ], \n\t\"names\": [ \"X\", \"Y\" ] }";
+
+        if (use_buffer) {
+            auto buffered = dump_buffer(payload, compression);
+            parsed = uzuki2::json::parse_buffer<DefaultProvisioner>(buffered.data(), buffered.size(), uzuki2::DummyExternals(0), opt);
+            EXPECT_NO_THROW(uzuki2::json::validate_buffer(buffered.data(), buffered.size(), 0, {}));
+        } else {
+            auto path = dump_file(payload, compression);
+            parsed = uzuki2::json::parse_file<DefaultProvisioner>(path, uzuki2::DummyExternals(0), opt);
+            EXPECT_NO_THROW(uzuki2::json::validate_file(path, 0, {}));
+        }
+
+        EXPECT_EQ(parsed->ptr->type(), uzuki2::LIST);
+
+        auto stuff = static_cast<const DefaultList*>(parsed->ptr.get());
         EXPECT_EQ(stuff->size(), 2);
 
         EXPECT_EQ(stuff->values[0]->type(), uzuki2::NOTHING);
@@ -94,87 +134,38 @@ TEST_P(JsonFileTest, Chunking) {
         EXPECT_EQ(stuff->names[1], "Y");
     }
 
-    // Checking that validation works fine.
+    // Again, with some externals.
     {
-        byteme::SomeFileReader reader(path, [&]{
-            byteme::SomeFileReaderOptions opts;
-            opts.buffer_size = block_size;
-            return opts;
-        }());
-        EXPECT_NO_THROW(uzuki2::json::validate(reader, 0, {}));
-    }
+        std::optional<uzuki2::ParsedList> parsed;
+        std::string payload = "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"external\", \"index\": 0 }, { \"type\": \"external\", \"index\": 1 } ] }";
 
-    // Checking that the overload works with external references.
-    {
-        std::ofstream ohandle(path);
-        ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"external\", \"index\": 0 }, { \"type\": \"external\", \"index\": 1 } ] }";
-    }
+        if (use_buffer) {
+            auto buffered = dump_buffer(payload, compression);
+            parsed = uzuki2::json::parse_buffer<DefaultProvisioner>(buffered.data(), buffered.size(), DefaultExternals(2), opt);
+            EXPECT_NO_THROW(uzuki2::json::validate_buffer(buffered.data(), buffered.size(), 2, {}));
+        } else {
+            auto path = dump_file(payload, compression);
+            parsed = uzuki2::json::parse_file<DefaultProvisioner>(path, DefaultExternals(2), opt);
+            EXPECT_NO_THROW(uzuki2::json::validate_file(path, 2, {}));
+        }
 
-    {
-        byteme::SomeFileReader reader(path, [&]{
-            byteme::SomeFileReaderOptions opts;
-            opts.buffer_size = block_size;
-            return opts;
-        }());
-        DefaultExternals ext(2);
-        auto parsed = uzuki2::json::parse<DefaultProvisioner>(reader, std::move(ext), {});
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
-
-        auto stuff = static_cast<const DefaultList*>(parsed.get());
-        EXPECT_EQ(stuff->size(), 2);
-
-        EXPECT_EQ(stuff->values[0]->type(), uzuki2::EXTERNAL);
-        EXPECT_EQ(reinterpret_cast<uintptr_t>(static_cast<const DefaultExternal*>(stuff->values[0].get())->ptr), 1);
-        EXPECT_EQ(stuff->values[1]->type(), uzuki2::EXTERNAL);
-        EXPECT_EQ(reinterpret_cast<uintptr_t>(static_cast<const DefaultExternal*>(stuff->values[1].get())->ptr), 2);
-    }
-
-    // Checking that validation works fine.
-    {
-        byteme::SomeFileReader reader(path, [&]{
-            byteme::SomeFileReaderOptions opts;
-            opts.buffer_size = block_size;
-            return opts;
-        }());
-        EXPECT_NO_THROW(uzuki2::json::validate(reader, 2, {}));
+        EXPECT_EQ(parsed->ptr->type(), uzuki2::LIST);
     }
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    JsonFile,
-    JsonFileTest,
+    Parse,
+    ParseOverloadTest,
     ::testing::Combine(
         ::testing::Values(3, 7, 13, 17, 29), // block size per read.
-        ::testing::Values(false, true)  // whether or not it's parallelized.
+        ::testing::Values(false, true), // whether or not it's parallelized.
+        ::testing::Values(
+            std::make_pair(false, 0), // file, uncompressed
+            std::make_pair(false, 1), // file, gzip-compressed
+            std::make_pair(true, 0), // buffer, uncompressed
+            std::make_pair(true, 1), // buffer, zlib-compressed
+            std::make_pair(true, 2)  // buffer, gzip-compressed
+        )
     )
 );
 
-TEST(JsonFileTest, CheckMethods) {
-    std::string path = "TEST.json";
-
-    // Making sure the parse_file methods work correctly.
-    {
-        std::ofstream ohandle(path);
-        ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"nothing\" }, { \"type\": \"integer\", \"values\": [ 1, 2, 3 ] } ], \n\t\"names\": [ \"X\", \"Y\" ] }";
-    }
-    {
-        auto parsed = uzuki2::json::parse_file<DefaultProvisioner>(path, uzuki2::DummyExternals(0), {});
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
-        EXPECT_NO_THROW(uzuki2::json::validate_file(path, 0, {}));
-    }
-
-    // Again, with some externals.
-    {
-        std::ofstream ohandle(path);
-        ohandle << "{ \"type\":\"list\",\n  \"values\": [ { \"type\": \"external\", \"index\": 0 }, { \"type\": \"external\", \"index\": 1 } ] }";
-    }
-    {
-        auto parsed = uzuki2::json::parse_file<DefaultProvisioner>(path, DefaultExternals(2), {});
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
-        EXPECT_NO_THROW(uzuki2::json::validate_file(path, 2, {}));
-    }
-}
-
-TEST(JsonFileTest, CheckVersion) {
-    expect_json_error("{ version: true }", "expected a string");
-}

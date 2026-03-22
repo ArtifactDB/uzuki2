@@ -19,7 +19,7 @@ option(UZUKI2_FETCH_EXTERN "Automatically fetch uzuki2's external dependencies."
 if(UZUKI2_FETCH_EXTERN)
     add_subdirectory(extern)
 else()
-    find_package(ltla_byteme 2.0.0 CONFIG REQUIRED)
+    find_package(ltla_byteme 2.1.0 CONFIG REQUIRED)
     find_package(ltla_millijson 2.0.0 CONFIG REQUIRED)
     find_package(artifactdb_ritsuko 0.6.0 CONFIG REQUIRED)
 endif()
