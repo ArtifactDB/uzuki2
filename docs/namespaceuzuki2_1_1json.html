@@ -108,9 +108,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a416088ee97d2e5cc206beae48499a5fb" id="r_a416088ee97d2e5cc206beae48499a5fb"><td class="memTemplParams" colspan="2">template&lt;class Provisioner_ , class Externals_ &gt; </td></tr>
-<tr class="memitem:a416088ee97d2e5cc206beae48499a5fb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structuzuki2_1_1ParsedList.html">ParsedList</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a416088ee97d2e5cc206beae48499a5fb">parse</a> (<a class="elRef" href="https://ltla.github.io/byteme/classbyteme_1_1Reader.html">byteme::Reader</a> &amp;reader, Externals_ ext, const <a class="el" href="structuzuki2_1_1json_1_1Options.html">Options</a> &amp;options)</td></tr>
-<tr class="separator:a416088ee97d2e5cc206beae48499a5fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a455ac2eb8044a9f01da3ff1536fe8f4f" id="r_a455ac2eb8044a9f01da3ff1536fe8f4f"><td class="memTemplParams" colspan="2">template&lt;class Provisioner_ , class Reader_ , class Externals_ &gt; </td></tr>
+<tr class="memitem:a455ac2eb8044a9f01da3ff1536fe8f4f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structuzuki2_1_1ParsedList.html">ParsedList</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a455ac2eb8044a9f01da3ff1536fe8f4f">parse</a> (Reader_ &amp;reader, Externals_ ext, const <a class="el" href="structuzuki2_1_1json_1_1Options.html">Options</a> &amp;options)</td></tr>
+<tr class="separator:a455ac2eb8044a9f01da3ff1536fe8f4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae55e948302f34d1c87bfa273ff82a287" id="r_ae55e948302f34d1c87bfa273ff82a287"><td class="memTemplParams" colspan="2">template&lt;class Provisioner_ , class Externals_ &gt; </td></tr>
 <tr class="memitem:ae55e948302f34d1c87bfa273ff82a287"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structuzuki2_1_1ParsedList.html">ParsedList</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#ae55e948302f34d1c87bfa273ff82a287">parse_file</a> (const std::string &amp;file, Externals_ ext, const <a class="el" href="structuzuki2_1_1json_1_1Options.html">Options</a> &amp;options)</td></tr>
 <tr class="separator:ae55e948302f34d1c87bfa273ff82a287"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -128,18 +128,18 @@ Functions</h2></td></tr>
 <div class="textblock"><p>Parse an R list from a JSON file. </p>
 <p>JSON provides an alternative to the HDF5 format handled by <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a44c67c6de55c5b336e6fb49579cf0f55">hdf5::parse()</a></code> and friends. JSON is simpler to parse and has less formatting-related overhead. However, it does not support random access and discards some precision for floating-point numbers. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a416088ee97d2e5cc206beae48499a5fb" name="a416088ee97d2e5cc206beae48499a5fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a416088ee97d2e5cc206beae48499a5fb">&#9670;&#160;</a></span>parse()</h2>
+<a id="a455ac2eb8044a9f01da3ff1536fe8f4f" name="a455ac2eb8044a9f01da3ff1536fe8f4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a455ac2eb8044a9f01da3ff1536fe8f4f">&#9670;&#160;</a></span>parse()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Provisioner_ , class Externals_ &gt; </div>
+template&lt;class Provisioner_ , class Reader_ , class Externals_ &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="structuzuki2_1_1ParsedList.html">ParsedList</a> uzuki2::json::parse </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="https://ltla.github.io/byteme/classbyteme_1_1Reader.html">byteme::Reader</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>reader</em></span>, </td>
+          <td class="paramtype">Reader_ &amp;</td>          <td class="paramname"><span class="paramname"><em>reader</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -157,6 +157,7 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Provisioner_</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a44c67c6de55c5b336e6fb49579cf0f55">hdf5::parse()</a></code> for more details. </td></tr>
+    <tr><td class="paramname">Reader_</td><td>Class of the source of input bytes. This should satisfy the <code><a class="elRef" href="https://ltla.github.io/byteme/classbyteme_1_1Reader.html">byteme::Reader</a></code> interface. </td></tr>
     <tr><td class="paramname">Externals_</td><td>Class describing how to resolve external references for type <code>EXTERNAL</code>. See <code><a class="el" href="namespaceuzuki2_1_1hdf5.html#a44c67c6de55c5b336e6fb49579cf0f55">hdf5::parse()</a></code> for more details.</td></tr>
   </table>
   </dd>

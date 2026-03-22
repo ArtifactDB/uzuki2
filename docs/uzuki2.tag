@@ -404,8 +404,8 @@
       <type>ParsedList</type>
       <name>parse</name>
       <anchorfile>namespaceuzuki2_1_1json.html</anchorfile>
-      <anchor>a416088ee97d2e5cc206beae48499a5fb</anchor>
-      <arglist>(byteme::Reader &amp;reader, Externals_ ext, const Options &amp;options)</arglist>
+      <anchor>a455ac2eb8044a9f01da3ff1536fe8f4f</anchor>
+      <arglist>(Reader_ &amp;reader, Externals_ ext, const Options &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>ParsedList</type>

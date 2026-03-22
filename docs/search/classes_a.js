@@ -1,8 +1,11 @@
 var searchData=
 [
-  ['parsedlist_0',['ParsedList',['../structuzuki2_1_1ParsedList.html',1,'uzuki2']]],
-  ['perbyteinterface_1',['PerByteInterface',['https://ltla.github.io/byteme/classbyteme_1_1PerByteInterface.html',1,'byteme']]],
-  ['perbyteinterface_3c_20type_5f_20_3e_2',['PerByteInterface&lt; Type_ &gt;',['https://ltla.github.io/byteme/classbyteme_1_1PerByteInterface.html',1,'byteme']]],
-  ['perbyteparallel_3',['PerByteParallel',['https://ltla.github.io/byteme/classbyteme_1_1PerByteParallel.html',1,'byteme']]],
-  ['perbyteserial_4',['PerByteSerial',['https://ltla.github.io/byteme/classbyteme_1_1PerByteSerial.html',1,'byteme']]]
+  ['rawbufferreader_0',['RawBufferReader',['https://ltla.github.io/byteme/classbyteme_1_1RawBufferReader.html',1,'byteme']]],
+  ['rawbufferwriter_1',['RawBufferWriter',['https://ltla.github.io/byteme/classbyteme_1_1RawBufferWriter.html',1,'byteme']]],
+  ['rawbufferwriteroptions_2',['RawBufferWriterOptions',['https://ltla.github.io/byteme/structbyteme_1_1RawBufferWriterOptions.html',1,'byteme']]],
+  ['rawfilereader_3',['RawFileReader',['https://ltla.github.io/byteme/classbyteme_1_1RawFileReader.html',1,'byteme']]],
+  ['rawfilereaderoptions_4',['RawFileReaderOptions',['https://ltla.github.io/byteme/structbyteme_1_1RawFileReaderOptions.html',1,'byteme']]],
+  ['rawfilewriter_5',['RawFileWriter',['https://ltla.github.io/byteme/classbyteme_1_1RawFileWriter.html',1,'byteme']]],
+  ['rawfilewriteroptions_6',['RawFileWriterOptions',['https://ltla.github.io/byteme/structbyteme_1_1RawFileWriterOptions.html',1,'byteme']]],
+  ['reader_7',['Reader',['https://ltla.github.io/byteme/classbyteme_1_1Reader.html',1,'byteme']]]
 ];

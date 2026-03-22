@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['parse_0',['parse',['../namespaceuzuki2_1_1json.html#a416088ee97d2e5cc206beae48499a5fb',1,'uzuki2::json::parse()'],['../namespaceuzuki2_1_1hdf5.html#a44c67c6de55c5b336e6fb49579cf0f55',1,'uzuki2::hdf5::parse(const H5::Group &amp;handle, Externals_ ext, const Options &amp;options)'],['../namespaceuzuki2_1_1hdf5.html#a7a6cbc1d27b48ce3a862001a1948ed33',1,'uzuki2::hdf5::parse(const std::string &amp;file, const std::string &amp;name, Externals_ ext, Options options=Options())']]],
-  ['parse_5fbuffer_1',['parse_buffer',['../namespaceuzuki2_1_1json.html#aa8e32ee9c2facc04314af9042c446173',1,'uzuki2::json']]],
-  ['parse_5ffile_2',['parse_file',['../namespaceuzuki2_1_1json.html#ae55e948302f34d1c87bfa273ff82a287',1,'uzuki2::json']]],
-  ['perbyteparallel_3',['PerByteParallel',['https://ltla.github.io/byteme/classbyteme_1_1PerByteParallel.html#af8b6d8751483f0505569e0d739f4e834',1,'byteme::PerByteParallel']]],
-  ['perbyteserial_4',['PerByteSerial',['https://ltla.github.io/byteme/classbyteme_1_1PerByteSerial.html#a1eea419c3dacadb8612b360e159025d2',1,'byteme::PerByteSerial']]],
-  ['position_5',['position',['https://ltla.github.io/byteme/classbyteme_1_1PerByteInterface.html#a374c2a658715b357ebe9511fdf772169',1,'byteme::PerByteInterface']]]
+  ['serialbufferedreader_0',['SerialBufferedReader',['https://ltla.github.io/byteme/classbyteme_1_1SerialBufferedReader.html#a0171352dd5853d7fdbbcff353de3a379',1,'byteme::SerialBufferedReader']]],
+  ['serialbufferedwriter_1',['SerialBufferedWriter',['https://ltla.github.io/byteme/classbyteme_1_1SerialBufferedWriter.html#a8a01232e87e3ab7512225fc4ebf747f2',1,'byteme::SerialBufferedWriter']]],
+  ['set_2',['set',['../classuzuki2_1_1IntegerVector.html#ad6806f779fa8d4a41cc97b14765c80b3',1,'uzuki2::IntegerVector::set()'],['../classuzuki2_1_1NumberVector.html#aeaa2342479571f738e039600accef8b5',1,'uzuki2::NumberVector::set()'],['../classuzuki2_1_1StringVector.html#aa2f0f5ebb2988b6c819286b44ba344a5',1,'uzuki2::StringVector::set()'],['../classuzuki2_1_1BooleanVector.html#a57c21c43d4c7404f7f61eb98a1cc9d50',1,'uzuki2::BooleanVector::set()'],['../classuzuki2_1_1Factor.html#a8ef2ea4bf336ab2527afb1b89d01711f',1,'uzuki2::Factor::set()'],['../classuzuki2_1_1List.html#a308225edf101962afc751caa321f5f82',1,'uzuki2::List::set()']]],
+  ['set_5flevel_3',['set_level',['../classuzuki2_1_1Factor.html#a4e76f892adf9041b6f01cedb0e12f740',1,'uzuki2::Factor']]],
+  ['set_5fmissing_4',['set_missing',['../classuzuki2_1_1Vector.html#aa03f82a088edd3c3280be33c6a8c9c41',1,'uzuki2::Vector']]],
+  ['set_5fname_5',['set_name',['../classuzuki2_1_1Vector.html#a42f996bcbb75853274f004a29fe2da8f',1,'uzuki2::Vector::set_name()'],['../classuzuki2_1_1List.html#a16d57dcda0cb9c8ffa7724d16473a4ff',1,'uzuki2::List::set_name()']]],
+  ['size_6',['size',['../classuzuki2_1_1Vector.html#abd47d52bccdf710e1f4958585736d6a2',1,'uzuki2::Vector::size()'],['../classuzuki2_1_1List.html#a8ffb41fd40c9578911b82d7463642cba',1,'uzuki2::List::size()']]]
 ];
