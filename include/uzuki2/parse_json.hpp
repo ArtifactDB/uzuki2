@@ -507,7 +507,7 @@ ParsedList parse_file(const std::string& file, Externals_ ext, const Options& op
 template<class Provisioner_, class Externals_>
 ParsedList parse_buffer(const unsigned char* buffer, size_t len, Externals_ ext, const Options& options) {
     std::unique_ptr<byteme::Reader> ptr;
-    if (byteme::is_zlib(buffer, len) || byteme::is_gzip(buffer, len)) {
+    if (byteme::is_zlib_or_gzip(buffer, len)) {
         ptr.reset(new byteme::ZlibBufferReader(buffer, len, {}));
     } else {
         ptr.reset(new byteme::RawBufferReader(buffer, len));
