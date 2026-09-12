@@ -164,7 +164,7 @@ TEST(Hdf5StringTest, CheckError) {
         auto ghandle = vector_opener(handle, "foo", "string");
         create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
-    expect_hdf5_error(path, "foo", "UTF-8 encoded string");
+    expect_hdf5_error(path, "foo", "can be represented by a UTF-8 string");
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
@@ -173,7 +173,7 @@ TEST(Hdf5StringTest, CheckError) {
         auto dhandle = create_dataset(ghandle, "data", { "michael", "gabriel", "raphael", "lucifer" });
         dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
     }
-    expect_hdf5_error(path, "foo", "string datatype");
+    expect_hdf5_error(path, "foo", "attribute to be a UTF-8 string");
 
     /***********************************************
      *** See integer.cpp for vector error tests. ***

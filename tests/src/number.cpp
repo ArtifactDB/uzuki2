@@ -86,7 +86,7 @@ TEST(Hdf5NumberTest, BlockLoading) {
 TEST(Hdf5NumberTest, MissingValues) {
     auto path = "TEST-number.h5";
 
-    auto missing = ritsuko::r_missing_value();
+    auto missing = uzuki2::hdf5::r_missing_value();
     auto nan = std::numeric_limits<double>::quiet_NaN();
     EXPECT_TRUE(std::isnan(missing));
 

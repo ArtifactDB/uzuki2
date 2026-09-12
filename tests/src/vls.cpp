@@ -19,7 +19,7 @@ TEST(Hdf5VlsTest, Basic) {
         const unsigned char* hptr = reinterpret_cast<const unsigned char*>(heap.c_str());
         hhandle.write(hptr, H5::PredType::NATIVE_UCHAR);
 
-        std::vector<ritsuko::hdf5::vls::Pointer<uint64_t, uint64_t> > pointers(nlen);
+        std::vector<ritsuko::cvls::Pointer<uint64_t, uint64_t> > pointers(nlen);
         size_t n = 0;
         for (size_t i = 0; i < nlen; ++i) {
             pointers[i].offset = n;
@@ -27,7 +27,7 @@ TEST(Hdf5VlsTest, Basic) {
             pointers[i].length = count;
             n += count;
         }
-        auto ptype = ritsuko::hdf5::vls::define_pointer_datatype<uint64_t, uint64_t>();
+        auto ptype = ritsuko::cvls::define_pointer_datatype<uint64_t, uint64_t>();
         auto phandle = create_dataset(vhandle, "data", pointers.size(), ptype);
         phandle.write(pointers.data(), ptype);
     }
@@ -64,7 +64,7 @@ TEST(Hdf5VlsTest, Basic) {
             vhandle.removeAttr("missing-value-placeholder");
             vhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT, H5S_SCALAR);
         }
-        expect_hdf5_error(path, "blub", "string datatype");
+        expect_hdf5_error(path, "blub", "attribute to be a UTF-8 string");
 
         // Removing for the next checks.
         {
@@ -90,12 +90,12 @@ TEST(Hdf5VlsTest, Failures) {
         H5::DataSpace hspace(1, &zero);
         ghandle.createDataSet("heap", H5::PredType::NATIVE_UINT8, hspace);
 
-        std::vector<ritsuko::hdf5::vls::Pointer<uint64_t, uint64_t> > pointers(nlen);
+        std::vector<ritsuko::cvls::Pointer<uint64_t, uint64_t> > pointers(nlen);
         for (size_t i = 0; i < nlen; ++i) {
             pointers[i].offset = i;
             pointers[i].length = 1;
         }
-        auto ptype = ritsuko::hdf5::vls::define_pointer_datatype<uint64_t, uint64_t>();
+        auto ptype = ritsuko::cvls::define_pointer_datatype<uint64_t, uint64_t>();
         auto phandle = create_dataset(ghandle, "data", pointers.size(), ptype);
         phandle.write(pointers.data(), ptype);
     }
@@ -107,14 +107,14 @@ TEST(Hdf5VlsTest, Failures) {
         auto ghandle = handle.openGroup("blub");
         ghandle.unlink("data");
 
-        std::vector<ritsuko::hdf5::vls::Pointer<int, int> > pointers(3);
+        std::vector<ritsuko::cvls::Pointer<int, int> > pointers(3);
         for (auto& p : pointers) {
             p.offset = 0;
             p.length = 0;
         }
         hsize_t plen = pointers.size();
         H5::DataSpace pspace(1, &plen);
-        auto ptype = ritsuko::hdf5::vls::define_pointer_datatype<int, int>();
+        auto ptype = ritsuko::cvls::define_pointer_datatype<int, int>();
         auto phandle = ghandle.createDataSet("data", ptype, pspace);
         phandle.write(pointers.data(), ptype);
     }
@@ -142,9 +142,9 @@ TEST(Hdf5VlsTest, Scalar) {
         const unsigned char* hptr = reinterpret_cast<const unsigned char*>(heap.c_str());
         hhandle.write(hptr, H5::PredType::NATIVE_UCHAR);
 
-        ritsuko::hdf5::vls::Pointer<uint8_t, uint8_t> ptr;
+        ritsuko::cvls::Pointer<uint8_t, uint8_t> ptr;
         ptr.offset = 0; ptr.length = 10;
-        auto ptype = ritsuko::hdf5::vls::define_pointer_datatype<uint8_t, uint8_t>();
+        auto ptype = ritsuko::cvls::define_pointer_datatype<uint8_t, uint8_t>();
         auto phandle = ghandle.createDataSet("data", ptype, H5S_SCALAR);
         phandle.write(&ptr, ptype);
     }
