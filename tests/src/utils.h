@@ -50,11 +50,6 @@ inline H5::Group external_opener(const H5::Group& parent, const std::string& nam
     return super_group_opener(parent, name, attrs);
 }
 
-inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, hsize_t len, const H5::DataType& dtype) {
-    H5::DataSpace dspace(1, &len);
-    return parent.createDataSet(name, dtype, dspace);
-}
-
 inline void add_version(const H5::Group& parent, const std::string& version) {
     H5::StrType stype(0, H5T_VARIABLE);
     auto ahandle = parent.createAttribute("uzuki_version", stype, H5S_SCALAR);
@@ -62,7 +57,7 @@ inline void add_version(const H5::Group& parent, const std::string& version) {
 }
 
 template<typename T>
-H5::DataSet write_scalar(const H5::Group& parent, const std::string& name, T value, const H5::DataType& dtype) {
+H5::DataSet write_number(const H5::Group& parent, const std::string& name, T value, const H5::DataType& dtype) {
     H5::DataSpace dspace;
     auto dhandle = parent.createDataSet(name, dtype, dspace);
 
@@ -76,26 +71,15 @@ H5::DataSet write_scalar(const H5::Group& parent, const std::string& name, T val
     return dhandle;
 }
 
-inline H5::DataSet write_string(const H5::Group& parent, const std::string& name, const std::string& value) {
-    H5::DataSpace dspace;
-    H5::StrType stype(0, value.size());
-    auto dhandle = parent.createDataSet(name, stype, dspace);
-    dhandle.write(value.c_str(), stype);
-    return dhandle;
-}
-
 template<typename T>
-H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, const std::vector<T>& values, const H5::DataType& dtype, bool compressed = false) {
+H5::DataSet write_numbers(const H5::Group& parent, const std::string& name, const std::vector<T>& values, const H5::DataType& dtype, hsize_t chunk_size) {
     hsize_t len = values.size();
     H5::DataSpace dspace(1, &len);
 
     H5::DSetCreatPropList cplist;
-    if (compressed) {
-        hsize_t chunk = 57;
-        cplist.setChunk(1, &chunk);
+    if (chunk_size) {
+        cplist.setChunk(1, &chunk_size);
         cplist.setDeflate(8);
-    } else {
-        cplist = H5::DSetCreatPropList::DEFAULT;
     }
 
     auto dhandle = parent.createDataSet(name, dtype, dspace, cplist);
@@ -103,17 +87,31 @@ H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, con
     return dhandle;
 }
 
-inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& name, const std::vector<std::string>& values, bool variable = false, bool compressed = false) {
+template<typename T>
+H5::DataSet write_numbers(const H5::Group& parent, const std::string& name, const std::vector<T>& values, const H5::DataType& dtype) {
+    return write_numbers(parent, name, values, dtype, 0);
+}
+
+inline H5::DataSet write_string(const H5::Group& parent, const std::string& name, const std::string& value, bool variable) {
+    H5::DataSpace dspace;
+    H5::StrType stype(0, variable ? H5T_VARIABLE : static_cast<decltype(H5T_VARIABLE)>(value.size()));
+    auto dhandle = parent.createDataSet(name, stype, dspace);
+    dhandle.write(value.c_str(), stype);
+    return dhandle;
+}
+
+inline H5::DataSet write_string(const H5::Group& parent, const std::string& name, const std::string& value) {
+    return write_string(parent, name, value, false);
+}
+
+inline H5::DataSet write_strings(const H5::Group& parent, const std::string& name, const std::vector<std::string>& values, bool variable, hsize_t chunk_size) {
     hsize_t len = values.size();
     H5::DataSpace dspace(1, &len);
 
     H5::DSetCreatPropList cplist;
-    if (compressed) {
-        hsize_t chunk = 96;
-        cplist.setChunk(1, &chunk);
+    if (chunk_size) {
+        cplist.setChunk(1, &chunk_size);
         cplist.setDeflate(6);
-    } else {
-        cplist = H5::DSetCreatPropList::DEFAULT;
     }
 
     if (!variable) {
@@ -149,6 +147,10 @@ inline H5::DataSet create_dataset(const H5::Group& parent, const std::string& na
     }
 }
 
+inline H5::DataSet write_strings(const H5::Group& parent, const std::string& name, const std::vector<std::string>& values) {
+    return write_strings(parent, name, values, false, 0);
+}
+
 inline auto load_hdf5(std::string name, std::string group) {
     uzuki2::hdf5::Options opt;
     opt.strict_list = false;
@@ -173,25 +175,23 @@ inline auto load_json_strict(std::string x, bool parallel = false) {
 }
 
 inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {
-    EXPECT_ANY_THROW({
-        try {
-            uzuki2::hdf5::validate(file, name, 0, {});
-        } catch (std::exception& e) {
-            EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
-            throw;
-        }
-    });
+    std::string obs;
+    try {
+        uzuki2::hdf5::validate(file, name, 0, {});
+    } catch (std::exception& e) {
+        obs = e.what();
+    }
+    EXPECT_THAT(obs, ::testing::HasSubstr(msg));
 }
 
 inline void expect_json_error(std::string json, std::string msg) {
-    EXPECT_ANY_THROW({
-        try {
-            uzuki2::json::validate_buffer(reinterpret_cast<const unsigned char*>(json.c_str()), json.size(), 0, {});
-        } catch (std::exception& e) {
-            EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
-            throw;
-        }
-    });
+    std::string obs;
+    try {
+        uzuki2::json::validate_buffer(reinterpret_cast<const unsigned char*>(json.c_str()), json.size(), 0, {});
+    } catch (std::exception& e) {
+        obs = e.what();
+    }
+    EXPECT_THAT(obs, ::testing::HasSubstr(msg));
 }
 
 #endif

@@ -16,7 +16,7 @@ TEST(Hdf5ListTest, SimpleLoading) {
         auto dhandle = ghandle.createGroup("data");
         nothing_opener(dhandle, "0");
         auto vhandle = vector_opener(dhandle, "1", "integer");
-        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
+        write_numbers<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
     }
     {
         auto parsed = load_hdf5_strict(path, "foo");
@@ -38,7 +38,7 @@ TEST(Hdf5ListTest, SimpleLoading) {
     {
         H5::H5File handle(path, H5F_ACC_RDWR);
         auto ghandle = handle.openGroup("foo");
-        create_dataset(ghandle, "names", { "bruce", "alfred" });
+        write_strings(ghandle, "names", { "bruce", "alfred" });
     }
     {
         auto parsed = load_hdf5_strict(path, "foo");
@@ -82,31 +82,34 @@ TEST(Hdf5ListTest, NestedLoading) {
 
 TEST(Hdf5ListTest, CheckError) {
     auto path = "TEST-list.h5";
+    H5Eset_auto2(H5E_DEFAULT, NULL, NULL);
 
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto ghandle = list_opener(handle, "foo");
-        create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
-    }
-    expect_hdf5_error(path, "foo", "expected a group at 'data'");
-
+    // All 'N' children of the list's 'data/' group should be named 0, 1, 2, ... N -1.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
         nothing_opener(dhandle, "1");
     }
-    expect_hdf5_error(path, "foo", "expected a group at '0'");
+    bool failed = true;
+    try {
+        uzuki2::hdf5::validate(path, "foo", 0, {});
+    } catch (H5::Exception&) {
+        failed = true;
+    }
+    EXPECT_TRUE(failed);
 
+    // Catches and rethrows nested errors correctly.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
-        create_dataset<int>(dhandle, "0", { 1, 2, 3 }, H5::PredType::NATIVE_INT);
+        std::map<std::string, std::string> attrs;
+        attrs["uzuki_object"] = "bar";
+        super_group_opener(dhandle, "0", attrs);
     }
-    expect_hdf5_error(path, "foo", "expected a group at '0'");
+    expect_hdf5_error(path, "foo", "unknown");
 }
-
 
 TEST(JsonListTest, SimpleLoading) {
     // Simple stuff works correctly.
