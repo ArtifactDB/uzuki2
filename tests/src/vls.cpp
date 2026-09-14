@@ -121,11 +121,11 @@ TEST(Hdf5Vls, ForbiddenPointerType) {
         dump_heap(vhandle, heap.c_str(), heap.size());
 
         struct Foo {
-            int offset, length;
+            std::int32_t offset, length;
         };
         H5::CompType ptype(sizeof(Foo));
-        ptype.insertMember("offset", HOFFSET(Foo, offset), H5::PredType::NATIVE_INT);
-        ptype.insertMember("length", HOFFSET(Foo, length), H5::PredType::NATIVE_INT);
+        ptype.insertMember("offset", HOFFSET(Foo, offset), H5::PredType::NATIVE_INT32);
+        ptype.insertMember("length", HOFFSET(Foo, length), H5::PredType::NATIVE_INT32);
         const hsize_t nlen = 10;
         vhandle.createDataSet("data", ptype, H5::DataSpace(1, &nlen));
     }
@@ -254,7 +254,7 @@ TEST(Hdf5Vls, MissingPlaceholderError) {
         H5::H5File handle(path, H5F_ACC_RDWR);
         auto vhandle = handle.openDataSet("blub/data");
         vhandle.removeAttr("missing-value-placeholder");
-        vhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT, H5S_SCALAR);
+        vhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT32, H5S_SCALAR);
     }
     expect_hdf5_error(path, "blub", "attribute to be a UTF-8 string");
 }

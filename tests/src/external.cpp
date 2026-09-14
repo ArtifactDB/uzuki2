@@ -6,7 +6,7 @@
 #include "test_subclass.h"
 #include "utils.h"
 
-TEST(Hdf5ExternalTest, Single) {
+TEST(Hdf5External, Single) {
     auto path = "TEST-external.h5";
     uzuki2::hdf5::Options opt;
     opt.strict_list = false;
@@ -26,7 +26,7 @@ TEST(Hdf5ExternalTest, Single) {
     EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff->ptr), 1);
 }
 
-TEST(Hdf5ExternalTest, Multiple) {
+TEST(Hdf5External, Multiple) {
     auto path = "TEST-external.h5";
     uzuki2::hdf5::Options opt;
     opt.strict_list = false;
@@ -67,13 +67,13 @@ void expect_hdf5_external_error(std::string path, std::string name, std::string 
     });
 }
 
-TEST(Hdf5ExternalTest, CheckErrors) {
+TEST(Hdf5External, CheckErrors) {
     auto path = "TEST-external.h5";
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
-        write_numbers<int>(ghandle, "index", { 0, 1 }, H5::PredType::NATIVE_INT32);
+        write_numbers<std::int32_t>(ghandle, "index", { 0, 1 }, H5::PredType::NATIVE_INT32);
     }
     expect_hdf5_external_error(path, "foo", "expected scalar", 1);
 

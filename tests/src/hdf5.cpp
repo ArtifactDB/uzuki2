@@ -31,7 +31,7 @@ TEST(Hdf5Error, UnknownType) {
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "whee", "BLAH");
-        write_numbers<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT32);
+        write_numbers<std::int32_t>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT32);
     }
     expect_hdf5_error(path, "whee", "unknown vector type");
 }

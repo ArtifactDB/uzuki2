@@ -8,52 +8,49 @@
 
 TEST(Hdf5DateTime, Legacy) {
     auto path = "TEST-datetime.h5";
+    std::vector<std::string> data { 
+        "2077-12-12T22:11:00Z", 
+        "2055-01-01T05:34:12+19:11", 
+        "2022-05-06T24:00:00-02:12", 
+        "2022-05-06T24:00:00.000+02:12", 
+        "2022-05-06T13:00:00.334-02:12"
+    };
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "date-time");
-        write_strings(vhandle, "data", { 
-            "2077-12-12T22:11:00Z", 
-            "2055-01-01T05:34:12+19:11", 
-            "2022-05-06T24:00:00-02:12", 
-            "2022-05-06T24:00:00.000+02:12", 
-            "2022-05-06T13:00:00.334-02:12"
-        });
+        write_strings(vhandle, "data", data);
     }
 
     auto parsed = load_hdf5(path, "blub");
     EXPECT_EQ(parsed->type(), uzuki2::STRING);
     auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-    EXPECT_EQ(sptr->size(), 5);
-    EXPECT_EQ(sptr->base.values.front(), "2077-12-12T22:11:00Z");
-    EXPECT_EQ(sptr->base.values.back(), "2022-05-06T13:00:00.334-02:12");
+    EXPECT_EQ(sptr->base.values, data);
     EXPECT_EQ(sptr->format, uzuki2::StringVector::DATETIME);
 }
 
 TEST(Hdf5DateTime, Vector) {
     auto path = "TEST-datetime.h5";
+    std::vector<std::string> data { 
+        "2077-12-12T22:11:00Z", 
+        "2055-01-01T05:34:12+19:11", 
+        "2022-05-06T24:00:00-02:12", 
+        "2022-05-06T24:00:00.000+02:12", 
+        "2022-05-06T13:00:00.334-02:12"
+    };
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "string");
         add_version(vhandle, "1.1");
-
-        write_strings(vhandle, "data", { 
-            "2077-12-12T22:11:00Z", 
-            "2055-01-01T05:34:12+19:11", 
-            "2022-05-06T24:00:00-02:12", 
-            "2022-05-06T24:00:00.000+02:12", 
-            "2022-05-06T13:00:00.334-02:12"
-        });
+        write_strings(vhandle, "data", data);
         write_string(vhandle, "format", "date-time");
     }
 
     auto parsed = load_hdf5(path, "blub");
     EXPECT_EQ(parsed->type(), uzuki2::STRING);
     auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-    EXPECT_EQ(sptr->size(), 5);
-    EXPECT_EQ(sptr->base.values.front(), "2077-12-12T22:11:00Z");
-    EXPECT_EQ(sptr->base.values.back(), "2022-05-06T13:00:00.334-02:12");
+    EXPECT_EQ(sptr->base.values, data);
     EXPECT_EQ(sptr->format, uzuki2::StringVector::DATETIME);
 }
 
@@ -76,18 +73,9 @@ TEST(Hdf5DateTime, Scalar) {
     EXPECT_EQ(sptr->format, uzuki2::StringVector::DATETIME);
 }
 
-TEST(Hdf5DateTime, FormatError) {
+TEST(Hdf5DateTime, FormatErrorScalar) {
     auto path = "TEST-datetime.h5";
 
-    // Vector.
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date-time");
-        write_strings(vhandle, "data", { "2055-12-01T11:55:11Z", /* invalid */ "2077-12-12T22:11:00A" });
-    }
-    expect_hdf5_error(path, "foo", "date-times should follow");
-
-    // Scalar.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "foo", "date-time");
@@ -96,7 +84,38 @@ TEST(Hdf5DateTime, FormatError) {
     expect_hdf5_error(path, "foo", "date-times should follow");
 }
 
-TEST(Hdf5DateTimeTest, MissingPlaceholder) {
+TEST(Hdf5DateTime, FormatErrorVector) {
+    auto path = "TEST-datetime.h5";
+    std::vector<std::string> data { 
+        "2077-12-12T22:11:00Z", 
+        "2055-01-01T05:34:12+19:11", 
+        "2022-05-06T24:00:00-02:12", 
+        "2022-05-06T24:00:00.000+02:12", 
+        "2022-05-06T13:00:00.334-02:12"
+    };
+
+    // Invalid date occurs in the first chunk.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "date-time");
+        auto modified = data;
+        modified[0] = "2055-02-01";
+        write_strings(vhandle, "data", modified, /* variable = */ false, /* chunk_size = */ 2);
+    }
+    expect_hdf5_error(path, "foo", "date-times should follow");
+
+    // Now in the last chunk.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "date-time");
+        auto modified = data;
+        modified.back() = "NA";
+        write_strings(vhandle, "data", modified, /* variable = */ false, /* chunk_size = */ 2);
+    }
+    expect_hdf5_error(path, "foo", "date-times should follow");
+}
+
+TEST(Hdf5DateTime, MissingPlaceholder) {
     auto path = "TEST-datetime.h5";
 
     // Check that the interaction between format checks and the missing placeholder is correct.
