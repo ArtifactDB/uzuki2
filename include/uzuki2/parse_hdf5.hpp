@@ -622,9 +622,12 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
  */
 struct Options {
     /**
-     * Buffer size, in terms of the number of elements, to use for reading data from HDF5 datasets.
+     * @cond
      */
     hsize_t buffer_size = 10000;
+    /**
+     * @endcond
+     */
 
     /**
      * Whether to throw an error if the top-level R object is not an R list.
