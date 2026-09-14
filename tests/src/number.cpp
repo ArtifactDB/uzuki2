@@ -260,9 +260,9 @@ TEST(Hdf5NumberTest, MissingPlaceholderError) {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = vector_opener(handle, "foo", "number");
         add_version(ghandle, "1.1");
-        auto dhandle = write_numbers<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT32);
+        auto dhandle = write_numbers<double>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_DOUBLE);
         constexpr hsize_t one = 1;
-        dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT32, H5::DataSpace(1, &one));
+        dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5::DataSpace(1, &one));
     }
     expect_hdf5_error(path, "foo", "scalar");
 

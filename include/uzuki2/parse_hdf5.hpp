@@ -348,7 +348,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
         } else if (ndims == 1) {
             dspace.getSimpleExtentDims(&len);
         } else {
-            throw std::runtime_error("expected a 1-dimensional dataset in 'data'");
+            throw std::runtime_error("expected a scalar or 1-dimensional dataset in 'data'");
         }
 
         const bool named = handle.exists("names");
