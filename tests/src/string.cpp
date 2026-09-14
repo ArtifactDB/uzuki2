@@ -6,41 +6,46 @@
 #include "test_subclass.h"
 #include "utils.h"
 
-TEST(Hdf5StringTest, SimpleLoading) {
+TEST(Hdf5StringTest, FixedVector) {
     auto path = "TEST-string.h5";
 
     // Simple stuff works correctly.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "string");
-        create_dataset(vhandle, "data", { "foo", "whee", "stuff" });
-    }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 3);
-        EXPECT_EQ(sptr->base.values.front(), "foo");
-        EXPECT_EQ(sptr->base.values.back(), "stuff");
-        EXPECT_FALSE(sptr->base.scalar);
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
+        write_strings(vhandle, "data", { "foo", "whee", "stuff" });
     }
 
-    // Variable stuff works correctly.
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 3);
+    EXPECT_EQ(sptr->base.values.front(), "foo");
+    EXPECT_EQ(sptr->base.values.back(), "stuff");
+    EXPECT_FALSE(sptr->base.scalar);
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
+}
+
+TEST(Hdf5StringTest, VariableVector) {
+    auto path = "TEST-string.h5";
+
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "string");
-        create_dataset(vhandle, "data", { "foo-qwerty", "whee", "stuff-asdasd" }, true);
+        write_strings(vhandle, "data", { "foo-qwerty", "whee", "stuff-asdasd" }, /* variable = */ true, /* chunk_size = */ 0);
     }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 3);
-        EXPECT_EQ(sptr->base.values.front(), "foo-qwerty");
-        EXPECT_EQ(sptr->base.values.back(), "stuff-asdasd");
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
-    }
+
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 3);
+    EXPECT_EQ(sptr->base.values.front(), "foo-qwerty");
+    EXPECT_EQ(sptr->base.values.back(), "stuff-asdasd");
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
+}
+
+TEST(Hdf5StringTest, FixedScalar) {
+    auto path = "TEST-string.h5";
 
     // Scalars work correctly.
     {
@@ -48,136 +53,101 @@ TEST(Hdf5StringTest, SimpleLoading) {
         auto vhandle = vector_opener(handle, "blub", "string");
         write_string(vhandle, "data", "antony");
     }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 1);
-        EXPECT_EQ(sptr->base.values.front(), "antony");
-        EXPECT_TRUE(sptr->base.scalar);
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
-    }
 
-    // Works with recent versions.
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 1);
+    EXPECT_EQ(sptr->base.values.front(), "antony");
+    EXPECT_TRUE(sptr->base.scalar);
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
+}
+
+TEST(Hdf5StringTest, VariableScalar) {
+    auto path = "TEST-string.h5";
+
+    // Scalars work correctly.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "string");
-        add_version(vhandle, "1.1");
-        create_dataset(vhandle, "data", { "foo", "whee", "stuff" });
-    }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 3);
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
+        write_string(vhandle, "data", "cleopatra", /* variable = */ true);
     }
 
-    /********************************************
-     *** See integer.cpp for tests for names. ***
-     ********************************************/
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 1);
+    EXPECT_EQ(sptr->base.values.front(), "cleopatra");
+    EXPECT_TRUE(sptr->base.scalar);
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
 }
 
 TEST(Hdf5StringTest, BlockLoading) {
     auto path = "TEST-string.h5";
 
-    // Buffer size is 10000, so we make sure we have enough values to go through a few iterations.
-    std::vector<std::string> collected(25000);
-    for (size_t i = 0; i < collected.size(); ++i) {
+    // Simulate multiple chunks so that we test the while{} loop for streaming values.
+    const std::size_t len = 25000;
+    std::vector<std::string> collected(len);
+    for (std::size_t i = 0; i < len; ++i) {
         collected[i] = std::to_string(i);
-    }
-
-    // Uncompressed works correctly.
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "blub", "string");
-        create_dataset(vhandle, "data", collected, /* variable */ false, /* compressed */ false);
-    }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->base.values, collected);
-
-        ASSERT_EQ(sptr->base.values.size(), collected.size());
-        for (size_t i = 0; i < collected.size(); ++i) {
-            if (sptr->base.values[i] != collected[i]) {
-                std::cout << sptr->base.values[i] << "\t" << collected[i] << std::endl;
-            }
-        }
     }
 
     // Compressed works correctly.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "string");
-        create_dataset(vhandle, "data", collected, /* variable */ false, /* compressed */ true);
-    }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->base.values, collected);
+        write_strings(vhandle, "data", collected, /* variable = */ false, /* chunk_size = */ 999);
     }
 
-    // Compressed works correctly with variable strings.
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "blub", "string");
-        create_dataset(vhandle, "data", collected, /* variable */ true, /* compressed */ true);
-    }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->base.values, collected);
-    }
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->base.values, collected);
 }
 
-TEST(Hdf5StringTest, MissingValues) {
+TEST(Hdf5StringTest, ForbiddenType) {
+    auto path = "TEST-string.h5";
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = vector_opener(handle, "foo", "string");
+        write_numbers<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
+    }
+    expect_hdf5_error(path, "foo", "can be represented by a UTF-8 string");
+}
+
+TEST(Hdf5StringTest, MissingPlaceholder) {
     auto path = "TEST-string.h5";
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "string");
-        auto dhandle = create_dataset(vhandle, "data", { "michael", "gabriel", "raphael", "lucifer" });
+        auto dhandle = write_strings(vhandle, "data", { "michael", "gabriel", "raphael", "lucifer" });
 
         H5::StrType stype(0, H5T_VARIABLE);
         auto ahandle = dhandle.createAttribute("missing-value-placeholder", stype, H5S_SCALAR);
         std::string target = "lucifer";
         ahandle.write(stype, target);
     }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 4);
-        EXPECT_EQ(sptr->base.values[3], "ich bin missing"); // i.e., the test's missing value placeholder.
-    }
+
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 4);
+    EXPECT_EQ(sptr->base.values[3], "ich bin missing"); // i.e., the test's missing value placeholder.
 }
 
-TEST(Hdf5StringTest, CheckError) {
+TEST(Hdf5StringTest, MissingPlaceholderError) {
     auto path = "TEST-string.h5";
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = vector_opener(handle, "foo", "string");
-        create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
-    }
-    expect_hdf5_error(path, "foo", "can be represented by a UTF-8 string");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto ghandle = vector_opener(handle, "foo", "string");
         add_version(ghandle, "1.1");
-        auto dhandle = create_dataset(ghandle, "data", { "michael", "gabriel", "raphael", "lucifer" });
+        auto dhandle = write_strings(ghandle, "data", { "michael", "gabriel", "raphael", "lucifer" });
         dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_DOUBLE, H5S_SCALAR);
     }
     expect_hdf5_error(path, "foo", "attribute to be a UTF-8 string");
-
-    /***********************************************
-     *** See integer.cpp for vector error tests. ***
-     ***********************************************/
 }
 
 TEST(JsonStringTest, SimpleLoading) {

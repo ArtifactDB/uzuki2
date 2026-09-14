@@ -94,10 +94,18 @@ H5::DataSet write_numbers(const H5::Group& parent, const std::string& name, cons
 
 inline H5::DataSet write_string(const H5::Group& parent, const std::string& name, const std::string& value, bool variable) {
     H5::DataSpace dspace;
-    H5::StrType stype(0, variable ? H5T_VARIABLE : static_cast<decltype(H5T_VARIABLE)>(value.size()));
-    auto dhandle = parent.createDataSet(name, stype, dspace);
-    dhandle.write(value.c_str(), stype);
-    return dhandle;
+    if (variable) {
+        H5::StrType stype(0, H5T_VARIABLE);
+        auto dhandle = parent.createDataSet(name, stype, dspace);
+        const auto ptr = value.c_str();
+        dhandle.write(&ptr, stype);
+        return dhandle;
+    } else {
+        H5::StrType stype(0, value.size());
+        auto dhandle = parent.createDataSet(name, stype, dspace);
+        dhandle.write(value.c_str(), stype);
+        return dhandle;
+    }
 }
 
 inline H5::DataSet write_string(const H5::Group& parent, const std::string& name, const std::string& value) {

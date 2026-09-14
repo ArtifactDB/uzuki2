@@ -22,11 +22,11 @@ add_executable(
     src/boolean.cpp
     src/factor.cpp
     src/number.cpp
-#    src/string.cpp
-#    src/vls.cpp
+    src/string.cpp
+    src/vls.cpp
 #    src/date.cpp
 #    src/datetime.cpp
-#    src/external.cpp
+    src/external.cpp
 #    src/misc.cpp
 )
 
