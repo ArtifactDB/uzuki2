@@ -94,8 +94,9 @@ The datatype of the placeholder attribute should be exactly the same as that of 
 The only exception is when `**/data` is a string, in which case the placeholder may be of any string datatype that can be represented by a UTF-8 encoded string.
 it is expected that any comparison between the placeholder and strings in `**/data` will be performed bytewise in the same manner as `strcmp`.
 
-Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
+Floating-point missingness should be identified by comparing the placeholder and data values as IEEE754-compliant `double`s.
 No casting should be performed to a lower-precision type, as this may cause a non-missing value to become equal to the placeholder.
+If the placeholder is not NaN, the comparison can be done with the usual `==` operator.
 If the placeholder is NaN, all NaNs in the dataset should be considered missing, regardless of the exact bit representation in the NaN payload.
 
 

@@ -220,13 +220,6 @@
     <name>uzuki2::hdf5::Options</name>
     <filename>structuzuki2_1_1hdf5_1_1Options.html</filename>
     <member kind="variable">
-      <type>hsize_t</type>
-      <name>buffer_size</name>
-      <anchorfile>structuzuki2_1_1hdf5_1_1Options.html</anchorfile>
-      <anchor>a7d44084f355c6def4b8109f69b9a15cd</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
       <type>bool</type>
       <name>strict_list</name>
       <anchorfile>structuzuki2_1_1hdf5_1_1Options.html</anchorfile>
