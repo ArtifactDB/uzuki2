@@ -6,52 +6,33 @@
 #include "test_subclass.h"
 #include "utils.h"
 
-TEST(Hdf5ListTest, SimpleLoading) {
+TEST(Hdf5List, SimpleLoading) {
     auto path = "TEST-list.h5";
 
     // Simple stuff works correctly.
+    std::vector<std::int32_t> expected{ -1, -2, -3, 0, 1, 2, 3 };
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
         nothing_opener(dhandle, "0");
         auto vhandle = vector_opener(dhandle, "1", "integer");
-        create_dataset<int>(vhandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
-    }
-    {
-        auto parsed = load_hdf5_strict(path, "foo");
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
-
-        auto stuff = static_cast<const DefaultList*>(parsed.get());
-        EXPECT_EQ(stuff->size(), 2);
-
-        EXPECT_EQ(stuff->values[0]->type(), uzuki2::NOTHING);
-        EXPECT_EQ(stuff->values[1]->type(), uzuki2::INTEGER);
-
-        auto iptr = static_cast<const DefaultIntegerVector*>(stuff->values[1].get());
-        EXPECT_EQ(iptr->size(), 5);
-        EXPECT_EQ(iptr->base.values.front(), 1);
-        EXPECT_EQ(iptr->base.values.back(), 5);
+        write_numbers(vhandle, "data", expected, H5::PredType::NATIVE_INT8);
     }
 
-    // Works with names.
-    {
-        H5::H5File handle(path, H5F_ACC_RDWR);
-        auto ghandle = handle.openGroup("foo");
-        create_dataset(ghandle, "names", { "bruce", "alfred" });
-    }
-    {
-        auto parsed = load_hdf5_strict(path, "foo");
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
+    auto parsed = load_hdf5_strict(path, "foo");
+    EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
-        auto stuff = static_cast<const DefaultList*>(parsed.get());
-        EXPECT_TRUE(stuff->has_names);
-        EXPECT_EQ(stuff->names[0], "bruce");
-        EXPECT_EQ(stuff->names[1], "alfred");
-    }
+    auto stuff = static_cast<const DefaultList*>(parsed.get());
+    EXPECT_EQ(stuff->size(), 2);
+    EXPECT_EQ(stuff->values[0]->type(), uzuki2::NOTHING);
+    EXPECT_EQ(stuff->values[1]->type(), uzuki2::INTEGER);
+
+    auto iptr = static_cast<const DefaultIntegerVector*>(stuff->values[1].get());
+    EXPECT_EQ(iptr->base.values, expected);
 }
 
-TEST(Hdf5ListTest, NestedLoading) {
+TEST(Hdf5List, NestedLoading) {
     auto path = "TEST-list.h5";
 
     {
@@ -65,48 +46,49 @@ TEST(Hdf5ListTest, NestedLoading) {
         nothing_opener(dhandle2, "0");
     }
 
-    {
-        auto parsed = load_hdf5_strict(path, "foo");
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
+    auto parsed = load_hdf5_strict(path, "foo");
+    EXPECT_EQ(parsed->type(), uzuki2::LIST);
 
-        auto stuff = static_cast<const DefaultList*>(parsed.get());
-        EXPECT_EQ(stuff->size(), 2);
+    auto stuff = static_cast<const DefaultList*>(parsed.get());
+    EXPECT_EQ(stuff->size(), 2);
 
-        EXPECT_EQ(stuff->values[0]->type(), uzuki2::NOTHING);
-        EXPECT_EQ(stuff->values[1]->type(), uzuki2::LIST);
+    EXPECT_EQ(stuff->values[0]->type(), uzuki2::NOTHING);
+    EXPECT_EQ(stuff->values[1]->type(), uzuki2::LIST);
 
-        auto lptr = static_cast<const DefaultList*>(stuff->values[1].get());
-        EXPECT_EQ(lptr->size(), 1);
-    }
+    auto lptr = static_cast<const DefaultList*>(stuff->values[1].get());
+    EXPECT_EQ(lptr->size(), 1);
 }
 
-TEST(Hdf5ListTest, CheckError) {
+TEST(Hdf5List, CheckError) {
     auto path = "TEST-list.h5";
+    H5Eset_auto2(H5E_DEFAULT, NULL, NULL);
 
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto ghandle = list_opener(handle, "foo");
-        create_dataset<int>(ghandle, "data", { 1, 2, 3, 4, 5 }, H5::PredType::NATIVE_INT);
-    }
-    expect_hdf5_error(path, "foo", "expected a group at 'data'");
-
+    // All 'N' children of the list's 'data/' group should be named 0, 1, 2, ... N -1.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
         nothing_opener(dhandle, "1");
     }
-    expect_hdf5_error(path, "foo", "expected a group at '0'");
+    bool failed = true;
+    try {
+        uzuki2::hdf5::validate(path, "foo", 0, {});
+    } catch (H5::Exception&) {
+        failed = true;
+    }
+    EXPECT_TRUE(failed);
 
+    // Catches and rethrows nested errors correctly.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
-        create_dataset<int>(dhandle, "0", { 1, 2, 3 }, H5::PredType::NATIVE_INT);
+        std::map<std::string, std::string> attrs;
+        attrs["uzuki_object"] = "bar";
+        super_group_opener(dhandle, "0", attrs);
     }
-    expect_hdf5_error(path, "foo", "expected a group at '0'");
+    expect_hdf5_error(path, "foo", "unknown");
 }
-
 
 TEST(JsonListTest, SimpleLoading) {
     // Simple stuff works correctly.

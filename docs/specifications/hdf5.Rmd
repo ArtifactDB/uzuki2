@@ -149,8 +149,9 @@ it is expected that any comparison between the placeholder and strings in `**/da
 
 ```{r, echo=FALSE, results="asis"}
 if (.version >= package_version("1.3")) {
-    cat('Floating-point missingness should be identified using the equality operator when both the placeholder and data values are loaded into memory as IEEE754-compliant `double`s.
+    cat('Floating-point missingness should be identified by comparing the placeholder and data values as IEEE754-compliant `double`s.
 No casting should be performed to a lower-precision type, as this may cause a non-missing value to become equal to the placeholder.
+If the placeholder is not NaN, the comparison can be done with the usual `==` operator.
 If the placeholder is NaN, all NaNs in the dataset should be considered missing, regardless of the exact bit representation in the NaN payload.')
 } else if (.version >= package_version("1.1")) {
     cat('Floating-point missingness may be encoded in the payload of an NaN, which distinguishes it from a non-missing "not-a-number" value.

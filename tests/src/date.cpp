@@ -6,188 +6,124 @@
 #include "test_subclass.h"
 #include "utils.h"
 
-TEST(Hdf5DateTest, SimpleLoading) {
+TEST(Hdf5Date, Legacy) {
     auto path = "TEST-date.h5";
+    std::vector<std::string> data{ "2077-12-12", "2055-01-01", "2022-05-06" };
 
-    // Simple stuff works correctly.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "2055-01-01", "2022-05-06" });
-    }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 3);
-        EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
-        EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
-        EXPECT_FALSE(sptr->base.scalar);
+        write_strings(vhandle, "data", data);
     }
 
-    // Scalars work correctly.
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "blub", "date");
-        write_string(vhandle, "data", "2022-05-09");
-    }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 1);
-        EXPECT_EQ(sptr->base.values.front(), "2022-05-09");
-        EXPECT_TRUE(sptr->base.scalar);
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
-    }
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 3);
+    EXPECT_EQ(sptr->base.values, data);
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
+    EXPECT_FALSE(sptr->base.scalar);
+}
 
-    // Latest version works correctly.
+TEST(Hdf5Date, Vector) {
+    auto path = "TEST-date.h5";
+    std::vector<std::string> data{ "2077-12-12", "2055-01-01", "2022-05-06" };
+
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "string");
-        add_version(vhandle, "1.1");
-
-        create_dataset(vhandle, "data", { "2077-12-12", "2055-01-01", "2022-05-06" });
+        add_version(vhandle, "1.2");
+        write_strings(vhandle, "data", data);
         write_string(vhandle, "format", "date");
     }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 3);
-        EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
-        EXPECT_EQ(sptr->base.values.back(), "2022-05-06");
-        EXPECT_FALSE(sptr->base.scalar);
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
-    }
 
-    /********************************************
-     *** See integer.cpp for tests for names. ***
-     ********************************************/
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 3);
+    EXPECT_EQ(sptr->base.values, data);
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
+    EXPECT_FALSE(sptr->base.scalar);
 }
 
-TEST(Hdf5DateTest, MissingValues) {
+TEST(Hdf5Date, Scalar) {
     auto path = "TEST-date.h5";
 
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        add_version(vhandle, "1.2");
+        write_string(vhandle, "data", "2077-12-12");
+        write_string(vhandle, "format", "date");
+    }
+
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    EXPECT_EQ(sptr->size(), 1);
+    EXPECT_EQ(sptr->base.values.front(), "2077-12-12");
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
+    EXPECT_TRUE(sptr->base.scalar);
+}
+
+TEST(Hdf5Date, FormatErrorScalar) {
+    auto path = "TEST-date.h5";
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "date");
+        write_string(vhandle, "data", "asda-as-as");
+    }
+    expect_hdf5_error(path, "foo", "dates should follow");
+}
+
+TEST(Hdf5Date, FormatErrorVector) {
+    auto path = "TEST-date.h5";
+    std::vector<std::string> data{ "2077-12-12", "2055-01-01", "2022-05-06", "2032-07-15" };
+
+    // Invalid date occurs in the first chunk.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "date");
+        auto modified = data;
+        modified[0] = "2055-2-01";
+        write_strings(vhandle, "data", modified, /* variable = */ false, /* chunk_size = */ 2);
+    }
+    expect_hdf5_error(path, "foo", "dates should follow");
+
+    // Now in the last chunk.
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "foo", "date");
+        auto modified = data;
+        modified.back() = "NA";
+        write_strings(vhandle, "data", modified, /* variable = */ false, /* chunk_size = */ 2);
+    }
+    expect_hdf5_error(path, "foo", "dates should follow");
+}
+
+TEST(Hdf5Date, MissingPlaceholder) {
+    auto path = "TEST-date.h5";
+    std::vector<std::string> data{ "2077-12-12", "NA", "NA" };
+
+    // Check that the interaction between format checks and the missing placeholder is correct.
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "date");
-        auto dhandle = create_dataset(vhandle, "data", { "2077-12-12", "NA", "NA" });
-
+        auto dhandle = write_strings(vhandle, "data", data);
         H5::StrType stype(0, H5T_VARIABLE);
         auto ahandle = dhandle.createAttribute("missing-value-placeholder", stype, H5S_SCALAR);
-        std::string target = "NA";
-        ahandle.write(stype, target);
+        ahandle.write(stype, std::string("NA"));
     }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(sptr->size(), 3);
-        EXPECT_EQ(sptr->base.values[2], "ich bin missing"); // i.e., the test's missing value placeholder.
-        EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
-    }
-}
 
-TEST(Hdf5DateTest, CheckError) {
-    auto path = "TEST-date.h5";
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "2055-23-01", "2022-05-06" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "2055-2-01", "2022-05-06" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "2055-12-1", "2022-05-06" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "22-12-12", "2022-05-06" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "2022-12-35", "2022-05-06" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "2022-12-55", "2022-05-06" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "2077-12-12", "asda-sd-as", "2022-05-06" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        create_dataset(vhandle, "data", { "harry", "ron", "hermoine" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    // Tests for the most recent version.
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "string");
-        add_version(vhandle, "1.1");
-        write_string(vhandle, "format", "date");
-        create_dataset(vhandle, "data", { "harry", "ron", "hermoine" });
-    }
-    expect_hdf5_error(path, "foo", "dates should follow");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "string");
-        add_version(vhandle, "1.1");
-        write_string(vhandle, "format", "foobar");
-        create_dataset(vhandle, "data", { "harry", "ron", "hermoine" });
-    }
-    expect_hdf5_error(path, "foo", "unsupported format");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "string");
-        add_version(vhandle, "1.1");
-        vhandle.createDataSet("format", H5::PredType::NATIVE_INT, H5S_SCALAR);
-        create_dataset(vhandle, "data", { "harry", "ron", "hermoine" });
-    }
-    expect_hdf5_error(path, "foo", "can be represented by a UTF-8 encoded string");
-
-    {
-        H5::H5File handle(path, H5F_ACC_TRUNC);
-        auto vhandle = vector_opener(handle, "foo", "date");
-        add_version(vhandle, "1.1");
-        create_dataset(vhandle, "data", { "2077-12-12" });
-    }
-    expect_hdf5_error(path, "foo", "unknown vector type");
-
-    /***********************************************
-     *** See integer.cpp for vector error tests. ***
-     ***********************************************/
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::STRING);
+    auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
+    auto expected = data;
+    expected[1] = "ich bin missing"; // i.e., the test's missing value placeholder.
+    expected[2] = "ich bin missing";
+    EXPECT_EQ(sptr->base.values, expected);
+    EXPECT_EQ(sptr->format, uzuki2::StringVector::DATE);
 }
 
 TEST(JsonDateTest, SimpleLoading) {

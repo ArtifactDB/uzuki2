@@ -14,13 +14,10 @@ void set_missing_internal(std::vector<T>& values, size_t i) {
     if constexpr(std::is_same<T, double>::value) {
         values[i] = -123456789;
     }
-    if constexpr(std::is_same<T, size_t>::value) {
-        values[i] = -1;
+    if constexpr(std::is_same<T, std::uint8_t>::value) {
+        values[i] = 255;
     }
-    if constexpr(std::is_same<T, unsigned char>::value) {
-        values[i] = -1;
-    }
-    if constexpr(std::is_same<T, int32_t>::value) {
+    if constexpr(std::is_same<T, std::int32_t>::value) {
         values[i] = -123456789;
     }
     if constexpr(std::is_same<T, std::string>::value) {
@@ -63,7 +60,7 @@ struct DefaultIntegerVector : public uzuki2::IntegerVector {
         return base.size();
     }
 
-    void set(size_t i, int32_t val) {
+    void set(size_t i, std::int32_t val) {
         base.set(i, val);
     }
 
@@ -75,7 +72,7 @@ struct DefaultIntegerVector : public uzuki2::IntegerVector {
         base.set_name(i, std::move(name));
     }
 
-    DefaultVectorBase<int32_t> base;
+    DefaultVectorBase<std::int32_t> base;
 };
 
 struct DefaultNumberVector : public uzuki2::NumberVector {
@@ -119,7 +116,7 @@ struct DefaultBooleanVector : public uzuki2::BooleanVector {
         base.set_name(i, std::move(name));
     }
 
-    DefaultVectorBase<uint8_t> base;
+    DefaultVectorBase<std::uint8_t> base;
 };
 
 struct DefaultStringVector : public uzuki2::StringVector {
@@ -168,7 +165,7 @@ struct DefaultFactor : public uzuki2::Factor {
         levels[i] = std::move(l);
     }
 
-    DefaultVectorBase<size_t> vbase;
+    DefaultVectorBase<std::int32_t> vbase;
     std::vector<std::string> levels;
     bool ordered;
 };

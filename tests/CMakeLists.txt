@@ -24,10 +24,13 @@ add_executable(
     src/number.cpp
     src/string.cpp
     src/vls.cpp
+    src/names.cpp
     src/date.cpp
     src/datetime.cpp
+    src/format.cpp
     src/external.cpp
-    src/misc.cpp
+    src/json.cpp
+    src/hdf5.cpp
 )
 
 target_link_libraries(

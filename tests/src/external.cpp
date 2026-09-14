@@ -6,7 +6,7 @@
 #include "test_subclass.h"
 #include "utils.h"
 
-TEST(Hdf5ExternalTest, SimpleLoading) {
+TEST(Hdf5External, Single) {
     auto path = "TEST-external.h5";
     uzuki2::hdf5::Options opt;
     opt.strict_list = false;
@@ -15,39 +15,42 @@ TEST(Hdf5ExternalTest, SimpleLoading) {
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
-        write_scalar(ghandle, "index", 0, H5::PredType::NATIVE_INT);
-    }
-    {
-        DefaultExternals ext(1);
-        auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext, opt);
-        EXPECT_EQ(parsed->type(), uzuki2::EXTERNAL);
-
-        auto stuff = static_cast<const DefaultExternal*>(parsed.get());
-        EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff->ptr), 1);
+        write_number(ghandle, "index", 0, H5::PredType::NATIVE_INT32);
     }
 
-    // Multiple entries.
+    DefaultExternals ext(1);
+    auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext, opt);
+    EXPECT_EQ(parsed->type(), uzuki2::EXTERNAL);
+
+    auto stuff = static_cast<const DefaultExternal*>(parsed.get());
+    EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff->ptr), 1);
+}
+
+TEST(Hdf5External, Multiple) {
+    auto path = "TEST-external.h5";
+    uzuki2::hdf5::Options opt;
+    opt.strict_list = false;
+
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
         auto ohandle1 = external_opener(dhandle, "0");
-        write_scalar(ohandle1, "index", 1, H5::PredType::NATIVE_INT);
+        write_number(ohandle1, "index", 1, H5::PredType::NATIVE_INT32);
         auto ohandle2 = external_opener(dhandle, "1");
-        write_scalar(ohandle2, "index", 0, H5::PredType::NATIVE_INT);
+        write_number(ohandle2, "index", 0, H5::PredType::NATIVE_INT32);
     }
-    {
-        DefaultExternals ext(2);
-        auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext, opt);
-        EXPECT_EQ(parsed->type(), uzuki2::LIST);
-        auto list = static_cast<const DefaultList*>(parsed.get());
 
-        auto stuff = static_cast<const DefaultExternal*>(list->values[0].get());
-        EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff->ptr), 2);
+    DefaultExternals ext(2);
+    auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, "foo", ext, opt);
+    EXPECT_EQ(parsed->type(), uzuki2::LIST);
+    auto list = static_cast<const DefaultList*>(parsed.get());
 
-        auto stuff2 = static_cast<const DefaultExternal*>(list->values[1].get());
-        EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff2->ptr), 1);
-    }
+    auto stuff = static_cast<const DefaultExternal*>(list->values[0].get());
+    EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff->ptr), 2);
+
+    auto stuff2 = static_cast<const DefaultExternal*>(list->values[1].get());
+    EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff2->ptr), 1);
 }
 
 void expect_hdf5_external_error(std::string path, std::string name, std::string msg, int num_expected) {
@@ -64,34 +67,34 @@ void expect_hdf5_external_error(std::string path, std::string name, std::string 
     });
 }
 
-TEST(Hdf5ExternalTest, CheckErrors) {
+TEST(Hdf5External, CheckErrors) {
     auto path = "TEST-external.h5";
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
-        create_dataset<int>(ghandle, "index", { 0, 1 }, H5::PredType::NATIVE_INT);
+        write_numbers<std::int32_t>(ghandle, "index", { 0, 1 }, H5::PredType::NATIVE_INT32);
     }
     expect_hdf5_external_error(path, "foo", "expected scalar", 1);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
-        write_scalar(ghandle, "index", 0, H5::PredType::NATIVE_DOUBLE);
+        write_number(ghandle, "index", 0, H5::PredType::NATIVE_DOUBLE);
     }
     expect_hdf5_external_error(path, "foo", "external index at 'index' cannot be represented", 1);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
-        write_scalar(ghandle, "index", 1, H5::PredType::NATIVE_INT);
+        write_number(ghandle, "index", 1, H5::PredType::NATIVE_INT32);
     }
     expect_hdf5_external_error(path, "foo", "out of range", 1);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto ghandle = external_opener(handle, "foo");
-        write_scalar(ghandle, "index", 0, H5::PredType::NATIVE_INT);
+        write_number(ghandle, "index", 0, H5::PredType::NATIVE_INT32);
     }
     expect_hdf5_external_error(path, "foo", "fewer instances", 2);
 
@@ -100,9 +103,9 @@ TEST(Hdf5ExternalTest, CheckErrors) {
         auto ghandle = list_opener(handle, "foo");
         auto dhandle = ghandle.createGroup("data");
         auto ohandle1 = external_opener(dhandle, "0");
-        write_scalar(ohandle1, "index", 0, H5::PredType::NATIVE_INT);
+        write_number(ohandle1, "index", 0, H5::PredType::NATIVE_INT32);
         auto ohandle2 = external_opener(dhandle, "1");
-        write_scalar(ohandle2, "index", 0, H5::PredType::NATIVE_INT);
+        write_number(ohandle2, "index", 0, H5::PredType::NATIVE_INT32);
     }
     expect_hdf5_external_error(path, "foo", "consecutive", 2);
 }
