@@ -36,7 +36,27 @@ TEST(Hdf5Error, UnknownType) {
     expect_hdf5_error(path, "whee", "unknown vector type");
 }
 
-TEST(Hdf5Error, WrongShape) {
+TEST(Hdf5Error, BadAttribute) {
+    auto path = "TEST-other.h5";
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = handle.createGroup("whee");
+        ghandle.createAttribute("uzuki_object", H5::PredType::NATIVE_INT, H5S_SCALAR);
+    }
+    expect_hdf5_error(path, "whee", "UTF-8 string");
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = handle.createGroup("whee");
+        constexpr hsize_t one = 1;
+        H5::DataSpace aspace(1, &one);
+        ghandle.createAttribute("uzuki_object", H5::StrType(0, 10), aspace);
+    }
+    expect_hdf5_error(path, "whee", "scalar");
+}
+
+TEST(Hdf5Error, WrongVectorShape) {
     auto path = "TEST-other.h5";
 
     {
