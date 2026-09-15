@@ -48,6 +48,7 @@ TEST(JsonExternal, CheckErrors) {
     expect_json_external_error("{\"type\":\"external\"}", "expected 'index'", 1);
     expect_json_external_error("{\"type\":\"external\", \"index\":false}", "expected a number", 1);
     expect_json_external_error("{\"type\":\"external\", \"index\":1.2}", "expected an integer", 1);
-    expect_json_external_error("{\"type\":\"external\", \"index\":-1}", "out of range", 1);
+    expect_json_external_error("{\"type\":\"external\", \"index\":-1}", "non-negative", 1);
+    expect_json_external_error("{\"type\":\"external\", \"index\":2}", "out of range", 1);
     expect_json_external_error("{ \"type\": \"list\", \"values\": [ { \"type\": \"external\", \"index\": 0 }, { \"type\": \"external\", \"index\": 0 } ] }", "consecutive", 2);
 }

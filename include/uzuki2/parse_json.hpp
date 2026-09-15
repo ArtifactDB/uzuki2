@@ -10,15 +10,18 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <type_traits>
+#include <cstddef>
 
 #include "byteme/byteme.hpp"
 #include "millijson/millijson.hpp"
 #include "ritsuko/ritsuko.hpp"
+#include "sanisizer/sanisizer.hpp"
 
 #include "interfaces.hpp"
 #include "Dummy.hpp"
 #include "ExternalTracker.hpp"
 #include "ParsedList.hpp"
+#include "utils.hpp"
 
 /**
  * @file parse_json.hpp
@@ -78,7 +81,8 @@ void fill_names(const millijson::Array* names_ptr, Destination_* dest, const std
         throw std::runtime_error("length of 'names' and 'values' should be the same in '" + path + "'"); 
     }
 
-    for (size_t i = 0; i < names.size(); ++i) {
+    const auto nnames = names.size();
+    for (I<decltype(nnames)> i = 0; i < nnames; ++i) {
         if (names[i]->type() != millijson::STRING) {
             throw std::runtime_error("expected a string at '" + path + ".names[" + std::to_string(i) + "]'");
         }
@@ -118,7 +122,8 @@ auto process_array_or_scalar_values(
 
 template<class Destination_, class Function_>
 void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination_* dest, Function_ check, const std::string& path, const Version& version) {
-    for (size_t i = 0; i < values.size(); ++i) {
+    const auto n = values.size();
+    for (I<decltype(n)> i = 0; i < n; ++i) {
         if (values[i]->type() == millijson::NOTHING) {
             dest->set_missing(i);
             continue;
@@ -133,14 +138,15 @@ void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& valu
             throw std::runtime_error("expected an integer at '" + path + ".values[" + std::to_string(i) + "]'");
         }
 
-        constexpr double upper = std::numeric_limits<int32_t>::max();
-        constexpr double lower = std::numeric_limits<int32_t>::min();
+        // 32-bit integers are always representable by doubles, as the latter have 53 bits of precision.
+        constexpr double upper = std::numeric_limits<std::int32_t>::max();
+        constexpr double lower = std::numeric_limits<std::int32_t>::min();
         if (val < lower || val > upper) {
             throw std::runtime_error("value at '" + path + ".values[" + std::to_string(i) + "]' cannot be represented by a 32-bit signed integer");
         }
 
-        int32_t ival = val;
-        if (version.equals(1, 0) && val == -2147483648) {
+        const std::int32_t ival = val;
+        if (version.equals(1, 0) && ival == -2147483648) {
             dest->set_missing(i);
             continue;
         }
@@ -152,7 +158,8 @@ void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& valu
 
 template<class Destination_, class Function_>
 void extract_strings(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination_* dest, Function_ check, const std::string& path) {
-    for (size_t i = 0; i < values.size(); ++i) {
+    const auto n = values.size();
+    for (I<decltype(n)> i = 0; i < n; ++i) {
         if (values[i]->type() == millijson::NOTHING) {
             dest->set_missing(i);
             continue;
@@ -198,20 +205,25 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
         if (index_ptr->type() != millijson::NUMBER) {
             throw std::runtime_error("expected a number at '" + path + ".index'");
         }
-        auto index = static_cast<const millijson::Number*>(index_ptr.get())->value();
 
-        if (index != std::floor(index)) {
+        const auto raw_index = static_cast<const millijson::Number*>(index_ptr.get())->value();
+        if (raw_index != std::floor(raw_index)) {
             throw std::runtime_error("expected an integer at '" + path + ".index'");
-        } else if (index < 0 || index >= static_cast<double>(ext.size())) {
+        } else if (raw_index < 0) {
+            throw std::runtime_error("expected a non-negative integer at '" + path + ".index'");
+        }
+
+        const auto index = sanisizer::from_float<std::size_t>(raw_index);
+        if (index >= ext.size()) {
             throw std::runtime_error("external index out of range at '" + path + ".index'");
         }
         output.reset(Provisioner_::new_External(ext.get(index)));
 
     } else if (type == "integer") {
         process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_Integer(vals.size(), named, scalar);
+            auto ptr = Provisioner_::new_Integer(sanisizer::cast<std::size_t>(vals.size()), named, scalar);
             output.reset(ptr);
-            extract_integers(vals, ptr, [](int32_t) -> void {}, path, version);
+            extract_integers(vals, ptr, [](std::int32_t) -> void {}, path, version);
             return ptr;
         });
 
@@ -231,12 +243,14 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
 
         const std::string levels_name = "levels"; // avoid dangling reference from casting of string literal.
         const auto& lvals = extract_array(map, levels_name, path);
-        int32_t nlevels = lvals.size();
+        const auto nlevels = lvals.size();
         auto fptr = process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_Factor(vals.size(), named, scalar, nlevels, ordered);
+            auto ptr = Provisioner_::new_Factor(sanisizer::cast<std::size_t>(vals.size()), named, scalar, sanisizer::cast<std::size_t>(nlevels), ordered);
             output.reset(ptr);
-            extract_integers(vals, ptr, [&](int32_t x) -> void {
-                if (x < 0 || x >= nlevels) {
+            extract_integers(vals, ptr, [&](std::int32_t x) -> void {
+                if (x < 0) {
+                    throw std::runtime_error("factor indices should be non-negative in '" + path + "'");
+                } else if (sanisizer::is_greater_than_or_equal(x, nlevels)) {
                     throw std::runtime_error("factor indices of out of range of levels in '" + path + "'");
                 }
             }, path, version);
@@ -244,7 +258,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
         });
 
         std::unordered_set<std::string> existing;
-        for (size_t l = 0; l < lvals.size(); ++l) {
+        for (I<decltype(nlevels)> l = 0; l < nlevels; ++l) {
             if (lvals[l]->type() != millijson::STRING) {
                 throw std::runtime_error("expected strings at '" + path + ".levels[" + std::to_string(l) + "]'");
             }
@@ -259,10 +273,11 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
 
     } else if (type == "boolean") {
         process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_Boolean(vals.size(), named, scalar);
+            const auto n = vals.size();
+            auto ptr = Provisioner_::new_Boolean(sanisizer::cast<std::size_t>(n), named, scalar);
             output.reset(ptr);
 
-            for (size_t i = 0; i < vals.size(); ++i) {
+            for (I<decltype(n)> i = 0; i < n; ++i) {
                 if (vals[i]->type() == millijson::NOTHING) {
                     ptr->set_missing(i);
                     continue;
@@ -279,10 +294,11 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
 
     } else if (type == "number") {
         process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_Number(vals.size(), named, scalar);
+            const auto n = vals.size();
+            auto ptr = Provisioner_::new_Number(sanisizer::cast<std::size_t>(n), named, scalar);
             output.reset(ptr);
 
-            for (size_t i = 0; i < vals.size(); ++i) {
+            for (I<decltype(n)> i = 0; i < n; ++i) {
                 if (vals[i]->type() == millijson::NOTHING) {
                     ptr->set_missing(i);
                     continue;
@@ -335,7 +351,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
         }
 
         process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_String(vals.size(), named, scalar, format);
+            auto ptr = Provisioner_::new_String(sanisizer::cast<std::size_t>(vals.size()), named, scalar, format);
             output.reset(ptr);
 
             if (format == StringVector::NONE) {
@@ -359,14 +375,16 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
 
     } else if (type == "list") {
         auto names_ptr = has_names(map, path);
-        bool has_names = names_ptr != NULL;
+        const bool has_names = names_ptr != NULL;
 
         const std::string values_name = "values"; // avoid dangling reference from casting of string literal.
         const auto& vals = extract_array(map, values_name, path);
-        auto ptr = Provisioner_::new_List(vals.size(), has_names);
+
+        const auto n = vals.size();
+        auto ptr = Provisioner_::new_List(sanisizer::cast<std::size_t>(n), has_names);
         output.reset(ptr);
 
-        for (size_t i = 0; i < vals.size(); ++i) {
+        for (I<decltype(n)> i = 0; i < n; ++i) {
             ptr->set(i, parse_object<Provisioner_>(vals[i].get(), ext, path + ".values[" + std::to_string(i) + "]", version));
         }
 
@@ -403,7 +421,7 @@ struct Options {
      * Size of the buffer to use for reading and decompressing bytes.
      * Larger values may improve speed at the cost of memory usage.
      */
-    size_t buffer_size = 65536;
+    std::size_t buffer_size = 65536;
 };
 
 /**
@@ -505,7 +523,7 @@ ParsedList parse_file(const std::string& file, Externals_ ext, const Options& op
  * Any invalid representations in `reader` will cause an error to be thrown.
  */
 template<class Provisioner_, class Externals_>
-ParsedList parse_buffer(const unsigned char* buffer, size_t len, Externals_ ext, const Options& options) {
+ParsedList parse_buffer(const unsigned char* buffer, std::size_t len, Externals_ ext, const Options& options) {
     std::unique_ptr<byteme::Reader> ptr;
     if (byteme::is_zlib_or_gzip(buffer, len)) {
         ptr.reset(new byteme::ZlibBufferReader(buffer, len, {}));
@@ -548,7 +566,7 @@ inline void validate_file(const std::string& file, int num_external, const Optio
  * @param num_external Expected number of external references. 
  * @param options Options for parsing.
  */
-inline void validate_buffer(const unsigned char* buffer, size_t len, int num_external, const Options& options) {
+inline void validate_buffer(const unsigned char* buffer, std::size_t len, int num_external, const Options& options) {
     parse_buffer<DummyProvisioner>(buffer, len, DummyExternals(num_external), options);
 }
 

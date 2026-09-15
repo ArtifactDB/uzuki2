@@ -12,13 +12,14 @@
 
 #include "H5Cpp.h"
 
+#include "ritsuko/ritsuko.hpp"
+#include "sanisizer/sanisizer.hpp"
+
 #include "interfaces.hpp"
 #include "Dummy.hpp"
 #include "ExternalTracker.hpp"
 #include "Version.hpp"
 #include "ParsedList.hpp"
-
-#include "ritsuko/ritsuko.hpp"
 
 /**
  * @file parse_hdf5.hpp
@@ -71,7 +72,7 @@ void parse_integer_like(const H5::DataSet& handle, Host_* ptr, bool is_scalar, F
     }
 
     bool has_missing = false;
-    int32_t missing_value = -2147483648;
+    std::int32_t missing_value = -2147483648;
     if (version.equals(1, 0)) {
         has_missing = true;
     } else {
@@ -84,7 +85,7 @@ void parse_integer_like(const H5::DataSet& handle, Host_* ptr, bool is_scalar, F
         }
     }
 
-    auto set = [&](hsize_t i, int32_t x) -> void {
+    auto set = [&](hsize_t i, std::int32_t x) -> void {
         if (has_missing && x == missing_value) {
             ptr->set_missing(i);
         } else {
@@ -94,19 +95,19 @@ void parse_integer_like(const H5::DataSet& handle, Host_* ptr, bool is_scalar, F
     };
 
     if (is_scalar) {
-        int32_t value;
+        std::int32_t value;
         handle.read(&value, H5::PredType::NATIVE_INT32);
         set(0, value);
     } else {
-        hsize_t full_length = ptr->size();
-        ritsuko::hdf5::Stream1dNumericDataset<int32_t> stream(&handle, full_length);
-        std::vector<int32_t> buffer(stream.chunk_size());
+        const hsize_t full_length = ptr->size(); // cast is safe, as ptr would have been initially allocated iwith an hsize_t length.
+        ritsuko::hdf5::Stream1dNumericDataset<std::int32_t> stream(&handle, full_length);
+        auto buffer = sanisizer::create<std::vector<std::int32_t> >(stream.chunk_size());
         while (true) {
             const auto available = stream.load(buffer.data());
             if (available == 0) {
                 break;
             }
-            for (hsize_t i = 0; i < available; ++i) {
+            for (I<decltype(available)> i = 0; i < available; ++i) {
                 set(i + stream.start(), buffer[i]);
             }
         }
@@ -143,15 +144,15 @@ void parse_string_like(const H5::DataSet& handle, Host_* ptr, bool is_scalar, Fu
         auto x = ritsuko::hdf5::read_scalar_string(handle);
         set(0, std::move(x));
     } else {
-        hsize_t full_length = ptr->size();
+        const hsize_t full_length = ptr->size(); // cast is safe, as ptr would have been initially allocated iwith an hsize_t length.
         ritsuko::hdf5::Stream1dStringDataset stream(&handle, full_length);
-        std::vector<std::string> buffer(stream.chunk_size());
+        auto buffer = sanisizer::create<std::vector<std::string> >(stream.chunk_size());
         while (true) {
             const auto available = stream.load(buffer.data());
             if (available == 0) {
                 break;
             }
-            for (hsize_t i = 0; i < available; ++i) {
+            for (I<decltype(available)> i = 0; i < available; ++i) {
                 set(i + stream.start(), std::move(buffer[i]));
             }
         }
@@ -162,7 +163,7 @@ void parse_string_like(const H5::DataSet& handle, Host_* ptr, bool is_scalar, Fu
 }
 
 inline double r_missing_value() {
-    uint32_t tmp_value = 1;
+    std::uint32_t tmp_value = 1;
     auto tmp_ptr = reinterpret_cast<unsigned char*>(&tmp_value);
 
     // Mimic R's generation of these values, but we can't use type punning as
@@ -246,7 +247,7 @@ void parse_numbers(const H5::DataSet& handle, Host_* ptr, bool is_scalar, Functi
         handle.read(&val, H5::PredType::NATIVE_DOUBLE);
         set(0, val);
     } else {
-        hsize_t full_length = ptr->size();
+        const hsize_t full_length = ptr->size(); // cast is safe, as ptr would have been initially allocated iwith an hsize_t length.
         ritsuko::hdf5::Stream1dNumericDataset<double> stream(&handle, full_length);
         std::vector<double> buffer(stream.chunk_size());
         while (true) {
@@ -254,7 +255,7 @@ void parse_numbers(const H5::DataSet& handle, Host_* ptr, bool is_scalar, Functi
             if (available == 0) {
                 break;
             }
-            for (hsize_t i = 0; i < available; ++i) {
+            for (I<decltype(available)> i = 0; i < available; ++i) {
                 set(i + stream.start(), buffer[i]);
             }
         }
@@ -271,14 +272,13 @@ void extract_names(const H5::Group& handle, Host_* ptr) try {
         throw std::runtime_error("expected 'names' to use a datatype that can be represented by a UTF-8 string");
     }
 
-    size_t len = ptr->size();
     const auto space = nhandle.getSpace();
     if (space.getSimpleExtentNdims() != 1) {
         throw std::runtime_error("expected 'names' to be a 1-dimensional dataset");
     }
     hsize_t nlen;
     space.getSimpleExtentDims(&nlen);
-    if (nlen != len) {
+    if (!sanisizer::is_equal(nlen, ptr->size())) {
         throw std::runtime_error("number of names should be equal to the object length");
     }
 
@@ -289,7 +289,7 @@ void extract_names(const H5::Group& handle, Host_* ptr) try {
         if (available == 0) {
             break;
         }
-        for (hsize_t i = 0; i < available; ++i) {
+        for (I<decltype(available)> i = 0; i < available; ++i) {
             ptr->set_name(i + stream.start(), std::move(buffer[i]));
         }
     }
@@ -316,19 +316,19 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
 
     if (object_type == "list") {
         auto dhandle = handle.openGroup("data");
-        size_t len = dhandle.getNumObjs();
+        const auto len = dhandle.getNumObjs();
 
         bool named = handle.exists("names");
-        auto lptr = Provisioner_::new_List(len, named);
+        auto lptr = Provisioner_::new_List(sanisizer::cast<std::size_t>(len), named);
         output.reset(lptr);
 
-        for (size_t i = 0; i < len; ++i) {
+        for (I<decltype(len)> i = 0; i < len; ++i) {
+            const auto istr = std::to_string(i);
             try {
-                auto istr = std::to_string(i);
                 auto lhandle = dhandle.openGroup(istr);
                 lptr->set(i, parse_inner<Provisioner_>(lhandle, ext, version));
             } catch (std::exception& e) {
-                throw std::runtime_error("failed to parse list element " + std::to_string(i) + "; " + std::string(e.what()));
+                throw std::runtime_error("failed to parse list element " + istr + "; " + std::string(e.what()));
             }
         }
 
@@ -354,24 +354,24 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
         const bool named = handle.exists("names");
         auto vector_type = read_uzuki_attr(handle, "uzuki_type");
         if (vector_type == "integer") {
-            auto iptr = Provisioner_::new_Integer(len, named, is_scalar);
+            auto iptr = Provisioner_::new_Integer(sanisizer::cast<std::size_t>(len), named, is_scalar);
             output.reset(iptr);
             parse_integer_like(
                 dhandle,
                 iptr,
                 is_scalar,
-                [](int32_t) -> void {},
+                [](std::int32_t) -> void {},
                 version
             );
 
         } else if (vector_type == "boolean") {
-            auto bptr = Provisioner_::new_Boolean(len, named, is_scalar);
+            auto bptr = Provisioner_::new_Boolean(sanisizer::cast<std::size_t>(len), named, is_scalar);
             output.reset(bptr);
             parse_integer_like(
                 dhandle,
                 bptr,
                 is_scalar,
-                [&](int32_t x) -> void { 
+                [&](std::int32_t x) -> void { 
                     if (x != 0 && x != 1) {
                         throw std::runtime_error("boolean values should be 0 or 1");
                     }
@@ -385,13 +385,12 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 throw std::runtime_error("expected a datatype that can be represented by a UTF-8 string for 'levels'");
             }
 
-            hsize_t raw_levlen;
+            hsize_t levlen;
             auto lspace = levhandle.getSpace();
             if (lspace.getSimpleExtentNdims() != 1) {
                 throw std::runtime_error("expected a 1-dimensional dataset for 'levels'");
             }
-            lspace.getSimpleExtentDims(&raw_levlen);
-            int32_t levlen = raw_levlen; // needs sanisizer.
+            lspace.getSimpleExtentDims(&levlen);
 
             bool ordered = false;
             if (vector_type == "ordered") {
@@ -404,20 +403,22 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 if (ritsuko::hdf5::exceeds_integer_limit(ohandle, 32, true)) {
                     throw std::runtime_error("'ordered' value cannot be represented by a 32-bit integer");
                 }
-                int32_t tmp_ordered = 0;
+                std::int32_t tmp_ordered = 0;
                 ohandle.read(&tmp_ordered, H5::PredType::NATIVE_INT32);
                 ordered = tmp_ordered > 0;
             }
 
-            auto fptr = Provisioner_::new_Factor(len, named, is_scalar, levlen, ordered);
+            auto fptr = Provisioner_::new_Factor(sanisizer::cast<std::size_t>(len), named, is_scalar, sanisizer::cast<std::size_t>(levlen), ordered);
             output.reset(fptr);
             parse_integer_like(
                 dhandle,
                 fptr,
                 is_scalar,
-                [&](int32_t x) -> void { 
-                    if (x < 0 || x >= levlen) {
-                        throw std::runtime_error("factor codes should be non-negative and less than the number of levels");
+                [&](std::int32_t x) -> void { 
+                    if (x < 0) {
+                        throw std::runtime_error("factor codes should be non-negative");
+                    } else if (sanisizer::is_greater_than_or_equal(x, levlen)) {
+                        throw std::runtime_error("factor codes should be less than the number of levels");
                     }
                 },
                 version
@@ -431,7 +432,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 if (available == 0) {
                     break;
                 }
-                for (hsize_t i = 0; i < available; ++i) {
+                for (I<decltype(available)> i = 0; i < available; ++i) {
                     auto& x = buffer[i];
                     if (present.find(x) != present.end()) {
                         throw std::runtime_error("levels should be unique");
@@ -442,7 +443,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             }
 
         } else if (vector_type == "vls" && !version.lt(1, 4)) {
-            constexpr auto precision = std::numeric_limits<uint64_t>::digits;
+            constexpr auto precision = std::numeric_limits<std::uint64_t>::digits;
             ritsuko::cvls::validate_pointer_datatype(dhandle, precision, precision);
             auto hhandle = handle.openDataSet("heap");
             ritsuko::cvls::validate_heap(hhandle);
@@ -455,7 +456,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 missingness = ritsuko::hdf5::read_scalar_string(attr);
             }
 
-            auto ptr = Provisioner_::new_String(len, named, is_scalar, StringVector::NONE);
+            auto ptr = Provisioner_::new_String(sanisizer::cast<std::size_t>(len), named, is_scalar, StringVector::NONE);
             output.reset(ptr);
 
             auto set = [&](hsize_t i, std::string x) -> void { 
@@ -467,8 +468,8 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             };
 
             if (is_scalar) {
-                ritsuko::cvls::Pointer<uint64_t, uint64_t> vlsptr;
-                dhandle.read(&vlsptr, ritsuko::cvls::define_pointer_datatype<uint64_t, uint64_t>());
+                ritsuko::cvls::Pointer<std::uint64_t, std::uint64_t> vlsptr;
+                dhandle.read(&vlsptr, ritsuko::cvls::define_pointer_datatype<std::uint64_t, std::uint64_t>());
 
                 hsize_t hlen;
                 hhandle.getSpace().getSimpleExtentDims(&hlen);
@@ -482,20 +483,20 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 dspace.selectHyperslab(H5S_SELECT_SET, &len, &offset);
                 H5::DataSpace mspace(1, &len);
 
-                std::vector<uint8_t> buffer(vlsptr.length);
+                std::vector<std::uint8_t> buffer(vlsptr.length);
                 hhandle.read(buffer.data(), H5::PredType::NATIVE_UINT8, mspace, dspace);
                 auto cptr = reinterpret_cast<const char*>(buffer.data());
                 set(0, std::string(cptr, cptr + ritsuko::hdf5::strnlen(cptr, vlsptr.length)));
 
             } else {
-                ritsuko::cvls::Stream1dArray<uint64_t, uint64_t> stream(&dhandle, len, &hhandle);
+                ritsuko::cvls::Stream1dArray<std::uint64_t, std::uint64_t> stream(&dhandle, len, &hhandle);
                 std::vector<std::string> buffer(stream.chunk_size());
                 while (1) {
                     const auto available = stream.load(buffer.data());
                     if (available == 0) {
                         break;
                     }
-                    for (hsize_t i = 0; i < available; ++i) {
+                    for (I<decltype(available)> i = 0; i < available; ++i) {
                         set(i + stream.start(), std::move(buffer[i]));
                     }
                 }
@@ -528,7 +529,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 }
             }
 
-            auto sptr = Provisioner_::new_String(len, named, is_scalar, format);
+            auto sptr = Provisioner_::new_String(sanisizer::cast<std::size_t>(len), named, is_scalar, format);
             output.reset(sptr);
             if (format == StringVector::NONE) {
                 parse_string_like(
@@ -564,7 +565,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             }
 
         } else if (vector_type == "number") {
-            auto dptr = Provisioner_::new_Number(len, named, is_scalar);
+            auto dptr = Provisioner_::new_Number(sanisizer::cast<std::size_t>(len), named, is_scalar);
             output.reset(dptr);
             parse_numbers(
                 dhandle,
@@ -596,10 +597,12 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             throw std::runtime_error("expected scalar dataset at 'index'");
         } 
 
-        int32_t idx;
+        std::int32_t idx;
         ihandle.read(&idx, H5::PredType::NATIVE_INT32);
-        if (idx < 0 || static_cast<size_t>(idx) >= ext.size()) {
-            throw std::runtime_error("external index out of range at 'index'");
+        if (idx < 0) {
+            throw std::runtime_error("external index at 'index' should be non-negative");
+        } else if (static_cast<std::size_t>(idx) >= ext.size()) {
+            throw std::runtime_error("external index at 'index' is out of range");
         }
 
         output.reset(Provisioner_::new_External(ext.get(idx)));
@@ -654,21 +657,21 @@ struct Options {
  * - `Nothing* new_Nothing()`, which returns a new instance of a `Nothing` subclass.
  * - `Other* new_Other(void* p)`, which returns a new instance of a `Other` subclass.
  *   `p` is a pointer to an "external" object, generated by calling `ext.get()` (see below).
- * - `List* new_List(size_t l, bool n)`, which returns a new instance of a `List` with length `l`.
+ * - `List* new_List(std::size_t l, bool n)`, which returns a new instance of a `List` with length `l`.
  *   If `n = true`, names are present and will be added via `List::set_name()`.
- * - `IntegerVector* new_Integer(size_t l, bool n, bool s)`, which returns a new instance of an `IntegerVector` subclass of length `l`.
+ * - `IntegerVector* new_Integer(std::size_t l, bool n, bool s)`, which returns a new instance of an `IntegerVector` subclass of length `l`.
  *   If `n = true`, names are present and will be added via `Vector::set_name()`.
  *   If `s = true` and `l = 1`, the value was represented on file as a scalar integer.
- * - `NumberVector* new_Number(size_t l, bool n, bool s)`, which returns a new instance of a `NumberVector` subclass of length `l`.
+ * - `NumberVector* new_Number(std::size_t l, bool n, bool s)`, which returns a new instance of a `NumberVector` subclass of length `l`.
  *   If `n = true`, names are present and will be added via `Vector::set_name()`.
  *   If `s = true` and `l = 1`, the value was represented on file as a scalar float.
- * - `StringVector* new_String(size_t l, bool n, bool s, StringVector::Format f)`, which returns a new instance of a `StringVector` subclass of length `l` with format `f`.
+ * - `StringVector* new_String(std::size_t l, bool n, bool s, StringVector::Format f)`, which returns a new instance of a `StringVector` subclass of length `l` with format `f`.
  *   If `n = true`, names are present and will be added via `Vector::set_name()`.
  *   If `s = true` and `l = 1`, the value was represented on file as a scalar string.
- * - `BooleanVector* new_Boolean(size_t l, bool n, bool s)`, which returns a new instance of a `BooleanVector` subclass of length `l`.
+ * - `BooleanVector* new_Boolean(std::size_t l, bool n, bool s)`, which returns a new instance of a `BooleanVector` subclass of length `l`.
  *   If `n = true`, names are present and will be added via `Vector::set_name()`.
  *   If `s = true` and `l = 1`, the value was represented on file as a scalar boolean.
- * - `Factor* new_Factor(size_t l, bool n, bool s, size_t ll, bool o)`, which returns a new instance of a `Factor` subclass of length `l` and with `ll` unique levels.
+ * - `Factor* new_Factor(std::size_t l, bool n, bool s, std::size_t ll, bool o)`, which returns a new instance of a `Factor` subclass of length `l` and with `ll` unique levels.
  *   If `n = true`, names are present and will be added via `Vector::set_name()`.
  *   If `s = true` and `l = 1`, the lone index was represented on file as a scalar integer.
  *   If `o = true`, the levels should be assumed to be sorted.
@@ -676,9 +679,9 @@ struct Options {
  * @section external-contract Externals requirements
  * The `Externals_` class is expected to provide the following `const` methods:
  *
- * - `void* get(size_t i) const`, which returns a pointer to an "external" object, given the index of that object.
+ * - `void* get(std::size_t i) const`, which returns a pointer to an "external" object, given the index of that object.
  *   This will be stored in the corresponding `Other` subclass generated by `Provisioner_::new_External`.
- * - `size_t size()`, which returns the number of available external references.
+ * - `std::size_t size()`, which returns the number of available external references.
  */
 template<class Provisioner_, class Externals_>
 ParsedList parse(const H5::Group& handle, Externals_ ext, const Options& options) {

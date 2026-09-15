@@ -80,7 +80,7 @@ TEST(JsonFactor, LegacyMissing) {
     EXPECT_EQ(fptr->levels, levels);
 
     // Special value doesn't work in the latest version.
-   expect_json_error("{ \"type\": \"factor\", \"values\": [ 2, 1, -2147483648, 0, null ], \"levels\": [ " + arrayify(levels) + " ], \"version\":\"1.1\" }", "out of range");
+   expect_json_error("{ \"type\": \"factor\", \"values\": [ 2, 1, -2147483648, 0, null ], \"levels\": [ " + arrayify(levels) + " ], \"version\":\"1.1\" }", "non-negative");
 }
 
 TEST(JsonFactor, Missing) {
@@ -102,7 +102,7 @@ TEST(JsonFactor, Error) {
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1.2, 0 ], \"levels\": [ " + levels_str + " ] }", "expected an integer");
 
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 3, 0 ], \"levels\": [ " + levels_str + " ] }", "out of range");
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, -1, 0 ], \"levels\": [ " + levels_str + " ] }", "out of range");
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, -1, 0 ], \"levels\": [ " + levels_str + " ] }", "non-negative");
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"aria\", \"aria\", \"aria\" ] }", "duplicate string");
 
     expect_json_error("{ \"type\": \"factor\", \"values\": [ 1, 0 ], \"levels\": [ " + levels_str + " ], \"ordered\": 1, \"version\": \"1.1\" }", "expected a boolean");

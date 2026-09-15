@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <cstdint>
+#include <cstddef>
 
 /**
  * @file interfaces.hpp
@@ -76,7 +77,7 @@ public:
     /**
      * @return Length of the vector.
      */
-    virtual size_t size () const = 0;
+    virtual std::size_t size () const = 0;
 
     /**
      * Set the name of a vector element.
@@ -85,14 +86,14 @@ public:
      * @param i Index of a vector element.
      * @param n Name for the vector element.
      */
-    virtual void set_name(size_t i, std::string n) = 0;
+    virtual void set_name(std::size_t i, std::string n) = 0;
 
     /**
      * Indicate that a vector element is missing.
      *
      * @param i Index of a vector element to be marked as missing.
      */
-    virtual void set_missing(size_t i) = 0;
+    virtual void set_missing(std::size_t i) = 0;
 };
 
 /**
@@ -110,7 +111,7 @@ public:
      * @param i Index of a vector element.
      * @param v Value of the vector element.
      */
-    virtual void set(size_t i, int32_t v) = 0;
+    virtual void set(std::size_t i, std::int32_t v) = 0;
 };
 
 /**
@@ -128,7 +129,7 @@ public:
      * @param i Index of a vector element.
      * @param v Value of the vector element.
      */
-    virtual void set(size_t i, double v) = 0;
+    virtual void set(std::size_t i, double v) = 0;
 };
 
 /**
@@ -146,7 +147,7 @@ public:
      * @param i Index of a vector element.
      * @param v Value of the vector element.
      */
-    virtual void set(size_t i, std::string v) = 0;
+    virtual void set(std::size_t i, std::string v) = 0;
 
     /**
      * Format constraints to apply to the strings.
@@ -177,7 +178,7 @@ public:
      * @param i Index of a vector element.
      * @param v Value of the vector element.
      */
-    virtual void set(size_t i, bool v) = 0;
+    virtual void set(std::size_t i, bool v) = 0;
 };
 
 /**
@@ -198,7 +199,7 @@ public:
      * @param i Index of a factor element.
      * @param v Value of the factor element, as an integer index that references the levels.
      */
-    virtual void set(size_t i, size_t v) = 0;
+    virtual void set(std::size_t i, std::size_t v) = 0;
 
     /**
      * Set the levels of the factor.
@@ -206,7 +207,7 @@ public:
      * @param il Index of the level element.
      * @param vl Value of the level element.
      */
-    virtual void set_level(size_t il, std::string vl) = 0;
+    virtual void set_level(std::size_t il, std::string vl) = 0;
 };
 
 /**
@@ -243,7 +244,7 @@ public:
     /**
      * @return Length of the list.
      */
-    virtual size_t size() const = 0;
+    virtual std::size_t size() const = 0;
 
     /**
      * Set an element of the list.
@@ -251,7 +252,7 @@ public:
      * @param i Index of the list element.
      * @param v Value of the list element.
      */
-    virtual void set(size_t i, std::shared_ptr<Base> v) = 0;
+    virtual void set(std::size_t i, std::shared_ptr<Base> v) = 0;
 
     /**
      * Set the name of an element of the list.
@@ -260,7 +261,7 @@ public:
      * @param i Index of a list element.
      * @param n Name for the list element.
      */
-    virtual void set_name(size_t i, std::string n) = 0;
+    virtual void set_name(std::size_t i, std::string n) = 0;
 };
 
 }

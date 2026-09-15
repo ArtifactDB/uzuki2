@@ -22,9 +22,10 @@ else()
     find_package(ltla_byteme 2.1.0 CONFIG REQUIRED)
     find_package(ltla_millijson 2.0.0 CONFIG REQUIRED)
     find_package(artifactdb_ritsuko 0.6.0 CONFIG REQUIRED)
+    find_package(ltla_sanisizer 0.2.0 CONFIG REQUIRED)
 endif()
 
-target_link_libraries(uzuki2 INTERFACE ltla::byteme ltla::millijson artifactdb::ritsuko)
+target_link_libraries(uzuki2 INTERFACE ltla::byteme ltla::millijson artifactdb::ritsuko ltla::sanisizer)
 
 option(UZUKI2_FIND_HDF5 "Try to find and link to HDF5 for uzuki2." ON)
 if(UZUKI2_FIND_HDF5)
