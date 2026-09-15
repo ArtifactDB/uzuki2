@@ -206,15 +206,20 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
             throw std::runtime_error("expected a number at '" + path + ".index'");
         }
 
-        const auto raw_index = static_cast<const millijson::Number*>(index_ptr.get())->value();
-        if (raw_index != std::floor(raw_index)) {
+        const auto flt_index = static_cast<const millijson::Number*>(index_ptr.get())->value();
+        if (flt_index != std::floor(flt_index)) {
             throw std::runtime_error("expected an integer at '" + path + ".index'");
-        } else if (raw_index < 0) {
+        } else if (flt_index < 0) {
             throw std::runtime_error("expected a non-negative integer at '" + path + ".index'");
         }
 
-        const auto index = sanisizer::from_float<std::size_t>(raw_index);
-        if (index >= ext.size()) {
+        std::int32_t index;
+        try {
+            index = sanisizer::from_float<std::int32_t>(flt_index);
+        } catch (...) {
+            throw std::runtime_error("value at '" + path + ".index' should fit in a 32-bit signed integer");
+        }
+        if (sanisizer::is_greater_than_or_equal(index, ext.size())) {
             throw std::runtime_error("external index out of range at '" + path + ".index'");
         }
         output.reset(Provisioner_::new_External(ext.get(index)));
