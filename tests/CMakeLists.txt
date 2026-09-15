@@ -17,20 +17,33 @@ enable_testing()
 # Main test executable.
 add_executable(
     libtest 
-    src/list.cpp
-    src/integer.cpp
-    src/boolean.cpp
-    src/factor.cpp
-    src/number.cpp
-    src/string.cpp
-    src/vls.cpp
-    src/names.cpp
-    src/date.cpp
-    src/datetime.cpp
-    src/format.cpp
-    src/external.cpp
-    src/json.cpp
-    src/hdf5.cpp
+
+    src/hdf5/list.cpp
+    src/hdf5/integer.cpp
+    src/hdf5/boolean.cpp
+    src/hdf5/factor.cpp
+    src/hdf5/number.cpp
+    src/hdf5/string.cpp
+    src/hdf5/vls.cpp
+    src/hdf5/names.cpp
+    src/hdf5/date.cpp
+    src/hdf5/datetime.cpp
+    src/hdf5/format.cpp
+    src/hdf5/external.cpp
+    src/hdf5/general.cpp
+
+    src/json/list.cpp
+    src/json/integer.cpp
+    src/json/boolean.cpp
+    src/json/factor.cpp
+    src/json/number.cpp
+    src/json/string.cpp
+    src/json/names.cpp
+    src/json/date.cpp
+    src/json/datetime.cpp
+    src/json/format.cpp
+    src/json/external.cpp
+    src/json/general.cpp
 )
 
 target_link_libraries(

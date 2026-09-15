@@ -6,8 +6,8 @@
 
 #include "uzuki2/parse_hdf5.hpp"
 
-#include "test_subclass.h"
 #include "utils.h"
+#include "../test_subclass.h"
 
 TEST(Hdf5Boolean, Vector) {
     auto path = "TEST-boolean.h5";
@@ -240,43 +240,4 @@ TEST(Hdf5Boolean, OutOfRangeScalar) {
         write_number(vhandle, "data", 100, H5::PredType::NATIVE_INT8);
     }
     expect_hdf5_error(path, "blub", "boolean values should be");
-}
-
-TEST(JsonBooleanTest, SimpleLoading) {
-    auto parsed = load_json("{ \"type\": \"boolean\", \"values\": [ true, false, false, true ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
-    auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
-    EXPECT_EQ(bptr->size(), 4);
-    EXPECT_FALSE(bptr->base.scalar);
-    EXPECT_EQ(bptr->base.values[0], 1);
-    EXPECT_EQ(bptr->base.values[1], 0);
-
-    // Works with scalars.
-    {
-        auto parsed = load_json("{ \"type\": \"boolean\", \"values\": true }");
-        EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
-        auto stuff = static_cast<const DefaultBooleanVector*>(parsed.get());
-        EXPECT_TRUE(stuff->base.scalar);
-        EXPECT_TRUE(stuff->base.values[0]);
-    }
-
-    /********************************************
-     *** See integer.cpp for tests for names. ***
-     ********************************************/
-}
-
-TEST(JsonBooleanTest, MissingValues) {
-    auto parsed = load_json("{ \"type\": \"boolean\", \"values\": [ true, null ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::BOOLEAN);
-    auto bptr = static_cast<const DefaultBooleanVector*>(parsed.get());
-    EXPECT_EQ(bptr->size(), 2);
-    EXPECT_EQ(bptr->base.values.back(), 255);
-}
-
-TEST(JsonBooleanTest, CheckError) {
-    expect_json_error("{\"type\":\"boolean\", \"values\":[true,1,2] }", "expected a boolean");
-
-    /***********************************************
-     *** See integer.cpp for vector error tests. ***
-     ***********************************************/
 }

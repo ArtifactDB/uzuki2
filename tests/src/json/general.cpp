@@ -9,18 +9,17 @@
 
 #include "uzuki2/parse_json.hpp"
 
-#include "test_subclass.h"
 #include "utils.h"
+#include "../test_subclass.h"
 
-TEST(JsonError, ForceList) {
+TEST(JsonParse, Error) {
     expect_json_error("{ \"type\":\"nothing\" }", "top-level object should represent an R list");
-}
-
-TEST(JsonError, Version) {
     expect_json_error("{ version: true }", "expected a string");
+    expect_json_error("{ \"type\": \"integer\" }", "expected 'values' property");
+    expect_json_error("{ \"type\": \"integer\", \"values\": {} }", "expected a number"); // correctly promote {} to [{}] for further processing.
 }
 
-class ParseOverloadTest : public ::testing::TestWithParam<std::tuple<int, bool, std::pair<bool, int> > > {
+class JsonParseOverloadTest : public ::testing::TestWithParam<std::tuple<int, bool, std::pair<bool, int> > > {
 protected:
     static std::string dump_file(const std::string& payload, int mode) {
         std::string path = "TEST.json";
@@ -52,7 +51,7 @@ protected:
     }
 };
 
-TEST_P(ParseOverloadTest, Basic) {
+TEST_P(JsonParseOverloadTest, Basic) {
     auto param = GetParam();
     uzuki2::json::Options opt;
     opt.buffer_size = std::get<0>(param);
@@ -111,8 +110,8 @@ TEST_P(ParseOverloadTest, Basic) {
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    Parse,
-    ParseOverloadTest,
+    JsonParse,
+    JsonParseOverloadTest,
     ::testing::Combine(
         ::testing::Values(3, 7, 13, 17, 29), // block size per read.
         ::testing::Values(false, true), // whether or not it's parallelized.

@@ -4,6 +4,7 @@
 #include "uzuki2/parse_hdf5.hpp"
 
 #include "utils.h"
+#include "../test_subclass.h"
 
 H5::DataSet dump_heap(H5::Group& handle, const char* heap, const hsize_t hlen) {
     H5::DataSpace vspace(1, &hlen);

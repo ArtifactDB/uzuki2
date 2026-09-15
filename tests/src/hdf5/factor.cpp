@@ -3,8 +3,8 @@
 
 #include "uzuki2/parse_hdf5.hpp"
 
-#include "test_subclass.h"
 #include "utils.h"
+#include "../test_subclass.h"
 
 TEST(Hdf5Factor, Simple) {
     auto path = "TEST-factor.h5";
@@ -347,94 +347,4 @@ TEST(Hdf5Factor, MissingPlaceholderError) {
         write_strings(ghandle, "levels", { "alice", "aika" });
     }
     expect_hdf5_error(path, "foo", "same type as");
-}
-
-TEST(JsonFactorTest, SimpleLoading) {
-    {
-        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 0, 1, 1, 0, 2 ], \"levels\": [ \"akari\", \"alice\", \"aika\" ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-
-        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-        EXPECT_EQ(fptr->size(), 5);
-        EXPECT_EQ(fptr->vbase.values.front(), 0);
-        EXPECT_EQ(fptr->vbase.values.back(), 2);
-
-        EXPECT_EQ(fptr->levels[0], "akari");
-        EXPECT_EQ(fptr->levels[2], "aika");
-    }
-
-    // Works in later versions.
-    {
-        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-        EXPECT_FALSE(fptr->ordered);
-    }
-
-
-    /********************************************
-     *** See integer.cpp for tests for names. ***
-     ********************************************/
-}
-
-TEST(JsonFactorTest, OrderedLoading) {
-    {
-        auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-        EXPECT_TRUE(fptr->ordered);
-    }
-
-    // Works in later versions.
-    {
-        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": true, \"version\": \"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-        EXPECT_TRUE(fptr->ordered);
-    }
-
-    // Responds to the negative case.
-    {
-        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": false, \"version\": \"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-        EXPECT_FALSE(fptr->ordered);
-    }
-}
-
-TEST(JsonFactorTest, MissingValues) {
-    {
-        auto parsed = load_json("{ \"type\": \"ordered\", \"values\": [ 2, 1, -2147483648, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-        EXPECT_EQ(fptr->vbase.values[2], -123456789); // i.e., the test's missing value placeholder.
-        EXPECT_EQ(fptr->vbase.values[4], -123456789); 
-    }
-
-    // Special value doesn't work in the latest version.
-   expect_json_error("{ \"type\": \"factor\", \"values\": [ 2, 1, -2147483648, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\":\"1.1\" }", "out of range");
-
-    {
-        auto parsed = load_json("{ \"type\": \"factor\", \"values\": [ 2, 1, null, 0, null ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::FACTOR);
-        auto fptr = static_cast<const DefaultFactor*>(parsed.get());
-        EXPECT_EQ(fptr->vbase.values[2], -123456789); // i.e., the test's missing value placeholder.
-        EXPECT_EQ(fptr->vbase.values[4], -123456789); 
-    }
-}
-
-TEST(JsonFactorTest, CheckError) {
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ true, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "expected a number");
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1.2, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "expected an integer");
-
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 3, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "out of range");
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, -1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ] }", "out of range");
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"aria\", \"aria\", \"aria\" ] }", "duplicate string");
-
-    expect_json_error("{ \"type\": \"factor\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"ordered\": 1, \"version\": \"1.1\" }", "expected a boolean");
-    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1, 0 ], \"levels\": [ \"athena\", \"akira\", \"alicia\" ], \"version\": \"1.1\" }", "unknown object type 'ordered'");
-
-    /***********************************************
-     *** See integer.cpp for vector error tests. ***
-     ***********************************************/
 }

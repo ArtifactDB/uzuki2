@@ -3,8 +3,8 @@
 
 #include "uzuki2/parse_hdf5.hpp"
 
-#include "test_subclass.h"
 #include "utils.h"
+#include "../test_subclass.h"
 
 TEST(Hdf5Format, Error) {
     const auto path = "TEST-format.h5";

@@ -3,8 +3,8 @@
 
 #include "uzuki2/parse_hdf5.hpp"
 
-#include "test_subclass.h"
 #include "utils.h"
+#include "../test_subclass.h"
 
 TEST(Hdf5DateTime, Legacy) {
     auto path = "TEST-datetime.h5";
@@ -137,62 +137,4 @@ TEST(Hdf5DateTime, MissingPlaceholder) {
     EXPECT_EQ(sptr->base.values[1], "ich bin missing"); // i.e., the test's missing value placeholder.
     EXPECT_EQ(sptr->base.values[2], "ich bin missing");
     EXPECT_EQ(sptr->format, uzuki2::StringVector::DATETIME);
-}
-
-TEST(JsonDateTimeTest, SimpleLoading) {
-    {
-        auto parsed = load_json("{ \"type\": \"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(dptr->size(), 2);
-        EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
-        EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
-        EXPECT_EQ(dptr->format, uzuki2::StringVector::DATETIME);
-    }
-
-    // Works with a more recent version.
-    {
-        auto parsed = load_json("{ \"type\":\"string\", \"format\":\"date-time\", \"values\": [ \"2022-01-22T00:00:00.1243Z\", \"1990-06-30T23:12:39.99+01:00\" ], \"version\":\"1.1\"}");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_EQ(dptr->size(), 2);
-        EXPECT_EQ(dptr->base.values[0], "2022-01-22T00:00:00.1243Z");
-        EXPECT_EQ(dptr->base.values[1], "1990-06-30T23:12:39.99+01:00");
-        EXPECT_EQ(dptr->format, uzuki2::StringVector::DATETIME);
-    }
-
-    // Works with scalars.
-    {
-        auto parsed = load_json("{ \"type\": \"string\", \"format\":\"date-time\", \"values\": \"2023-02-19T12:34:56-09:00\", \"version\":\"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::STRING);
-        auto stuff = static_cast<const DefaultStringVector*>(parsed.get());
-        EXPECT_TRUE(stuff->base.scalar);
-        EXPECT_EQ(stuff->base.values[0], "2023-02-19T12:34:56-09:00");
-        EXPECT_EQ(stuff->format, uzuki2::StringVector::DATETIME);
-    }
-
-    expect_json_error("{ \"type\": \"date-time\", \"values\": [ \"2023-02-19T12:34:56-09:00\" ], \"version\": \"1.1\" }", "unknown object type");
-
-    /********************************************
-     *** See integer.cpp for tests for names. ***
-     ********************************************/
-}
-
-TEST(JsonDateTimeTest, MissingValues) {
-    auto parsed = load_json("{ \"type\": \"date-time\", \"values\": [ \"2022-01-22T11:09:45.2-09:00\", null ] }");
-    EXPECT_EQ(parsed->type(), uzuki2::STRING);
-    auto dptr = static_cast<const DefaultStringVector*>(parsed.get());
-    EXPECT_EQ(dptr->size(), 2);
-    EXPECT_EQ(dptr->base.values.back(), "ich bin missing");
-    EXPECT_EQ(dptr->format, uzuki2::StringVector::DATETIME);
-}
-
-TEST(JsonDateTimeTest, CheckError) {
-    expect_json_error("{\"type\":\"date-time\", \"values\":[true,1,2] }", "expected a string");
-    expect_json_error("{\"type\":\"date-time\", \"values\":[\"foo\", \"bar\"] }", "Internet Date/Time");
-    expect_json_error("{\"type\":\"string\", \"format\":\"date-time\", \"values\":[\"foo\", \"bar\"], \"version\":\"1.1\"}", "Internet Date/Time");
-
-    /***********************************************
-     *** See integer.cpp for vector error tests. ***
-     ***********************************************/
 }

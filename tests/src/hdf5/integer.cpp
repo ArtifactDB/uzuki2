@@ -3,8 +3,8 @@
 
 #include "uzuki2/parse_hdf5.hpp"
 
-#include "test_subclass.h"
 #include "utils.h"
+#include "../test_subclass.h"
 
 TEST(Hdf5Integer, Vector) {
     auto path = "TEST-integer.h5";
@@ -201,81 +201,4 @@ TEST(Hdf5Integer, MissingPlaceholderError) {
         dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT8, H5S_SCALAR);
     }
     expect_hdf5_error(path, "foo", "same type as");
-}
-
-TEST(JsonIntegerTest, SimpleLoading) {
-    // Simple stuff works correctly.
-    {
-        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -1, 12345, -2e+4 ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
-        EXPECT_EQ(iptr->size(), 5);
-        EXPECT_FALSE(iptr->base.scalar);
-        EXPECT_EQ(iptr->base.values[0], 0);
-        EXPECT_EQ(iptr->base.values[1], 1000);
-        EXPECT_EQ(iptr->base.values[2], -1);
-        EXPECT_EQ(iptr->base.values[3], 12345);
-        EXPECT_EQ(iptr->base.values[4], -20000);
-    }
-
-    // Works with names.
-    {
-        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -1, 12345, -2e+4 ], \"names\": [ \"a\", \"bb\", \"ccc\", \"dddd\", \"eeeee\" ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-        auto stuff = static_cast<const DefaultIntegerVector*>(parsed.get());
-        EXPECT_TRUE(stuff->base.has_names);
-        EXPECT_EQ(stuff->base.names.front(), "a");
-        EXPECT_EQ(stuff->base.names.back(), "eeeee");
-    }
-
-    // Works with scalars.
-    {
-        auto parsed = load_json("{ \"type\": \"integer\", \"values\": 1234 }");
-        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-        auto stuff = static_cast<const DefaultIntegerVector*>(parsed.get());
-        EXPECT_TRUE(stuff->base.scalar);
-        EXPECT_EQ(stuff->base.values[0], 1234);
-    }
-}
-
-TEST(JsonIntegerTest, MissingValues) {
-    {
-        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -1, null, -2e+4 ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
-        EXPECT_EQ(iptr->size(), 5);
-        EXPECT_EQ(iptr->base.values[3], -123456789); // i.e., the test's missing value placeholder.
-    }
-
-    // Same for our special value.
-    {
-        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -2147483648, null, -2e+4 ] }");
-        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
-        EXPECT_EQ(iptr->size(), 5);
-        EXPECT_EQ(iptr->base.values[2], -123456789); 
-        EXPECT_EQ(iptr->base.values[3], -123456789);
-    }
-
-    // Except in the latest version.
-    {
-        auto parsed = load_json("{ \"type\": \"integer\", \"values\": [ 0, 1000, -2147483648, null, -2e+4 ], \"version\":\"1.1\" }");
-        EXPECT_EQ(parsed->type(), uzuki2::INTEGER);
-        auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
-        EXPECT_EQ(iptr->size(), 5);
-        EXPECT_EQ(iptr->base.values[2], -2147483648); 
-        EXPECT_EQ(iptr->base.values[3], -123456789); 
-    }
-}
-
-TEST(JsonIntegerTest, CheckError) {
-    expect_json_error("{ \"type\": \"integer\" }", "expected 'values' property");
-    expect_json_error("{ \"type\": \"integer\", \"values\": \"foo\"}", "expected a number");
-
-    expect_json_error("{ \"type\": \"integer\", \"values\": [true]}", "expected a number");
-    expect_json_error("{ \"type\": \"integer\", \"values\": [1.2]}", "expected an integer");
-    expect_json_error("{ \"type\": \"integer\", \"values\": [-999999999999]}", "cannot be represented");
-
-    expect_json_error("{ \"type\": \"integer\", \"values\": [-99], \"names\": true}", "expected an array");
-    expect_json_error("{ \"type\": \"integer\", \"values\": [-99], \"names\": [\"a\", \"b\"]}", "should be the same");
 }

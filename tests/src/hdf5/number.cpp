@@ -5,8 +5,8 @@
 
 #include "ritsuko/ritsuko.hpp"
 
-#include "test_subclass.h"
 #include "utils.h"
+#include "../test_subclass.h"
 
 TEST(Hdf5Number, Vector) {
     auto path = "TEST-number.h5";
@@ -276,46 +276,4 @@ TEST(Hdf5Number, MissingPlaceholderError) {
         auto ahandle = dhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_FLOAT, H5S_SCALAR);
     }
     expect_hdf5_error(path, "foo", "same type as");
-}
-
-TEST(JsonNumberTest, SimpleLoading) {
-    auto parsed = load_json("{\"type\":\"number\", \"values\":[1.2, -3.5, -0.2, 1.343e+2] }");
-    EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
-    auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
-    EXPECT_EQ(bptr->size(), 4);
-    EXPECT_FALSE(bptr->base.scalar);
-    EXPECT_EQ(bptr->base.values.front(), 1.2);
-    EXPECT_EQ(bptr->base.values.back(), 134.3);
-
-    // Works with scalars.
-    {
-        auto parsed = load_json("{ \"type\": \"number\", \"values\": 12.34 }");
-        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
-        auto stuff = static_cast<const DefaultNumberVector*>(parsed.get());
-        EXPECT_TRUE(stuff->base.scalar);
-        EXPECT_EQ(stuff->base.values[0], 12.34);
-    }
-
-    /********************************************
-     *** See integer.cpp for tests for names. ***
-     ********************************************/
-}
-
-TEST(JsonNumberTest, MissingValues) {
-    auto parsed = load_json("{\"type\":\"number\", \"values\":[1.2, null, \"Inf\", \"-Inf\", \"NaN\"] }");
-    EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
-
-    auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
-    EXPECT_EQ(bptr->size(), 5);
-    EXPECT_EQ(bptr->base.values[1], -123456789);
-    EXPECT_TRUE(std::isinf(bptr->base.values[2]));
-    EXPECT_TRUE(bptr->base.values[2] > 0);
-    EXPECT_TRUE(std::isinf(bptr->base.values[3]));
-    EXPECT_TRUE(bptr->base.values[3] < 0);
-    EXPECT_TRUE(std::isnan(bptr->base.values[4]));
-}
-
-TEST(JsonNumberTest, CheckError) {
-    expect_json_error("{ \"type\": \"number\", \"values\": [true]}", "expected a number");
-    expect_json_error("{ \"type\": \"number\", \"values\": [\"nan\"]}", "unsupported string");
 }
