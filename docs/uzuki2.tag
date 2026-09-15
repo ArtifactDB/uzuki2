@@ -87,8 +87,8 @@
       <type>virtual void</type>
       <name>set</name>
       <anchorfile>classuzuki2_1_1BooleanVector.html</anchorfile>
-      <anchor>a57c21c43d4c7404f7f61eb98a1cc9d50</anchor>
-      <arglist>(size_t i, bool v)=0</arglist>
+      <anchor>ad757c9bd790ac937dac847de60eb2f23</anchor>
+      <arglist>(std::size_t i, bool v)=0</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -122,15 +122,15 @@
       <type>virtual void</type>
       <name>set</name>
       <anchorfile>classuzuki2_1_1Factor.html</anchorfile>
-      <anchor>a8ef2ea4bf336ab2527afb1b89d01711f</anchor>
-      <arglist>(size_t i, size_t v)=0</arglist>
+      <anchor>a73cf0020fa41fd97e0453ae4d6b52f7e</anchor>
+      <arglist>(std::size_t i, std::size_t v)=0</arglist>
     </member>
     <member kind="function" virtualness="pure">
       <type>virtual void</type>
       <name>set_level</name>
       <anchorfile>classuzuki2_1_1Factor.html</anchorfile>
-      <anchor>a4e76f892adf9041b6f01cedb0e12f740</anchor>
-      <arglist>(size_t il, std::string vl)=0</arglist>
+      <anchor>ac1cb02bed16d8c4632020e4c3a71ffb4</anchor>
+      <arglist>(std::size_t il, std::string vl)=0</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -148,8 +148,8 @@
       <type>virtual void</type>
       <name>set</name>
       <anchorfile>classuzuki2_1_1IntegerVector.html</anchorfile>
-      <anchor>ad6806f779fa8d4a41cc97b14765c80b3</anchor>
-      <arglist>(size_t i, int32_t v)=0</arglist>
+      <anchor>ad2faa2164aba6723641e22c4ea86917a</anchor>
+      <arglist>(std::size_t i, std::int32_t v)=0</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -164,25 +164,25 @@
       <arglist>() const</arglist>
     </member>
     <member kind="function" virtualness="pure">
-      <type>virtual size_t</type>
+      <type>virtual std::size_t</type>
       <name>size</name>
       <anchorfile>classuzuki2_1_1List.html</anchorfile>
-      <anchor>a8ffb41fd40c9578911b82d7463642cba</anchor>
+      <anchor>ac650f0331083ee83cf5edc697ac94b2b</anchor>
       <arglist>() const =0</arglist>
     </member>
     <member kind="function" virtualness="pure">
       <type>virtual void</type>
       <name>set</name>
       <anchorfile>classuzuki2_1_1List.html</anchorfile>
-      <anchor>a308225edf101962afc751caa321f5f82</anchor>
-      <arglist>(size_t i, std::shared_ptr&lt; Base &gt; v)=0</arglist>
+      <anchor>a4a769b0986a828218fd76eb6b5689d2d</anchor>
+      <arglist>(std::size_t i, std::shared_ptr&lt; Base &gt; v)=0</arglist>
     </member>
     <member kind="function" virtualness="pure">
       <type>virtual void</type>
       <name>set_name</name>
       <anchorfile>classuzuki2_1_1List.html</anchorfile>
-      <anchor>a16d57dcda0cb9c8ffa7724d16473a4ff</anchor>
-      <arglist>(size_t i, std::string n)=0</arglist>
+      <anchor>ab118825a40cf2a1d26a1f6dab6fa30ab</anchor>
+      <arglist>(std::size_t i, std::string n)=0</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -212,8 +212,8 @@
       <type>virtual void</type>
       <name>set</name>
       <anchorfile>classuzuki2_1_1NumberVector.html</anchorfile>
-      <anchor>aeaa2342479571f738e039600accef8b5</anchor>
-      <arglist>(size_t i, double v)=0</arglist>
+      <anchor>a981409188ec1a84226305818467b77ed</anchor>
+      <arglist>(std::size_t i, double v)=0</arglist>
     </member>
   </compound>
   <compound kind="struct">
@@ -245,10 +245,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>size_t</type>
+      <type>std::size_t</type>
       <name>buffer_size</name>
       <anchorfile>structuzuki2_1_1json_1_1Options.html</anchorfile>
-      <anchor>ab3a08f0ea9132c8ae2980049b928b84d</anchor>
+      <anchor>a5c9523dccd7809509db36c363a706540</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -292,8 +292,8 @@
       <type>virtual void</type>
       <name>set</name>
       <anchorfile>classuzuki2_1_1StringVector.html</anchorfile>
-      <anchor>aa2f0f5ebb2988b6c819286b44ba344a5</anchor>
-      <arglist>(size_t i, std::string v)=0</arglist>
+      <anchor>a8ac94995d690307e8f20d3733cbaa88c</anchor>
+      <arglist>(std::size_t i, std::string v)=0</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -301,25 +301,25 @@
     <filename>classuzuki2_1_1Vector.html</filename>
     <base>uzuki2::Base</base>
     <member kind="function" virtualness="pure">
-      <type>virtual size_t</type>
+      <type>virtual std::size_t</type>
       <name>size</name>
       <anchorfile>classuzuki2_1_1Vector.html</anchorfile>
-      <anchor>abd47d52bccdf710e1f4958585736d6a2</anchor>
+      <anchor>adf197744e386ba3871c126b16f4746d7</anchor>
       <arglist>() const =0</arglist>
     </member>
     <member kind="function" virtualness="pure">
       <type>virtual void</type>
       <name>set_name</name>
       <anchorfile>classuzuki2_1_1Vector.html</anchorfile>
-      <anchor>a42f996bcbb75853274f004a29fe2da8f</anchor>
-      <arglist>(size_t i, std::string n)=0</arglist>
+      <anchor>a273568a30924904daaa2ab70b6be75b6</anchor>
+      <arglist>(std::size_t i, std::string n)=0</arglist>
     </member>
     <member kind="function" virtualness="pure">
       <type>virtual void</type>
       <name>set_missing</name>
       <anchorfile>classuzuki2_1_1Vector.html</anchorfile>
-      <anchor>aa03f82a088edd3c3280be33c6a8c9c41</anchor>
-      <arglist>(size_t i)=0</arglist>
+      <anchor>ae706b74f023a9ec0fefcfa73368e6abc</anchor>
+      <arglist>(std::size_t i)=0</arglist>
     </member>
   </compound>
   <compound kind="namespace">
@@ -411,8 +411,8 @@
       <type>ParsedList</type>
       <name>parse_buffer</name>
       <anchorfile>namespaceuzuki2_1_1json.html</anchorfile>
-      <anchor>aa8e32ee9c2facc04314af9042c446173</anchor>
-      <arglist>(const unsigned char *buffer, size_t len, Externals_ ext, const Options &amp;options)</arglist>
+      <anchor>a01474d4d7e32921114a5c79b2781a514</anchor>
+      <arglist>(const unsigned char *buffer, std::size_t len, Externals_ ext, const Options &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -432,8 +432,8 @@
       <type>void</type>
       <name>validate_buffer</name>
       <anchorfile>namespaceuzuki2_1_1json.html</anchorfile>
-      <anchor>a539849702748af88933ba7707e45a71c</anchor>
-      <arglist>(const unsigned char *buffer, size_t len, int num_external, const Options &amp;options)</arglist>
+      <anchor>a94d031c2c91f1b63fa270060734f9ba8</anchor>
+      <arglist>(const unsigned char *buffer, std::size_t len, int num_external, const Options &amp;options)</arglist>
     </member>
   </compound>
   <compound kind="page">
