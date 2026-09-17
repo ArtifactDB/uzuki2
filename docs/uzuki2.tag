@@ -362,8 +362,8 @@
       <type>ParsedList</type>
       <name>parse</name>
       <anchorfile>namespaceuzuki2_1_1hdf5.html</anchorfile>
-      <anchor>a44c67c6de55c5b336e6fb49579cf0f55</anchor>
-      <arglist>(const H5::Group &amp;handle, Externals_ ext, const Options &amp;options)</arglist>
+      <anchor>a090d1af1b9b61247cac8a40f50e4c14f</anchor>
+      <arglist>(const H5::Group &amp;group, Externals_ ext, const Options &amp;options)</arglist>
       <docanchor file="namespaceuzuki2_1_1hdf5.html" title="Provisioner requirements">provisioner-contract</docanchor>
       <docanchor file="namespaceuzuki2_1_1hdf5.html" title="Externals requirements">external-contract</docanchor>
     </member>
@@ -378,8 +378,8 @@
       <type>void</type>
       <name>validate</name>
       <anchorfile>namespaceuzuki2_1_1hdf5.html</anchorfile>
-      <anchor>a2c3b06098aebbda4fcf51d32d8b340f4</anchor>
-      <arglist>(const H5::Group &amp;handle, int num_external, const Options &amp;options)</arglist>
+      <anchor>a3e54712aa337a43e9505984f62a55ad8</anchor>
+      <arglist>(const H5::Group &amp;group, int num_external, const Options &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
