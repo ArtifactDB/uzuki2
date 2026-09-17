@@ -642,7 +642,7 @@ struct Options {
  * @tparam Provisioner_ A class namespace defining static methods for creating new `Base` objects.
  * @tparam Externals_ Class describing how to resolve external references for type `EXTERNAL`.
  *
- * @param handle Handle for a HDF5 group corresponding to the list.
+ * @param group HDF5 group representing an R list.
  * @param ext Instance of an external reference resolver class.
  * @param options Optional parameters.
  *
@@ -684,17 +684,17 @@ struct Options {
  * - `std::size_t size()`, which returns the number of available external references.
  */
 template<class Provisioner_, class Externals_>
-ParsedList parse(const H5::Group& handle, Externals_ ext, const Options& options) {
+ParsedList parse(const H5::Group& group, Externals_ ext, const Options& options) {
     Version version;
-    if (handle.attrExists("uzuki_version")) {
-        auto ver_str = read_uzuki_attr(handle, "uzuki_version");
+    if (group.attrExists("uzuki_version")) {
+        auto ver_str = read_uzuki_attr(group, "uzuki_version");
         auto vraw = ritsuko::parse_version_string(ver_str.c_str(), ver_str.size(), /* skip_patch = */ true);
         version.major = vraw.major;
         version.minor = vraw.minor;
     }
 
     ExternalTracker etrack(std::move(ext));
-    auto ptr = parse_inner<Provisioner_>(handle, etrack, version);
+    auto ptr = parse_inner<Provisioner_>(group, etrack, version);
 
     if (options.strict_list && ptr->type() != LIST) {
         throw std::runtime_error("top-level object should represent an R list");
@@ -722,20 +722,20 @@ ParsedList parse(const H5::Group& handle, Externals_ ext, const Options& options
  */
 template<class Provisioner_, class Externals_>
 ParsedList parse(const std::string& file, const std::string& name, Externals_ ext, Options options = Options()) {
-    H5::H5File handle(file, H5F_ACC_RDONLY);
-    return parse<Provisioner_>(handle.openGroup(name), std::move(ext), options);
+    H5::H5File fhandle(file, H5F_ACC_RDONLY);
+    return parse<Provisioner_>(fhandle.openGroup(name), std::move(ext), options);
 }
 
 /**
- * Validate HDF5 file contents against the **uzuki2** specification, given the group handle.
+ * Validate HDF5 file contents against the **uzuki2** specification, given the HDF5 group containing the list.
  * Any invalid representations will cause an error to be thrown.
  *
- * @param handle Handle for a HDF5 group corresponding to the list.
+ * @param group HDF5 group representing an R list.
  * @param num_external Expected number of external references. 
  * @param options Optional parameters.
  */
-inline void validate(const H5::Group& handle, int num_external, const Options& options) {
-    parse<DummyProvisioner>(handle, DummyExternals(num_external), options);
+inline void validate(const H5::Group& group, int num_external, const Options& options) {
+    parse<DummyProvisioner>(group, DummyExternals(num_external), options);
 }
 
 /**
