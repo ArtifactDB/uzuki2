@@ -21,6 +21,9 @@ TEST(Hdf5Integer, Vector) {
     auto iptr = static_cast<const DefaultIntegerVector*>(parsed.get());
     EXPECT_EQ(iptr->base.values, data);
     EXPECT_FALSE(iptr->base.scalar);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Integer, Scalar) {
@@ -166,6 +169,9 @@ TEST(Hdf5Integer, MissingPlaceholder) {
     auto modified = data;
     modified[2] = -123456789; // i.e., the test's missing value placeholder.
     EXPECT_EQ(iptr->base.values, modified);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Integer, MissingPlaceholderError) {

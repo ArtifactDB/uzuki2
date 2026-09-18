@@ -104,6 +104,7 @@ TEST(JsonFactor, Error) {
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 3, 0 ], \"levels\": [ " + levels_str + " ] }", "out of range");
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, -1, 0 ], \"levels\": [ " + levels_str + " ] }", "non-negative");
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ \"aria\", \"aria\", \"aria\" ] }", "duplicate string");
+    expect_json_error("{ \"type\": \"ordered\", \"values\": [ 2, 1, 0 ], \"levels\": [ 1, 2, 3 ] }", "expected strings");
 
     expect_json_error("{ \"type\": \"factor\", \"values\": [ 1, 0 ], \"levels\": [ " + levels_str + " ], \"ordered\": 1, \"version\": \"1.1\" }", "expected a boolean");
     expect_json_error("{ \"type\": \"ordered\", \"values\": [ 1, 0 ], \"levels\": [ " + levels_str + " ], \"version\": \"1.1\" }", "unknown object type 'ordered'");

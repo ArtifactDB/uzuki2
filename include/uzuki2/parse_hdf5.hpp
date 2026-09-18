@@ -601,7 +601,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
         ihandle.read(&idx, H5::PredType::NATIVE_INT32);
         if (idx < 0) {
             throw std::runtime_error("external index at 'index' should be non-negative");
-        } else if (static_cast<std::size_t>(idx) >= ext.size()) {
+        } else if (sanisizer::is_greater_than_or_equal(idx, ext.size())) {
             throw std::runtime_error("external index at 'index' is out of range");
         }
 

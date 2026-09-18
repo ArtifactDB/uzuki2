@@ -13,10 +13,24 @@
 #include "../test_subclass.h"
 
 TEST(JsonParse, Error) {
+    expect_json_error("{}", "missing 'type'");
+    expect_json_error("{ \"type\": true }", "string");
     expect_json_error("{ \"type\":\"nothing\" }", "top-level object should represent an R list");
-    expect_json_error("{ version: true }", "expected a string");
+    expect_json_error("{ \"version\": true }", "expected a string in 'version'");
     expect_json_error("{ \"type\": \"integer\" }", "expected 'values' property");
     expect_json_error("{ \"type\": \"integer\", \"values\": {} }", "expected a number"); // correctly promote {} to [{}] for further processing.
+}
+
+TEST(JsonParse, ParsedListMethods) {
+    // Technically we should do this for HDF5 as well, but the methods are unrelated to the storage mode, so there's no point repeating them for HDF5.
+    auto parsed = load_json("{ \"type\": \"nothing\" }");
+    EXPECT_TRUE(static_cast<bool>(parsed));
+    EXPECT_EQ((*parsed).type(), uzuki2::NOTHING);
+    EXPECT_EQ(parsed->type(), uzuki2::NOTHING);
+    EXPECT_EQ(parsed.get()->type(), uzuki2::NOTHING);
+
+    parsed.reset();
+    EXPECT_FALSE(static_cast<bool>(parsed));
 }
 
 class JsonParseOverloadTest : public ::testing::TestWithParam<std::tuple<int, bool, std::pair<bool, int> > > {
@@ -124,4 +138,3 @@ INSTANTIATE_TEST_SUITE_P(
         )
     )
 );
-

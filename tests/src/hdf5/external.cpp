@@ -24,6 +24,9 @@ TEST(Hdf5External, Single) {
 
     auto stuff = static_cast<const DefaultExternal*>(parsed.get());
     EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff->ptr), 1);
+
+    // Test coverage of the relevant Dummy class.
+    uzuki2::hdf5::validate(path, "foo", 1, opt);
 }
 
 TEST(Hdf5External, Multiple) {
@@ -51,6 +54,9 @@ TEST(Hdf5External, Multiple) {
 
     auto stuff2 = static_cast<const DefaultExternal*>(list->values[1].get());
     EXPECT_EQ(reinterpret_cast<uintptr_t>(stuff2->ptr), 1);
+
+    // Test coverage of the relevant Dummy class.
+    uzuki2::hdf5::validate(path, "foo", 2, opt);
 }
 
 void expect_hdf5_external_error(std::string path, std::string name, std::string msg, int num_expected) {
@@ -83,6 +89,13 @@ TEST(Hdf5External, CheckErrors) {
         write_number(ghandle, "index", 0, H5::PredType::NATIVE_DOUBLE);
     }
     expect_hdf5_external_error(path, "foo", "external index at 'index' cannot be represented", 1);
+
+    {
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto ghandle = external_opener(handle, "foo");
+        write_number(ghandle, "index", -1, H5::PredType::NATIVE_INT32);
+    }
+    expect_hdf5_external_error(path, "foo", "non-negative", 1);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);

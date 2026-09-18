@@ -30,6 +30,9 @@ TEST(Hdf5List, SimpleLoading) {
 
     auto iptr = static_cast<const DefaultIntegerVector*>(stuff->values[1].get());
     EXPECT_EQ(iptr->base.values, expected);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "foo");
 }
 
 TEST(Hdf5List, NestedLoading) {

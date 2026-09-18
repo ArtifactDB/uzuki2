@@ -23,6 +23,9 @@ TEST(Hdf5Number, Vector) {
     auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
     EXPECT_EQ(bptr->base.values, data);
     EXPECT_FALSE(bptr->base.scalar);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Number, Scalar) {
@@ -144,14 +147,16 @@ TEST(Hdf5Number, Missing1_0) {
         auto vhandle = vector_opener(handle, "blub", "number");
         write_numbers<double>(vhandle, "data", { 1, 0, missing, 0, nan, 1 }, H5::PredType::NATIVE_DOUBLE);
     }
-    {
-        auto parsed = load_hdf5(path, "blub");
-        EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
-        auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
-        EXPECT_EQ(bptr->size(), 6);
-        EXPECT_EQ(bptr->base.values[2], -123456789);
-        EXPECT_TRUE(std::isnan(bptr->base.values[4]));
-    }
+
+    auto parsed = load_hdf5(path, "blub");
+    EXPECT_EQ(parsed->type(), uzuki2::NUMBER);
+    auto bptr = static_cast<const DefaultNumberVector*>(parsed.get());
+    EXPECT_EQ(bptr->size(), 6);
+    EXPECT_EQ(bptr->base.values[2], -123456789);
+    EXPECT_TRUE(std::isnan(bptr->base.values[4]));
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Number, Missing1_1) {

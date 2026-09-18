@@ -25,6 +25,9 @@ TEST(Hdf5Boolean, Vector) {
     EXPECT_EQ(bptr->size(), 5);
     EXPECT_EQ(bptr->base.values, data);
     EXPECT_FALSE(bptr->base.scalar);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Boolean, Scalar) {
@@ -166,6 +169,9 @@ TEST(Hdf5Boolean, MissingPlaceholder) {
     auto expected = data;
     expected[2] = 255; // i.e., the test's missing value placeholder.
     EXPECT_EQ(bptr->base.values, std::vector<std::uint8_t>(expected.begin(), expected.end()));
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Boolean, MissingPlaceholderError) {

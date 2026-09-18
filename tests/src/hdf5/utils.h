@@ -159,13 +159,19 @@ inline H5::DataSet write_strings(const H5::Group& parent, const std::string& nam
     return write_strings(parent, name, values, false, 0);
 }
 
-inline auto load_hdf5(std::string name, std::string group) {
+inline auto load_hdf5(const std::string& name, const std::string& group) {
     uzuki2::hdf5::Options opt;
     opt.strict_list = false;
     return uzuki2::hdf5::parse<DefaultProvisioner>(name, group, uzuki2::DummyExternals(), std::move(opt));
 }
 
-inline auto load_hdf5_strict(std::string name, std::string group) {
+inline auto validate_hdf5(const std::string& name, const std::string& group) {
+    uzuki2::hdf5::Options opt;
+    opt.strict_list = false;
+    return uzuki2::hdf5::validate(name, group, 0, std::move(opt));
+}
+
+inline auto load_hdf5_strict(const std::string& name, const std::string& group) {
     return uzuki2::hdf5::parse<DefaultProvisioner>(name, group, uzuki2::DummyExternals(), {});
 }
 

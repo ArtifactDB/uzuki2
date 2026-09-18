@@ -58,7 +58,7 @@ public:
     }
 
     template<typename ...Args_>
-    void reset(Args_&& ... args) const {
+    void reset(Args_&& ... args) {
         ptr.reset(std::forward<Args_>(args)...);
     }
     /**

@@ -24,6 +24,9 @@ TEST(Hdf5Factor, Simple) {
     EXPECT_EQ(fptr->vbase.values, codes);
     EXPECT_EQ(fptr->levels, levels);
     EXPECT_FALSE(fptr->ordered);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Factor, LegacyOrdered) {
@@ -309,6 +312,9 @@ TEST(Hdf5Factor, MissingPlaceholder) {
     modified[2] = -123456789; // i.e., the test's missing value placeholder.
     modified[4] = -123456789;
     EXPECT_EQ(fptr->vbase.values, modified);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5Factor, MissingPlaceholderError) {

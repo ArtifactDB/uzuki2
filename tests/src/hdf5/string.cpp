@@ -22,6 +22,9 @@ TEST(Hdf5String, FixedVector) {
         auto sptr = static_cast<const DefaultStringVector*>(parsed.get());
         EXPECT_EQ(sptr->base.values, data);
         EXPECT_EQ(sptr->format, uzuki2::StringVector::NONE);
+
+        // Test coverage of the relevant Dummy class.
+        validate_hdf5(path, "blub");
     }
 
     // Also testing some more recent versions to get some coverage of the no-'format' case.
@@ -147,6 +150,9 @@ TEST(Hdf5String, MissingPlaceholder) {
     auto modified = data;
     modified[3] = "ich bin missing"; // i.e., the test's missing value placeholder.
     EXPECT_EQ(sptr->base.values, modified);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "blub");
 }
 
 TEST(Hdf5String, MissingPlaceholderError) {

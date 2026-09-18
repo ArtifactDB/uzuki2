@@ -38,6 +38,9 @@ TEST(Hdf5Names, Vector) {
         EXPECT_TRUE(stuff->base.has_names);
         EXPECT_EQ(stuff->base.names, names);
         EXPECT_EQ(stuff->base.values, data);
+
+        // Test coverage of the relevant Dummy class.
+        validate_hdf5(path, "blub");
     }
 }
 
@@ -124,6 +127,9 @@ TEST(Hdf5Names, List) {
 
     EXPECT_TRUE(stuff->has_names);
     EXPECT_EQ(stuff->names, names);
+
+    // Test coverage of the relevant Dummy class.
+    validate_hdf5(path, "foo");
 }
 
 TEST(Hdf5Names, Error) {
