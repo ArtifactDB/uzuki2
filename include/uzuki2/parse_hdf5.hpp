@@ -446,7 +446,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             constexpr auto precision = std::numeric_limits<std::uint64_t>::digits;
             ritsuko::cvls::validate_pointer_datatype(dhandle, precision, precision);
             auto hhandle = handle.openDataSet("heap");
-            ritsuko::cvls::validate_heap(hhandle);
+            auto hlen = ritsuko::cvls::validate_heap(hhandle);
 
             const char* placeholder_name = "missing-value-placeholder";
             std::optional<std::string> missingness;
@@ -470,9 +470,6 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             if (is_scalar) {
                 ritsuko::cvls::Pointer<std::uint64_t, std::uint64_t> vlsptr;
                 dhandle.read(&vlsptr, ritsuko::cvls::define_pointer_datatype<std::uint64_t, std::uint64_t>());
-
-                hsize_t hlen;
-                hhandle.getSpace().getSimpleExtentDims(&hlen);
                 if (ritsuko::cvls::is_Pointer_out_of_range(vlsptr, hlen)) {
                     throw std::runtime_error("compressed VLS pointer in '" + ritsuko::hdf5::get_name(dhandle) + "' is out of range of the heap");
                 }
@@ -489,7 +486,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 set(0, std::string(cptr, cptr + ritsuko::hdf5::strnlen(cptr, vlsptr.length)));
 
             } else {
-                ritsuko::cvls::Stream1dArray<std::uint64_t, std::uint64_t> stream(&dhandle, len, &hhandle);
+                ritsuko::cvls::Stream1dArray<std::uint64_t, std::uint64_t> stream(&dhandle, len, &hhandle, hlen);
                 std::vector<std::string> buffer(stream.chunk_size());
                 while (1) {
                     const auto available = stream.load(buffer.data());
