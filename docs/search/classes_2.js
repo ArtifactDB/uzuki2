@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['external_0',['External',['../classuzuki2_1_1External.html',1,'uzuki2']]]
+  ['cast_0',['Cast',['https://ltla.github.io/sanisizer/classsanisizer_1_1Cast.html',1,'sanisizer']]]
 ];

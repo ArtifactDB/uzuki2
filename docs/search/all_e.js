@@ -11,6 +11,9 @@ var searchData=
   ['parsedlist_8',['ParsedList',['../structuzuki2_1_1ParsedList.html',1,'uzuki2']]],
   ['parsedlist_2ehpp_9',['ParsedList.hpp',['../ParsedList_8hpp.html',1,'']]],
   ['position_10',['position',['https://ltla.github.io/byteme/classbyteme_1_1BufferedReader.html#ab2e8c16f833432e10414208a89fb26c6',1,'byteme::BufferedReader']]],
-  ['provisioner_20requirements_11',['Provisioner requirements',['../namespaceuzuki2_1_1hdf5.html#provisioner-contract',1,'']]],
-  ['ptr_12',['ptr',['../structuzuki2_1_1ParsedList.html#a59daad773fe543ae299ff51ce78b2f5e',1,'uzuki2::ParsedList']]]
+  ['product_11',['product',['https://ltla.github.io/sanisizer/namespacesanisizer.html#ace3b6841d0fd165ae3f47d07a713a15c',1,'sanisizer']]],
+  ['product_5funsafe_12',['product_unsafe',['https://ltla.github.io/sanisizer/namespacesanisizer.html#aa3df28f9c655292959f7fbf22e61f9c2',1,'sanisizer']]],
+  ['provisioner_20requirements_13',['Provisioner requirements',['../namespaceuzuki2_1_1hdf5.html#provisioner-contract',1,'']]],
+  ['ptr_14',['ptr',['../structuzuki2_1_1ParsedList.html#a59daad773fe543ae299ff51ce78b2f5e',1,'uzuki2::ParsedList']]],
+  ['ptrdiff_2ehpp_15',['ptrdiff.hpp',['https://ltla.github.io/sanisizer/ptrdiff_8hpp.html',1,'']]]
 ];

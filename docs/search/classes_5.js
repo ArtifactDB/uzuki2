@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['integervector_0',['IntegerVector',['../classuzuki2_1_1IntegerVector.html',1,'uzuki2']]],
-  ['istreamreader_1',['IstreamReader',['https://ltla.github.io/byteme/classbyteme_1_1IstreamReader.html',1,'byteme']]]
+  ['factor_0',['Factor',['../classuzuki2_1_1Factor.html',1,'uzuki2']]]
 ];

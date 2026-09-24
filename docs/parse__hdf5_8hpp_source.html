@@ -108,7 +108,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;H5Cpp.h&quot;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;ritsuko/ritsuko.hpp&quot;</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;sanisizer/sanisizer.hpp&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;<a class="codeRef" href="https://ltla.github.io/sanisizer/sanisizer_8hpp.html">sanisizer/sanisizer.hpp</a>&quot;</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &quot;<a class="code" href="interfaces_8hpp.html">interfaces.hpp</a>&quot;</span></div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &quot;<a class="code" href="Dummy_8hpp.html">Dummy.hpp</a>&quot;</span></div>
@@ -122,7 +122,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
 <div class="foldopen" id="foldopen00044" data-start="{" data-end="};">
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="structuzuki2_1_1hdf5_1_1Options.html">   44</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structuzuki2_1_1hdf5_1_1Options.html">Options</a> {</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="structuzuki2_1_1hdf5_1_1Options.html#a7d44084f355c6def4b8109f69b9a15cd">   49</a></span>    hsize_t <a class="code hl_variable" href="structuzuki2_1_1hdf5_1_1Options.html#a7d44084f355c6def4b8109f69b9a15cd">buffer_size</a> = 10000;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="structuzuki2_1_1hdf5_1_1Options.html#a7d44084f355c6def4b8109f69b9a15cd">   49</a></span>    hsize_t <a class="code hl_variable" href="structuzuki2_1_1hdf5_1_1Options.html#a7d44084f355c6def4b8109f69b9a15cd">buffer_size</a> = <a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#abd46ba64586c8de228897cc013def813">sanisizer::cap&lt;hsize_t&gt;</a>(10000);</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="structuzuki2_1_1hdf5_1_1Options.html#a93ab8f17a23f6677921101b86626541e">   54</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="structuzuki2_1_1hdf5_1_1Options.html#a93ab8f17a23f6677921101b86626541e">strict_list</a> = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>};</div>
@@ -154,7 +154,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type_, <span class="keyword">class</span> Stream_, <span class="keyword">class</span> Action_&gt;</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="keywordtype">void</span> iterate_stream(Stream_&amp; stream, Action_ action) {</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keyword">auto</span> buffer = sanisizer::create&lt;std::vector&lt;Type_&gt; &gt;(stream.chunk_size());</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keyword">auto</span> buffer = <a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#a0c7c43499ff60d5185708c50b32a40d7">sanisizer::create&lt;std::vector&lt;Type_&gt;</a> &gt;(stream.chunk_size());</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordflow">while</span> (<span class="keyword">true</span>) {</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keyword">auto</span> available = stream.load(buffer.data());</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <span class="keywordflow">if</span> (available == 0) {</div>
@@ -373,7 +373,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    }</div>
 <div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>    hsize_t nlen;</div>
 <div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    space.getSimpleExtentDims(&amp;nlen);</div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    <span class="keywordflow">if</span> (!sanisizer::is_equal(nlen, ptr-&gt;size())) {</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    <span class="keywordflow">if</span> (!<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#a48da56272ee357d828828ffd58eda482">sanisizer::is_equal</a>(nlen, ptr-&gt;size())) {</div>
 <div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;number of names should be equal to the object length&quot;</span>);</div>
 <div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    }</div>
 <div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span> </div>
@@ -418,7 +418,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>        <span class="keyword">const</span> <span class="keyword">auto</span> len = dhandle.getNumObjs();</div>
 <div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span> </div>
 <div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>        <span class="keywordtype">bool</span> named = handle.exists(<span class="stringliteral">&quot;names&quot;</span>);</div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>        <span class="keyword">auto</span> lptr = Provisioner_::new_List(sanisizer::cast&lt;std::size_t&gt;(len), named);</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>        <span class="keyword">auto</span> lptr = Provisioner_::new_List(<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(len), named);</div>
 <div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>        output.reset(lptr);</div>
 <div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span> </div>
 <div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>        <span class="keywordflow">for</span> (I&lt;<span class="keyword">decltype</span>(len)&gt; i = 0; i &lt; len; ++i) {</div>
@@ -453,7 +453,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>        <span class="keyword">const</span> <span class="keywordtype">bool</span> named = handle.exists(<span class="stringliteral">&quot;names&quot;</span>);</div>
 <div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>        <span class="keyword">auto</span> vector_type = read_uzuki_attr(handle, <span class="stringliteral">&quot;uzuki_type&quot;</span>);</div>
 <div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <span class="keywordflow">if</span> (vector_type == <span class="stringliteral">&quot;integer&quot;</span>) {</div>
-<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>            <span class="keyword">auto</span> iptr = Provisioner_::new_Integer(sanisizer::cast&lt;std::size_t&gt;(len), named, is_scalar);</div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>            <span class="keyword">auto</span> iptr = Provisioner_::new_Integer(<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(len), named, is_scalar);</div>
 <div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>            output.reset(iptr);</div>
 <div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>            parse_integer_like(</div>
 <div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>                dhandle,</div>
@@ -465,7 +465,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>            );</div>
 <div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span> </div>
 <div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (vector_type == <span class="stringliteral">&quot;boolean&quot;</span>) {</div>
-<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>            <span class="keyword">auto</span> bptr = Provisioner_::new_Boolean(sanisizer::cast&lt;std::size_t&gt;(len), named, is_scalar);</div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>            <span class="keyword">auto</span> bptr = Provisioner_::new_Boolean(<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(len), named, is_scalar);</div>
 <div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>            output.reset(bptr);</div>
 <div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>            parse_integer_like(</div>
 <div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>                dhandle,</div>
@@ -509,7 +509,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>                ordered = tmp_ordered &gt; 0;</div>
 <div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>            }</div>
 <div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span> </div>
-<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>            <span class="keyword">auto</span> fptr = Provisioner_::new_Factor(sanisizer::cast&lt;std::size_t&gt;(len), named, is_scalar, sanisizer::cast&lt;std::size_t&gt;(levlen), ordered);</div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>            <span class="keyword">auto</span> fptr = Provisioner_::new_Factor(<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(len), named, is_scalar, <a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(levlen), ordered);</div>
 <div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>            output.reset(fptr);</div>
 <div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span>            parse_integer_like(</div>
 <div class="line"><a id="l00444" name="l00444"></a><span class="lineno">  444</span>                dhandle,</div>
@@ -518,7 +518,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>                [&amp;](std::int32_t x) -&gt; <span class="keywordtype">void</span> { </div>
 <div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span>                    <span class="keywordflow">if</span> (x &lt; 0) {</div>
 <div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>                        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;factor codes should be non-negative&quot;</span>);</div>
-<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>                    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (sanisizer::is_greater_than_or_equal(x, levlen)) {</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>                    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#a6e29b2bd239d09d23bf296ffa9c9c8a5">sanisizer::is_greater_than_or_equal</a>(x, levlen)) {</div>
 <div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>                        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;factor codes should be less than the number of levels&quot;</span>);</div>
 <div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>                    }</div>
 <div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>                },</div>
@@ -561,7 +561,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span>                missingness = ritsuko::hdf5::read_scalar_string(attr);</div>
 <div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span>            }</div>
 <div class="line"><a id="l00492" name="l00492"></a><span class="lineno">  492</span> </div>
-<div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span>            <span class="keyword">auto</span> ptr = Provisioner_::new_String(sanisizer::cast&lt;std::size_t&gt;(len), named, is_scalar, StringVector::NONE);</div>
+<div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span>            <span class="keyword">auto</span> ptr = Provisioner_::new_String(<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(len), named, is_scalar, StringVector::NONE);</div>
 <div class="line"><a id="l00494" name="l00494"></a><span class="lineno">  494</span>            output.reset(ptr);</div>
 <div class="line"><a id="l00495" name="l00495"></a><span class="lineno">  495</span> </div>
 <div class="line"><a id="l00496" name="l00496"></a><span class="lineno">  496</span>            <span class="keyword">auto</span> set = [&amp;](hsize_t i, std::string x) -&gt; <span class="keywordtype">void</span> { </div>
@@ -632,7 +632,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>                }</div>
 <div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>            }</div>
 <div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span> </div>
-<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>            <span class="keyword">auto</span> sptr = Provisioner_::new_String(sanisizer::cast&lt;std::size_t&gt;(len), named, is_scalar, format);</div>
+<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>            <span class="keyword">auto</span> sptr = Provisioner_::new_String(<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(len), named, is_scalar, format);</div>
 <div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>            output.reset(sptr);</div>
 <div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>            <span class="keywordflow">if</span> (format == StringVector::NONE) {</div>
 <div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>                parse_string_like(</div>
@@ -671,7 +671,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span>            }</div>
 <div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span> </div>
 <div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (vector_type == <span class="stringliteral">&quot;number&quot;</span>) {</div>
-<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>            <span class="keyword">auto</span> dptr = Provisioner_::new_Number(sanisizer::cast&lt;std::size_t&gt;(len), named, is_scalar);</div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>            <span class="keyword">auto</span> dptr = Provisioner_::new_Number(<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast&lt;std::size_t&gt;</a>(len), named, is_scalar);</div>
 <div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span>            output.reset(dptr);</div>
 <div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span>            parse_numbers(</div>
 <div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span>                dhandle,</div>
@@ -708,7 +708,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>        ihandle.read(&amp;idx, H5::PredType::NATIVE_INT32);</div>
 <div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>        <span class="keywordflow">if</span> (idx &lt; 0) {</div>
 <div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;external index at &#39;index&#39; should be non-negative&quot;</span>);</div>
-<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (sanisizer::is_greater_than_or_equal(idx, ext.size())) {</div>
+<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_functionRef" href="https://ltla.github.io/sanisizer/namespacesanisizer.html#a6e29b2bd239d09d23bf296ffa9c9c8a5">sanisizer::is_greater_than_or_equal</a>(idx, ext.size())) {</div>
 <div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;external index at &#39;index&#39; is out of range&quot;</span>);</div>
 <div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span>        }</div>
 <div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span> </div>
@@ -776,9 +776,15 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="aclassuzuki2_1_1DummyExternals_html"><div class="ttname"><a href="classuzuki2_1_1DummyExternals.html">uzuki2::DummyExternals</a></div><div class="ttdoc">Dummy class satisfying the Externals_ interface of hdf5::parse().</div><div class="ttdef"><b>Definition</b> Dummy.hpp:131</div></div>
 <div class="ttc" id="aclassuzuki2_1_1StringVector_html_a19642038725cf2a60f158245c876cab6"><div class="ttname"><a href="classuzuki2_1_1StringVector.html#a19642038725cf2a60f158245c876cab6">uzuki2::StringVector::Format</a></div><div class="ttdeci">Format</div><div class="ttdef"><b>Definition</b> interfaces.hpp:159</div></div>
 <div class="ttc" id="ainterfaces_8hpp_html"><div class="ttname"><a href="interfaces_8hpp.html">interfaces.hpp</a></div><div class="ttdoc">Defines the interfaces to use in HDF5 parsing.</div></div>
+<div class="ttc" id="anamespacesanisizer_html_a0c7c43499ff60d5185708c50b32a40d7"><div class="ttname"><a href="https://ltla.github.io/sanisizer/namespacesanisizer.html#a0c7c43499ff60d5185708c50b32a40d7">sanisizer::create</a></div><div class="ttdeci">Container_ create(Value_ x, Args_ &amp;&amp;... args)</div></div>
+<div class="ttc" id="anamespacesanisizer_html_a48da56272ee357d828828ffd58eda482"><div class="ttname"><a href="https://ltla.github.io/sanisizer/namespacesanisizer.html#a48da56272ee357d828828ffd58eda482">sanisizer::is_equal</a></div><div class="ttdeci">constexpr bool is_equal(Left_ left, Right_ right)</div></div>
+<div class="ttc" id="anamespacesanisizer_html_a6e29b2bd239d09d23bf296ffa9c9c8a5"><div class="ttname"><a href="https://ltla.github.io/sanisizer/namespacesanisizer.html#a6e29b2bd239d09d23bf296ffa9c9c8a5">sanisizer::is_greater_than_or_equal</a></div><div class="ttdeci">constexpr bool is_greater_than_or_equal(Left_ left, Right_ right)</div></div>
+<div class="ttc" id="anamespacesanisizer_html_abd46ba64586c8de228897cc013def813"><div class="ttname"><a href="https://ltla.github.io/sanisizer/namespacesanisizer.html#abd46ba64586c8de228897cc013def813">sanisizer::cap</a></div><div class="ttdeci">constexpr Dest_ cap(Value_ x)</div></div>
+<div class="ttc" id="anamespacesanisizer_html_acde4a5b2077777f0c0d0b0761183b29b"><div class="ttname"><a href="https://ltla.github.io/sanisizer/namespacesanisizer.html#acde4a5b2077777f0c0d0b0761183b29b">sanisizer::cast</a></div><div class="ttdeci">constexpr Dest_ cast(Value_ x)</div></div>
 <div class="ttc" id="anamespaceuzuki2_1_1hdf5_html_a090d1af1b9b61247cac8a40f50e4c14f"><div class="ttname"><a href="namespaceuzuki2_1_1hdf5.html#a090d1af1b9b61247cac8a40f50e4c14f">uzuki2::hdf5::parse</a></div><div class="ttdeci">ParsedList parse(const H5::Group &amp;group, Externals_ ext, const Options &amp;options)</div><div class="ttdef"><b>Definition</b> parse_hdf5.hpp:705</div></div>
 <div class="ttc" id="anamespaceuzuki2_1_1hdf5_html_a3e54712aa337a43e9505984f62a55ad8"><div class="ttname"><a href="namespaceuzuki2_1_1hdf5.html#a3e54712aa337a43e9505984f62a55ad8">uzuki2::hdf5::validate</a></div><div class="ttdeci">void validate(const H5::Group &amp;group, int num_external, const Options &amp;options)</div><div class="ttdef"><b>Definition</b> parse_hdf5.hpp:755</div></div>
 <div class="ttc" id="anamespaceuzuki2_html"><div class="ttname"><a href="namespaceuzuki2.html">uzuki2</a></div><div class="ttdoc">Parse an R list from a HDF5 or JSON file.</div><div class="ttdef"><b>Definition</b> parse_json.hpp:31</div></div>
+<div class="ttc" id="asanisizer_8hpp_html"><div class="ttname"><a href="https://ltla.github.io/sanisizer/sanisizer_8hpp.html">sanisizer.hpp</a></div></div>
 <div class="ttc" id="astructuzuki2_1_1ParsedList_html"><div class="ttname"><a href="structuzuki2_1_1ParsedList.html">uzuki2::ParsedList</a></div><div class="ttdoc">Results of parsing a list from file.</div><div class="ttdef"><b>Definition</b> ParsedList.hpp:19</div></div>
 <div class="ttc" id="astructuzuki2_1_1hdf5_1_1Options_html"><div class="ttname"><a href="structuzuki2_1_1hdf5_1_1Options.html">uzuki2::hdf5::Options</a></div><div class="ttdoc">Options for HDF5 file parsing.</div><div class="ttdef"><b>Definition</b> parse_hdf5.hpp:44</div></div>
 <div class="ttc" id="astructuzuki2_1_1hdf5_1_1Options_html_a7d44084f355c6def4b8109f69b9a15cd"><div class="ttname"><a href="structuzuki2_1_1hdf5_1_1Options.html#a7d44084f355c6def4b8109f69b9a15cd">uzuki2::hdf5::Options::buffer_size</a></div><div class="ttdeci">hsize_t buffer_size</div><div class="ttdef"><b>Definition</b> parse_hdf5.hpp:49</div></div>

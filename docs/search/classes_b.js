@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['serialbufferedreader_0',['SerialBufferedReader',['https://ltla.github.io/byteme/classbyteme_1_1SerialBufferedReader.html',1,'byteme']]],
-  ['serialbufferedwriter_1',['SerialBufferedWriter',['https://ltla.github.io/byteme/classbyteme_1_1SerialBufferedWriter.html',1,'byteme']]],
-  ['stringvector_2',['StringVector',['../classuzuki2_1_1StringVector.html',1,'uzuki2']]]
+  ['parallelbufferedreader_0',['ParallelBufferedReader',['https://ltla.github.io/byteme/classbyteme_1_1ParallelBufferedReader.html',1,'byteme']]],
+  ['parallelbufferedwriter_1',['ParallelBufferedWriter',['https://ltla.github.io/byteme/classbyteme_1_1ParallelBufferedWriter.html',1,'byteme']]],
+  ['parsedlist_2',['ParsedList',['../structuzuki2_1_1ParsedList.html',1,'uzuki2']]]
 ];
