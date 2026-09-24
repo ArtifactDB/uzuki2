@@ -426,7 +426,7 @@ struct Options {
      * Size of the buffer to use for reading and decompressing bytes.
      * Larger values may improve speed at the cost of memory usage.
      */
-    std::size_t buffer_size = 65536;
+    std::size_t buffer_size = sanisizer::cap<std::size_t>(65536);
 };
 
 /**

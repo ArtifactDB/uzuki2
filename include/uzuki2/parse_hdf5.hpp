@@ -46,7 +46,7 @@ struct Options {
      * Size of the buffer to use for streaming contiguous HDF5 datasets.
      * This is ignored for chunked datasets, where the buffer is set to the chunk size.
      */
-    hsize_t buffer_size = 10000;
+    hsize_t buffer_size = sanisizer::cap<hsize_t>(10000);
 
     /**
      * Whether to throw an error if the top-level R object is not an R list.
