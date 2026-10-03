@@ -62,7 +62,7 @@ TEST(Hdf5List, NestedLoading) {
     EXPECT_EQ(lptr->size(), 1);
 }
 
-TEST(Hdf5List, CheckError) {
+TEST(Hdf5List, jheckError) {
     auto path = "TEST-list.h5";
     H5Eset_auto2(H5E_DEFAULT, NULL, NULL);
 
@@ -73,13 +73,7 @@ TEST(Hdf5List, CheckError) {
         auto dhandle = ghandle.createGroup("data");
         nothing_opener(dhandle, "1");
     }
-    bool failed = true;
-    try {
-        uzuki2::hdf5::validate(path, "foo", 0, {});
-    } catch (H5::Exception&) {
-        failed = true;
-    }
-    EXPECT_TRUE(failed);
+    expect_hdf5_error(path, "foo", "failed to read element 0");
 
     // Catches and rethrows nested errors correctly.
     {

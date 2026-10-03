@@ -230,7 +230,7 @@ TEST(Hdf5Factor, LevelsError) {
         write_numbers(vhandle, "data", data, H5::PredType::NATIVE_INT32);
         write_strings(vhandle, "levels", { "Malcolm", "Malcolm", "John" });
     }
-    expect_hdf5_error(path, "blub", "unique");
+    expect_hdf5_error(path, "blub", "duplicated");
 }
 
 TEST(Hdf5Factor, OrderedError) {
