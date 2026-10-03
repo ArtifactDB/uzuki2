@@ -570,7 +570,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>                    stream,</div>
 <div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span>                    [&amp;](hsize_t pos, std::string val) -&gt; <span class="keywordtype">void</span> {</div>
 <div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span>                        <span class="keywordflow">if</span> (present.find(val) != present.end()) {</div>
-<div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>                            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;detected duplicate factor level &#39;&quot;</span> + val + <span class="stringliteral">&quot;&#39;&quot;</span>);</div>
+<div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>                            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;detected duplicated factor level &#39;&quot;</span> + val + <span class="stringliteral">&quot;&#39;&quot;</span>);</div>
 <div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>                        }</div>
 <div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>                        fptr-&gt;set_level(pos, val); </div>
 <div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>                        present.insert(std::move(val));</div>
