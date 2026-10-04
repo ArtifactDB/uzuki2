@@ -63,14 +63,14 @@ void expect_hdf5_external_error(std::string path, std::string name, std::string 
     H5::H5File file(path, H5F_ACC_RDONLY); 
     uzuki2::hdf5::Options opt;
     opt.strict_list = false;
-    EXPECT_ANY_THROW({
-        try {
-            uzuki2::hdf5::validate(file.openGroup(name), num_expected, std::move(opt));
-        } catch (std::exception& e) {
-            EXPECT_THAT(e.what(), ::testing::HasSubstr(msg));
-            throw;
-        }
-    });
+
+    std::string output;
+    try {
+        uzuki2::hdf5::validate(file.openGroup(name), num_expected, std::move(opt));
+    } catch (std::exception& e) {
+        output = get_message(e);
+    }
+    EXPECT_THAT(output, ::testing::HasSubstr(msg));
 }
 
 TEST(Hdf5External, CheckErrors) {

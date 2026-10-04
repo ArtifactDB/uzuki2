@@ -175,12 +175,24 @@ inline auto load_hdf5_strict(const std::string& name, const std::string& group) 
     return uzuki2::hdf5::parse<DefaultProvisioner>(name, group, uzuki2::DummyExternals(), {});
 }
 
+inline std::string get_message(const std::exception& e) {
+    std::string output = e.what();
+    try {
+        std::rethrow_if_nested(e);
+    } catch (std::exception& e) {
+        output += "; " + get_message(e);
+    } catch (H5::Exception& e) {
+        output += "; " + e.getDetailMsg();
+    }
+    return output;
+}
+
 inline void expect_hdf5_error(std::string file, std::string name, std::string msg) {
     std::string obs;
     try {
         uzuki2::hdf5::validate(file, name, 0, {});
     } catch (std::exception& e) {
-        obs = e.what();
+        obs = get_message(e);
     }
     EXPECT_THAT(obs, ::testing::HasSubstr(msg));
 }

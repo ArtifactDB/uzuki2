@@ -57,17 +57,6 @@ struct Options {
 /**
  * @cond
  */
-[[noreturn]]
-inline void wrap_hdf5_error(const std::exception_ptr& err, const std::string& context) {
-    try {
-        std::rethrow_exception(err);
-    } catch (std::exception& e) {
-        throw std::runtime_error(context + "; " + std::string(e.what()));
-    } catch (H5::Exception& e) {
-        throw std::runtime_error(context + "; " + e.getDetailMsg());
-    }
-}
-
 inline void validate_numeric_missing_placeholder(const H5::Attribute& attr, const H5::DataSet& data, const Version& version) { 
     if (attr.getSpace().getSimpleExtentNdims() != 0) {
         throw std::runtime_error("expected the missing value placeholder to be a scalar attribute");
@@ -125,7 +114,7 @@ void parse_integer_like(const H5::DataSet& handle, Host_* ptr, bool is_scalar, F
                 validate_numeric_missing_placeholder(attr, handle, version);
                 attr.read(H5::PredType::NATIVE_INT32, &missing_value);
             } catch (...) {
-                wrap_hdf5_error(std::current_exception(), "failed to read the '" + std::string(placeholder_name) + "' attribute");
+                std::throw_with_nested(std::runtime_error("failed to read the '" + std::string(placeholder_name) + "' attribute"));
             }
         }
     }
@@ -171,7 +160,7 @@ void parse_string_like(const H5::DataSet& handle, Host_* ptr, bool is_scalar, Fu
             validate_string_missing_placeholder(attr);
             missingness = ritsuko::hdf5::read_scalar_string(attr);
         } catch (...) {
-            wrap_hdf5_error(std::current_exception(), "failed to read the '" + std::string(placeholder_name) + "' attribute");
+            std::throw_with_nested(std::runtime_error("failed to read the '" + std::string(placeholder_name) + "' attribute"));
         }
     }
 
@@ -257,7 +246,7 @@ void parse_numbers(const H5::DataSet& handle, Host_* ptr, bool is_scalar, Functi
                 validate_numeric_missing_placeholder(attr, handle, version);
                 attr.read(H5::PredType::NATIVE_DOUBLE, &missing_value);
             } catch (...) {
-                wrap_hdf5_error(std::current_exception(), "failed to read the '" + std::string(placeholder_name) + "' attribute");
+                std::throw_with_nested(std::runtime_error("failed to read the '" + std::string(placeholder_name) + "' attribute"));
             }
         }
     }
@@ -354,7 +343,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
         auto ahandle = handle.openAttribute("uzuki_object");
         object_type = safe_read_scalar_string_attribute(ahandle);
     } catch (...) {
-        wrap_hdf5_error(std::current_exception(), "failed to read the 'uzuki_object' attribute");
+        std::throw_with_nested(std::runtime_error("failed to read the 'uzuki_object' attribute"));
     }
 
     std::shared_ptr<Base> output;
@@ -374,11 +363,11 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                     auto lhandle = dhandle.openGroup(istr);
                     lptr->set(i, parse_inner<Provisioner_>(lhandle, ext, version, options));
                 } catch (...) {
-                    wrap_hdf5_error(std::current_exception(), "failed to read element " + istr);
+                    std::throw_with_nested(std::runtime_error("failed to read element " + istr));
                 }
             }
         } catch (...) {
-            wrap_hdf5_error(std::current_exception(), "failed to read 'data'");
+            std::throw_with_nested(std::runtime_error("failed to read 'data'"));
         }
 
         if (named) {
@@ -387,7 +376,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 auto nhandle = handle.openDataSet("names");
                 parse_names(nhandle, lptr, options);
             } catch (...) {
-                wrap_hdf5_error(std::current_exception(), "failed to read 'names'");
+                std::throw_with_nested(std::runtime_error("failed to read 'names'"));
             }
         }
 
@@ -397,7 +386,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             auto ahandle = handle.openAttribute("uzuki_type");
             vector_type = safe_read_scalar_string_attribute(ahandle);
         } catch (...) {
-            wrap_hdf5_error(std::current_exception(), "failed to read the 'uzuki_type' attribute");
+            std::throw_with_nested(std::runtime_error("failed to read the 'uzuki_type' attribute"));
         }
 
         const bool named = handle.exists("names");
@@ -465,7 +454,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                         ohandle.read(&tmp_ordered, H5::PredType::NATIVE_INT32);
                         ordered = tmp_ordered > 0;
                     } catch (...) {
-                        wrap_hdf5_error(std::current_exception(), "failed to validate 'ordered'");
+                        std::throw_with_nested(std::runtime_error("failed to validate 'ordered'"));
                     }
                 }
 
@@ -539,7 +528,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                         validate_string_missing_placeholder(attr);
                         missingness = ritsuko::hdf5::read_scalar_string(attr);
                     } catch (...) {
-                        wrap_hdf5_error(std::current_exception(), "failed to validate the '" + std::string(placeholder_name) + "'");
+                        std::throw_with_nested(std::runtime_error("failed to validate the '" + std::string(placeholder_name) + "'"));
                     }
                 }
 
@@ -679,7 +668,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 case HEAP: desc = "heap"; break;
                 case FORMAT: desc = "format"; break;
             };
-            wrap_hdf5_error(std::current_exception(), "failed to read '" + desc + "'");
+            std::throw_with_nested(std::runtime_error("failed to read '" + desc + "'"));
         }
 
         if (named) {
@@ -688,7 +677,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                 auto nhandle = handle.openDataSet("names");
                 parse_names(nhandle, vptr, options);
             } catch (...) {
-                wrap_hdf5_error(std::current_exception(), "failed to read 'names'");
+                std::throw_with_nested(std::runtime_error("failed to read 'names'"));
             }
         }
 
@@ -716,7 +705,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
 
             output.reset(Provisioner_::new_External(ext.get(idx)));
         } catch (...) {
-            wrap_hdf5_error(std::current_exception(), "failed to read 'index'");
+            std::throw_with_nested(std::runtime_error("failed to read 'index'"));
         }
 
     } else {
@@ -785,7 +774,7 @@ ParsedList parse(const H5::Group& group, Externals_ ext, const Options& options)
             version.major = vraw.major;
             version.minor = vraw.minor;
         } catch (...) {
-            wrap_hdf5_error(std::current_exception(), "failed to read the 'uzuki_version' attribute");
+            std::throw_with_nested(std::runtime_error("failed to read the 'uzuki_version' attribute"));
         }
     }
 
@@ -822,7 +811,7 @@ ParsedList parse(const std::string& file, const std::string& name, Externals_ ex
         H5::H5File fhandle(file, H5F_ACC_RDONLY);
         return parse<Provisioner_>(fhandle.openGroup(name), std::move(ext), options);
     } catch (...) {
-        wrap_hdf5_error(std::current_exception(), "failed to parse '" + name + "' in '" + file + "'");
+        std::throw_with_nested(std::runtime_error("failed to parse '" + name + "' in '" + file + "'"));
     }
 }
 
