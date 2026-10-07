@@ -237,14 +237,16 @@ TEST(Hdf5Vls, MissingPlaceholderScalar) {
 TEST(Hdf5Vls, MissingPlaceholderError) {
     auto path = "TEST-vls.h5";
     std::string heap = "abcdefghijklmno";
+    ritsuko::cvls::Pointer<uint64_t, uint64_t> full;
+    full.offset = 0;
+    full.length = heap.size();
+    std::vector<ritsuko::cvls::Pointer<uint64_t, uint64_t> > pointers(10, full);
 
     {
         H5::H5File handle(path, H5F_ACC_TRUNC);
         auto vhandle = vector_opener(handle, "blub", "vls");
         add_version(vhandle, "1.4");
         dump_heap(vhandle, heap.c_str(), heap.size());
-
-        std::vector<ritsuko::cvls::Pointer<uint64_t, uint64_t> > pointers(10);
         auto phandle = dump_pointers(vhandle, pointers);
         constexpr hsize_t one = 1;
         phandle.createAttribute("missing-value-placeholder", H5::StrType(0, H5T_VARIABLE), H5::DataSpace(1, &one));
@@ -252,10 +254,12 @@ TEST(Hdf5Vls, MissingPlaceholderError) {
     expect_hdf5_error(path, "blub", "scalar");
 
     {
-        H5::H5File handle(path, H5F_ACC_RDWR);
-        auto vhandle = handle.openDataSet("blub/data");
-        vhandle.removeAttr("missing-value-placeholder");
-        vhandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT32, H5S_SCALAR);
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "vls");
+        add_version(vhandle, "1.4");
+        dump_heap(vhandle, heap.c_str(), heap.size());
+        auto phandle = dump_pointers(vhandle, pointers);
+        phandle.createAttribute("missing-value-placeholder", H5::PredType::NATIVE_INT32, H5S_SCALAR);
     }
     expect_hdf5_error(path, "blub", "attribute to be a UTF-8 string");
 }

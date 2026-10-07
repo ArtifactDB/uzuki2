@@ -27,9 +27,10 @@ TEST(Hdf5Names, Vector) {
     // Plus names.
     std::vector<std::string> names{ "A", "B", "C", "D", "E" };
     {
-        H5::H5File handle(path, H5F_ACC_RDWR);
-        auto ghandle = handle.openGroup("blub");
-        write_strings(ghandle, "names", names);
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "integer");
+        write_numbers(vhandle, "data", data, H5::PredType::NATIVE_INT32);
+        write_strings(vhandle, "names", names);
     }
     {
         auto parsed = load_hdf5(path, "blub");
@@ -63,9 +64,10 @@ TEST(Hdf5Names, Scalar) {
 
     // Plus names.
     {
-        H5::H5File handle(path, H5F_ACC_RDWR);
-        auto ghandle = handle.openGroup("blub");
-        write_strings(ghandle, "names", { "A" });
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "integer");
+        write_number(vhandle, "data", 999, H5::PredType::NATIVE_INT32);
+        write_strings(vhandle, "names", { "A" });
     }
     {
         auto parsed = load_hdf5(path, "blub");

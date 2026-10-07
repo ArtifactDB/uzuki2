@@ -29,8 +29,9 @@ TEST(Hdf5String, FixedVector) {
 
     // Also testing some more recent versions to get some coverage of the no-'format' case.
     {
-        H5::H5File handle(path, H5F_ACC_RDWR);
-        auto vhandle = handle.openGroup("blub");
+        H5::H5File handle(path, H5F_ACC_TRUNC);
+        auto vhandle = vector_opener(handle, "blub", "string");
+        write_strings(vhandle, "data", data);
         add_version(vhandle, "1.1");
     }
     {
