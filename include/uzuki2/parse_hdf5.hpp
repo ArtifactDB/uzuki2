@@ -7,6 +7,7 @@
 #include <string>
 #include <cstring>
 #include <stdexcept>
+#include <exception>
 #include <cstdint>
 #include <unordered_set>
 
@@ -719,6 +720,8 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
  */
 
 /**
+ * Read an **uzuki2**-formatted list inside a HDF5 group. 
+ *
  * @tparam Provisioner_ A class namespace defining static methods for creating new `Base` objects.
  * @tparam Externals_ Class describing how to resolve external references for type `EXTERNAL`.
  *
@@ -728,8 +731,9 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
  *
  * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner_`, this may contain references to all nested objects. 
- * 
- * Any invalid representations in `contents` will cause an error to be thrown.
+ *
+ * @throw std::exception Thrown upon encountering an invalid representation in `group`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  *
  * @section provisioner-contract Provisioner requirements
  * The `Provisioner_` class is expected to provide the following static methods:
@@ -802,8 +806,9 @@ ParsedList parse(const H5::Group& group, Externals_ ext, const Options& options)
  *
  * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner_`, this may contain references to all nested objects. 
- * 
- * Any invalid representations in `contents` will cause an error to be thrown.
+ *
+ * @throw std::exception Thrown upon encountering an invalid representation in `file`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 template<class Provisioner_, class Externals_>
 ParsedList parse(const std::string& file, const std::string& name, Externals_ ext, Options options = Options()) {
@@ -817,11 +822,13 @@ ParsedList parse(const std::string& file, const std::string& name, Externals_ ex
 
 /**
  * Validate HDF5 file contents against the **uzuki2** specification, given the HDF5 group containing the list.
- * Any invalid representations will cause an error to be thrown.
  *
  * @param group HDF5 group representing an R list.
  * @param num_external Expected number of external references. 
  * @param options Optional parameters.
+ *
+ * @throw std::exception Thrown upon encountering an invalid representation in `group`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 inline void validate(const H5::Group& group, int num_external, const Options& options) {
     parse<DummyProvisioner>(group, DummyExternals(num_external), options);
@@ -829,12 +836,14 @@ inline void validate(const H5::Group& group, int num_external, const Options& op
 
 /**
  * Validate HDF5 file contents against the **uzuki2** specification, given the file path.
- * Any invalid representations will cause an error to be thrown.
  *
  * @param file Path to a HDF5 file.
  * @param name Name of the HDF5 group containing the list in `file`.
  * @param num_external Expected number of external references. 
  * @param options Optional parameters.
+ *
+ * @throw std::exception Thrown upon encountering an invalid representation in `file`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 inline void validate(const std::string& file, const std::string& name, int num_external, const Options& options) {
     parse<DummyProvisioner>(file, name, DummyExternals(num_external), options);
