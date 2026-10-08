@@ -148,6 +148,7 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Read an <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b>-formatted list inside a HDF5 group.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Provisioner_</td><td>A class namespace defining static methods for creating new <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> objects. </td></tr>
@@ -164,7 +165,12 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="structuzuki2_1_1ParsedList.html" title="Results of parsing a list from file.">ParsedList</a></code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner_</code>, this may contain references to all nested objects.</dd></dl>
-<p>Any invalid representations in <code>contents</code> will cause an error to be thrown.</p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>group</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message.</td></tr>
+  </table>
+  </dd>
+</dl>
 <h1><a class="anchor" id="provisioner-contract"></a>
 Provisioner requirements</h1>
 <p>The <code>Provisioner_</code> class is expected to provide the following static methods:</p>
@@ -236,7 +242,12 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="structuzuki2_1_1ParsedList.html" title="Results of parsing a list from file.">ParsedList</a></code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner_</code>, this may contain references to all nested objects.</dd></dl>
-<p>Any invalid representations in <code>contents</code> will cause an error to be thrown. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>file</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -271,12 +282,18 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the HDF5 group containing the list. Any invalid representations will cause an error to be thrown.</p>
+<p>Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the HDF5 group containing the list.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">group</td><td>HDF5 group representing an R list. </td></tr>
     <tr><td class="paramname">num_external</td><td>Expected number of external references. </td></tr>
-    <tr><td class="paramname">options</td><td>Optional parameters. </td></tr>
+    <tr><td class="paramname">options</td><td>Optional parameters.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>group</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -319,13 +336,19 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the file path. Any invalid representations will cause an error to be thrown.</p>
+<p>Validate HDF5 file contents against the <b><a class="el" href="namespaceuzuki2.html" title="Parse an R list from a HDF5 or JSON file.">uzuki2</a></b> specification, given the file path.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">file</td><td>Path to a HDF5 file. </td></tr>
     <tr><td class="paramname">name</td><td>Name of the HDF5 group containing the list in <code>file</code>. </td></tr>
     <tr><td class="paramname">num_external</td><td>Expected number of external references. </td></tr>
-    <tr><td class="paramname">options</td><td>Optional parameters. </td></tr>
+    <tr><td class="paramname">options</td><td>Optional parameters.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>file</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>
 </dl>
