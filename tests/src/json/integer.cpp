@@ -42,7 +42,7 @@ TEST(JsonInteger, Missing) {
 }
 
 TEST(JsonInteger, Error) {
-    expect_json_error("{ \"type\": \"integer\" }", "expected 'values' property");
+    expect_json_error("{ \"type\": \"integer\" }", "no such property");
     expect_json_error("{ \"type\": \"integer\", \"values\": \"foo\"}", "expected a number");
 
     expect_json_error("{ \"type\": \"integer\", \"values\": [true]}", "expected a number");

@@ -47,12 +47,22 @@ inline auto load_json_strict(std::string x, bool parallel = false) {
     return uzuki2::json::parse_buffer<DefaultProvisioner>(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), uzuki2::DummyExternals(), std::move(opt));
 }
 
+inline std::string get_json_message(const std::exception& e) {
+    std::string output = e.what();
+    try {
+        std::rethrow_if_nested(e);
+    } catch (std::exception& e) {
+        output += "; " + get_json_message(e);
+    }
+    return output;
+}
+
 inline void expect_json_error(std::string json, std::string msg) {
     std::string obs;
     try {
         uzuki2::json::validate_buffer(reinterpret_cast<const unsigned char*>(json.c_str()), json.size(), 0, {});
     } catch (std::exception& e) {
-        obs = e.what();
+        obs = get_json_message(e);
     }
     EXPECT_THAT(obs, ::testing::HasSubstr(msg));
 }

@@ -39,13 +39,13 @@ void expect_json_external_error(std::string x, std::string msg, int num_expected
     try {
         uzuki2::json::validate_buffer(reinterpret_cast<const unsigned char*>(x.c_str()), x.size(), num_expected, {});
     } catch (std::exception& e) {
-        obs = e.what();
+        obs = get_json_message(e);
     }
     EXPECT_THAT(obs, ::testing::HasSubstr(msg));
 }
 
 TEST(JsonExternal, CheckErrors) {
-    expect_json_external_error("{\"type\":\"external\"}", "expected 'index'", 1);
+    expect_json_external_error("{\"type\":\"external\"}", "no such property", 1);
     expect_json_external_error("{\"type\":\"external\", \"index\":false}", "expected a number", 1);
     expect_json_external_error("{\"type\":\"external\", \"index\":1.2}", "expected an integer", 1);
     expect_json_external_error("{\"type\":\"external\", \"index\":-1}", "non-negative", 1);

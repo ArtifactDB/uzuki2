@@ -13,11 +13,11 @@
 #include "../test_subclass.h"
 
 TEST(JsonParse, Error) {
-    expect_json_error("{}", "missing 'type'");
+    expect_json_error("{}", "no such property");
     expect_json_error("{ \"type\": true }", "string");
     expect_json_error("{ \"type\":\"nothing\" }", "top-level object should represent an R list");
-    expect_json_error("{ \"version\": true }", "expected a string in 'version'");
-    expect_json_error("{ \"type\": \"integer\" }", "expected 'values' property");
+    expect_json_error("{ \"version\": true }", "expected a string");
+    expect_json_error("{ \"type\": \"integer\" }", "no such property");
     expect_json_error("{ \"type\": \"integer\", \"values\": {} }", "expected a number"); // correctly promote {} to [{}] for further processing.
 }
 

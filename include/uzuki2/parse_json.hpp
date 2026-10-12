@@ -6,6 +6,7 @@
 #include <cctype>
 #include <string>
 #include <stdexcept>
+#include <exception>
 #include <cmath>
 #include <unordered_map>
 #include <unordered_set>
@@ -43,194 +44,221 @@ namespace json {
 /**
  * @cond
  */
-inline const std::vector<std::shared_ptr<millijson::Base> >& extract_array(
-    const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, 
-    const std::string& name, 
-    const std::string& path) 
-{
-    auto vIt = properties.find(name);
-    if (vIt == properties.end()) {
-        throw std::runtime_error("expected '" + name + "' property for object at '" + path + "'");
+inline const std::vector<std::shared_ptr<millijson::Base> >& extract_array(const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, const std::string& name) {
+    auto it = properties.find(name);
+    if (it == properties.end()) {
+        throw std::runtime_error("no such property");
     }
 
-    const auto& values_ptr = vIt->second;
-    if (values_ptr->type() != millijson::ARRAY) {
-        throw std::runtime_error("expected an array in '" + path + "/" + name + "'"); 
+    const auto& ptr = it->second;
+    if (ptr->type() != millijson::ARRAY) {
+        throw std::runtime_error("expected an array");
     }
 
-    return static_cast<const millijson::Array*>(values_ptr.get())->value();
+    return static_cast<const millijson::Array*>(ptr.get())->value();
 }
 
-inline const millijson::Array* has_names(const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, const std::string& path) {
-    auto nIt = properties.find("names");
-    if (nIt == properties.end()) {
+inline const millijson::Array* extract_array_or_null(const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, const std::string& name) {
+    auto it = properties.find(name);
+    if (it == properties.end()) {
         return NULL;
     }
 
-    const auto name_ptr = nIt->second;
-    if (name_ptr->type() != millijson::ARRAY) {
-        throw std::runtime_error("expected an array in '" + path + "/names'"); 
+    const auto ptr = it->second;
+    if (ptr->type() != millijson::ARRAY) {
+        throw std::runtime_error("expected an array");
     }
-    return static_cast<const millijson::Array*>(name_ptr.get());
+
+    return static_cast<const millijson::Array*>(ptr.get());
 }
 
 template<class Destination_>
-void fill_names(const millijson::Array* names_ptr, Destination_* dest, const std::string& path) {
+void fill_names(const millijson::Array* names_ptr, Destination_* dest) {
     const auto& names = names_ptr->value();
     if (names.size() != dest->size()) {
-        throw std::runtime_error("length of 'names' and 'values' should be the same in '" + path + "'"); 
+        throw std::runtime_error("unexpected number of names");
     }
 
     const auto nnames = names.size();
     for (I<decltype(nnames)> i = 0; i < nnames; ++i) {
         if (names[i]->type() != millijson::STRING) {
-            throw std::runtime_error("expected a string at '" + path + "/names/" + std::to_string(i) + "'");
+            throw std::runtime_error("expected a string at element " + std::to_string(i));
         }
         dest->set_name(i, static_cast<const millijson::String*>(names[i].get())->value());
     }
 }
 
 template<class Function_>
-auto process_array_or_scalar_values(
-    const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, 
-    const std::string& path,
-    Function_ fun)
-{
-    auto vIt = properties.find("values");
-    if (vIt == properties.end()) {
-        throw std::runtime_error("expected 'values' property for object at '" + path + "'");
+auto process_array_or_scalar_values(const std::unordered_map<std::string, std::shared_ptr<millijson::Base> >& properties, Function_ fun) {
+    const millijson::Array* names_ptr;
+    try {
+        names_ptr = extract_array_or_null(properties, "names");
+    } catch (...) {
+        std::throw_with_nested(std::runtime_error("failed to read 'names'")); 
     }
 
-    auto names_ptr = has_names(properties, path);
-    bool has_names = names_ptr != NULL;
+    auto out_ptr = [&]{
+        try {
+            auto vIt = properties.find("values");
+            if (vIt == properties.end()) {
+                throw std::runtime_error("no such property");
+            }
 
-    typename std::invoke_result<Function_,std::vector<std::shared_ptr<millijson::Base> >,bool,bool>::type out_ptr;
+            const auto& values_ptr = vIt->second;
+            if (values_ptr->type() == millijson::ARRAY) {
+                return fun(static_cast<const millijson::Array*>(values_ptr.get())->value(), names_ptr != NULL, false);
+            } else {
+                std::vector<std::shared_ptr<millijson::Base> > temp { values_ptr };
+                return fun(temp, names_ptr != NULL, true);
+            }
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("failed to read 'values'"));
+        }
+    }();
 
-    const auto& values_ptr = vIt->second;
-    if (values_ptr->type() == millijson::ARRAY) {
-        out_ptr = fun(static_cast<const millijson::Array*>(values_ptr.get())->value(), has_names, false);
-    } else {
-        std::vector<std::shared_ptr<millijson::Base> > temp { values_ptr };
-        out_ptr = fun(temp, has_names, true);
-    }
-
-    if (has_names) {
-        fill_names(names_ptr, out_ptr, path);
+    if (names_ptr != NULL) {
+        try {
+            fill_names(names_ptr, out_ptr);
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("failed to parse 'names'"));
+        }
     }
     return out_ptr;
 }
 
 template<class Destination_, class Function_>
-void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination_* dest, Function_ check, const std::string& path, const Version& version) {
+void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination_* dest, Function_ check, const Version& version) {
     const auto n = values.size();
     for (I<decltype(n)> i = 0; i < n; ++i) {
-        if (values[i]->type() == millijson::NOTHING) {
-            dest->set_missing(i);
-            continue;
-        }
+        try {
+            if (values[i]->type() == millijson::NOTHING) {
+                dest->set_missing(i);
+                continue;
+            }
 
-        if (values[i]->type() != millijson::NUMBER) {
-            throw std::runtime_error("expected a number at '" + path + "/values/" + std::to_string(i) + "'");
-        }
+            if (values[i]->type() != millijson::NUMBER) {
+                throw std::runtime_error("expected a number");
+            }
 
-        auto val = static_cast<const millijson::Number*>(values[i].get())->value();
-        if (val != std::floor(val)) {
-            throw std::runtime_error("expected an integer at '" + path + "/values/" + std::to_string(i) + "'");
-        }
+            auto val = static_cast<const millijson::Number*>(values[i].get())->value();
+            if (val != std::floor(val)) {
+                throw std::runtime_error("expected an integer");
+            }
 
-        // 32-bit integers are always representable by doubles, as the latter have 53 bits of precision.
-        constexpr double upper = std::numeric_limits<std::int32_t>::max();
-        constexpr double lower = std::numeric_limits<std::int32_t>::min();
-        if (val < lower || val > upper) {
-            throw std::runtime_error("value at '" + path + "/values/" + std::to_string(i) + "' cannot be represented by a 32-bit signed integer");
-        }
+            // 32-bit integers are always representable by doubles, as the latter have 53 bits of precision.
+            constexpr double upper = std::numeric_limits<std::int32_t>::max();
+            constexpr double lower = std::numeric_limits<std::int32_t>::min();
+            if (val < lower || val > upper) {
+                throw std::runtime_error("value cannot be represented by a 32-bit signed integer");
+            }
 
-        const std::int32_t ival = val;
-        if (version.equals(1, 0) && ival == -2147483648) {
-            dest->set_missing(i);
-            continue;
-        }
+            const std::int32_t ival = val;
+            if (version.equals(1, 0) && ival == -2147483648) {
+                dest->set_missing(i);
+                continue;
+            }
 
-        check(ival);
-        dest->set(i, ival);
+            check(ival);
+            dest->set(i, ival);
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("failed to process element " + std::to_string(i)));
+        }
     }
 }
 
 template<class Destination_, class Function_>
-void extract_strings(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination_* dest, Function_ check, const std::string& path) {
+void extract_strings(const std::vector<std::shared_ptr<millijson::Base> >& values, Destination_* dest, Function_ check) {
     const auto n = values.size();
     for (I<decltype(n)> i = 0; i < n; ++i) {
-        if (values[i]->type() == millijson::NOTHING) {
-            dest->set_missing(i);
-            continue;
-        }
+        try {
+            if (values[i]->type() == millijson::NOTHING) {
+                dest->set_missing(i);
+                continue;
+            }
 
-        if (values[i]->type() != millijson::STRING) {
-            throw std::runtime_error("expected a string at '" + path + "/values/" + std::to_string(i) + "'");
-        }
+            if (values[i]->type() != millijson::STRING) {
+                throw std::runtime_error("expected a string");
+            }
 
-        const auto& str = static_cast<const millijson::String*>(values[i].get())->value();
-        check(str);
-        dest->set(i, str);
+            const auto& str = static_cast<const millijson::String*>(values[i].get())->value();
+            check(str);
+            dest->set(i, str);
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("failed to process element " + std::to_string(i)));
+        }
     }
 }
 
 template<class Provisioner_, class Externals_>
-std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& ext, const std::string& path, const Version& version) {
+std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& ext, const Version& version) {
     if (contents->type() != millijson::OBJECT) {
-        throw std::runtime_error("each R object should be represented by a JSON object at '" + path + "'");
+        throw std::runtime_error("each R object should be represented by a JSON object");
     }
     const auto& map = static_cast<const millijson::Object*>(contents)->value();
 
-    auto tIt = map.find("type");
-    if (tIt == map.end()) {
-        throw std::runtime_error("missing 'type' property for JSON object at '" + path + "'");
-    }
-    const auto& type_ptr = tIt->second;
-    if (type_ptr->type() != millijson::STRING) {
-        throw std::runtime_error("expected a string at '" + path + "/type'");
-    }
-    const auto& type = static_cast<const millijson::String*>(type_ptr.get())->value();
+    const auto& type = [&]() -> const std::string& {
+        try {
+            auto tIt = map.find("type");
+            if (tIt == map.end()) {
+                throw std::runtime_error("no such property");
+            }
+
+            const auto& type_ptr = tIt->second;
+            if (type_ptr->type() != millijson::STRING) {
+                throw std::runtime_error("expected a string");
+            }
+            return static_cast<const millijson::String*>(type_ptr.get())->value();
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("failed to read 'type'"));
+        }
+    }();
 
     std::shared_ptr<Base> output;
     if (type == "nothing") {
         output.reset(Provisioner_::new_Nothing());
 
     } else if (type == "external") {
-        auto iIt = map.find("index");
-        if (iIt == map.end()) {
-            throw std::runtime_error("expected 'index' property for 'external' type at '" + path + "'");
-        }
-        const auto& index_ptr = iIt->second;
-        if (index_ptr->type() != millijson::NUMBER) {
-            throw std::runtime_error("expected a number at '" + path + "/index'");
-        }
-
-        const auto flt_index = static_cast<const millijson::Number*>(index_ptr.get())->value();
-        if (flt_index != std::floor(flt_index)) {
-            throw std::runtime_error("expected an integer at '" + path + "/index'");
-        } else if (flt_index < 0) {
-            throw std::runtime_error("expected a non-negative integer at '" + path + "/index'");
-        }
-
-        std::int32_t index;
         try {
-            index = sanisizer::from_float<std::int32_t>(flt_index);
+            auto iIt = map.find("index");
+            if (iIt == map.end()) {
+                throw std::runtime_error("no such property");
+            }
+            const auto& index_ptr = iIt->second;
+            if (index_ptr->type() != millijson::NUMBER) {
+                throw std::runtime_error("expected a number");
+            }
+
+            const auto flt_index = static_cast<const millijson::Number*>(index_ptr.get())->value();
+            if (flt_index != std::floor(flt_index)) {
+                throw std::runtime_error("expected an integer");
+            } else if (flt_index < 0) {
+                throw std::runtime_error("expected a non-negative integer");
+            }
+
+            std::int32_t index;
+            try {
+                index = sanisizer::from_float<std::int32_t>(flt_index);
+            } catch (...) {
+                throw std::runtime_error("value should fit in a 32-bit signed integer");
+            }
+            if (sanisizer::is_greater_than_or_equal(index, ext.size())) {
+                throw std::runtime_error("external index out of range");
+            }
+            output.reset(Provisioner_::new_External(ext.get(index)));
         } catch (...) {
-            throw std::runtime_error("value at '" + path + "/index' should fit in a 32-bit signed integer");
+            std::throw_with_nested(std::runtime_error("failed to read 'index'"));
         }
-        if (sanisizer::is_greater_than_or_equal(index, ext.size())) {
-            throw std::runtime_error("external index out of range at '" + path + "/index'");
-        }
-        output.reset(Provisioner_::new_External(ext.get(index)));
 
     } else if (type == "integer") {
-        process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_Integer(sanisizer::cast<std::size_t>(vals.size()), named, scalar);
-            output.reset(ptr);
-            extract_integers(vals, ptr, [](std::int32_t) -> void {}, path, version);
-            return ptr;
-        });
+        process_array_or_scalar_values(
+            map,
+            [&](const auto& vals, bool named, bool scalar) -> auto {
+                auto ptr = Provisioner_::new_Integer(sanisizer::cast<std::size_t>(vals.size()), named, scalar);
+                output.reset(ptr);
+                extract_integers(vals, ptr, [](std::int32_t) -> void {}, version);
+                return ptr;
+            }
+        );
 
     } else if (type == "factor" || (version.equals(1, 0) && type == "ordered")) {
         bool ordered = false;
@@ -240,95 +268,133 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
             auto oIt = map.find("ordered");
             if (oIt != map.end()) {
                 if (oIt->second->type() != millijson::BOOLEAN) {
-                    throw std::runtime_error("expected a boolean at '" + path + "/ordered'");
+                    throw std::runtime_error("expected a boolean at 'ordered'");
                 }
                 ordered = static_cast<const millijson::Boolean*>((oIt->second).get())->value();
             }
         }
 
-        const std::string levels_name = "levels"; // avoid dangling reference from casting of string literal.
-        const auto& lvals = extract_array(map, levels_name, path);
-        const auto nlevels = lvals.size();
-        auto fptr = process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_Factor(sanisizer::cast<std::size_t>(vals.size()), named, scalar, sanisizer::cast<std::size_t>(nlevels), ordered);
-            output.reset(ptr);
-            extract_integers(vals, ptr, [&](std::int32_t x) -> void {
-                if (x < 0) {
-                    throw std::runtime_error("factor indices should be non-negative in '" + path + "/values'");
-                } else if (sanisizer::is_greater_than_or_equal(x, nlevels)) {
-                    throw std::runtime_error("factor indices of out of range of levels in '" + path + "/values'");
+        bool level_failed = true;
+        try {
+            const std::string level_field = "levels"; // use a separate variable to avoid issues with overzealous GCC warnings.
+            const auto& lvals = extract_array(map, level_field);
+            const auto nlevels = lvals.size();
+
+            level_failed = false;
+            auto fptr = process_array_or_scalar_values(
+                map,
+                [&](const auto& vals, bool named, bool scalar) -> auto {
+                    auto ptr = Provisioner_::new_Factor(sanisizer::cast<std::size_t>(vals.size()), named, scalar, sanisizer::cast<std::size_t>(nlevels), ordered);
+                    output.reset(ptr);
+                    extract_integers(
+                        vals,
+                        ptr,
+                        [&](std::int32_t x) -> void {
+                            if (x < 0) {
+                                throw std::runtime_error("factor code should be non-negative");
+                            } else if (sanisizer::is_greater_than_or_equal(x, nlevels)) {
+                                throw std::runtime_error("factor code should be less than the number of levels");
+                            }
+                        },
+                        version
+                    );
+                    return ptr;
                 }
-            }, path, version);
-            return ptr;
-        });
+            );
 
-        std::unordered_set<std::string> existing;
-        for (I<decltype(nlevels)> l = 0; l < nlevels; ++l) {
-            if (lvals[l]->type() != millijson::STRING) {
-                throw std::runtime_error("expected strings at '" + path + "/levels/" + std::to_string(l) + "'");
-            }
+            level_failed = true;
+            std::unordered_set<std::string> existing;
+            for (I<decltype(nlevels)> l = 0; l < nlevels; ++l) {
+                try {
+                    if (lvals[l]->type() != millijson::STRING) {
+                        throw std::runtime_error("expected a string");
+                    }
 
-            const auto& level = static_cast<const millijson::String*>(lvals[l].get())->value();
-            if (existing.find(level) != existing.end()) {
-                throw std::runtime_error("detected duplicate string at '" + path + "/levels/" + std::to_string(l) + "'");
+                    const auto& level = static_cast<const millijson::String*>(lvals[l].get())->value();
+                    if (existing.find(level) != existing.end()) {
+                        throw std::runtime_error("detected duplicate level '" + level + "'");
+                    }
+                    fptr->set_level(l, level);
+                    existing.insert(level);
+                } catch (...) {
+                    std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(l)));
+                }
             }
-            fptr->set_level(l, level);
-            existing.insert(level);
+        } catch (...) {
+            if (level_failed) {
+                std::throw_with_nested(std::runtime_error("failed to read 'levels'")); 
+            } else {
+                throw;
+            }
         }
 
     } else if (type == "boolean") {
-        process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            const auto n = vals.size();
-            auto ptr = Provisioner_::new_Boolean(sanisizer::cast<std::size_t>(n), named, scalar);
-            output.reset(ptr);
+        process_array_or_scalar_values(
+            map,
+            [&](const auto& vals, bool named, bool scalar) -> auto {
+                const auto n = vals.size();
+                auto ptr = Provisioner_::new_Boolean(sanisizer::cast<std::size_t>(n), named, scalar);
+                output.reset(ptr);
 
-            for (I<decltype(n)> i = 0; i < n; ++i) {
-                if (vals[i]->type() == millijson::NOTHING) {
-                    ptr->set_missing(i);
-                    continue;
+                for (I<decltype(n)> i = 0; i < n; ++i) {
+                    try {
+                        if (vals[i]->type() == millijson::NOTHING) {
+                            ptr->set_missing(i);
+                            continue;
+                        }
+
+                        if (vals[i]->type() != millijson::BOOLEAN) {
+                            throw std::runtime_error("expected a boolean");
+                        }
+                        ptr->set(i, static_cast<const millijson::Boolean*>(vals[i].get())->value());
+                    } catch (...) {
+                        std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(i)));
+                    }
                 }
 
-                if (vals[i]->type() != millijson::BOOLEAN) {
-                    throw std::runtime_error("expected a boolean at '" + path + "/values/" + std::to_string(i) + "'");
-                }
-                ptr->set(i, static_cast<const millijson::Boolean*>(vals[i].get())->value());
+                return ptr;
             }
-
-            return ptr;
-        });
+        );
 
     } else if (type == "number") {
-        process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            const auto n = vals.size();
-            auto ptr = Provisioner_::new_Number(sanisizer::cast<std::size_t>(n), named, scalar);
-            output.reset(ptr);
+        process_array_or_scalar_values(
+            map,
+            [&](const auto& vals, bool named, bool scalar) -> auto {
+                const auto n = vals.size();
+                auto ptr = Provisioner_::new_Number(sanisizer::cast<std::size_t>(n), named, scalar);
+                output.reset(ptr);
 
-            for (I<decltype(n)> i = 0; i < n; ++i) {
-                if (vals[i]->type() == millijson::NOTHING) {
-                    ptr->set_missing(i);
-                    continue;
-                }
+                for (I<decltype(n)> i = 0; i < n; ++i) {
+                    try {
+                        if (vals[i]->type() == millijson::NOTHING) {
+                            ptr->set_missing(i);
+                            continue;
+                        }
 
-                if (vals[i]->type() == millijson::NUMBER) {
-                    ptr->set(i, static_cast<const millijson::Number*>(vals[i].get())->value());
-                } else if (vals[i]->type() == millijson::STRING) {
-                    auto str = static_cast<const millijson::String*>(vals[i].get())->value();
-                    if (str == "NaN") {
-                        ptr->set(i, std::numeric_limits<double>::quiet_NaN());
-                    } else if (str == "Inf") {
-                        ptr->set(i, std::numeric_limits<double>::infinity());
-                    } else if (str == "-Inf") {
-                        ptr->set(i, -std::numeric_limits<double>::infinity());
-                    } else {
-                        throw std::runtime_error("unsupported string '" + str + "' at '" + path + "/values/" + std::to_string(i) + "'");
+                        if (vals[i]->type() == millijson::NUMBER) {
+                            ptr->set(i, static_cast<const millijson::Number*>(vals[i].get())->value());
+                        } else if (vals[i]->type() == millijson::STRING) {
+                            auto str = static_cast<const millijson::String*>(vals[i].get())->value();
+                            if (str == "NaN") {
+                                ptr->set(i, std::numeric_limits<double>::quiet_NaN());
+                            } else if (str == "Inf") {
+                                ptr->set(i, std::numeric_limits<double>::infinity());
+                            } else if (str == "-Inf") {
+                                ptr->set(i, -std::numeric_limits<double>::infinity());
+                            } else {
+                                throw std::runtime_error("unsupported string '" + str + "'");
+                            }
+                        } else {
+                            throw std::runtime_error("expected a number");
+                        }
+                    } catch (...) {
+                        std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(i)));
                     }
-                } else {
-                    throw std::runtime_error("expected a number at '" + path + "/values/" + std::to_string(i) + "'");
                 }
-            }
 
-            return ptr;
-        });
+                return ptr;
+            }
+        );
 
     } else if (type == "string" || (version.equals(1, 0) && (type == "date" || type == "date-time"))) {
         StringVector::Format format = StringVector::NONE;
@@ -342,7 +408,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
             auto fIt = map.find("format");
             if (fIt != map.end()) {
                 if (fIt->second->type() != millijson::STRING) {
-                    throw std::runtime_error("expected a string at '" + path + "/format'");
+                    throw std::runtime_error("expected a string at 'format'");
                 }
                 auto fptr = static_cast<const millijson::String*>(fIt->second.get());
                 if (fptr->value() == "date") {
@@ -350,55 +416,83 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                 } else if (fptr->value() == "date-time") {
                     format = StringVector::DATETIME;
                 } else {
-                    throw std::runtime_error("unsupported format '" + fptr->value() + "' at '" + path + "/format'");
+                    throw std::runtime_error("unsupported format '" + fptr->value() + "' at 'format'");
                 }
             }
         }
 
-        process_array_or_scalar_values(map, path, [&](const auto& vals, bool named, bool scalar) -> auto {
-            auto ptr = Provisioner_::new_String(sanisizer::cast<std::size_t>(vals.size()), named, scalar, format);
-            output.reset(ptr);
+        process_array_or_scalar_values(
+            map,
+            [&](const auto& vals, bool named, bool scalar) -> auto {
+                auto ptr = Provisioner_::new_String(sanisizer::cast<std::size_t>(vals.size()), named, scalar, format);
+                output.reset(ptr);
 
-            if (format == StringVector::NONE) {
-                extract_strings(vals, ptr, [](const std::string&) -> void {}, path);
-            } else if (format == StringVector::DATE) {
-                extract_strings(vals, ptr, [&](const std::string& x) -> void {
-                    if (!ritsuko::is_date(x.c_str(), x.size())) {
-                         throw std::runtime_error("dates should follow YYYY-MM-DD formatting in '" + path + "/values'");
-                    }
-                }, path);
-            } else if (format == StringVector::DATETIME) {
-                extract_strings(vals, ptr, [&](const std::string& x) -> void {
-                    if (!ritsuko::is_rfc3339(x.c_str(), x.size())) {
-                         throw std::runtime_error("date-times should follow the Internet Date/Time format in '" + path + "/values'");
-                    }
-                }, path);
+                if (format == StringVector::NONE) {
+                    extract_strings(vals, ptr, [](const std::string&) -> void {});
+                } else if (format == StringVector::DATE) {
+                    extract_strings(
+                        vals,
+                        ptr,
+                        [&](const std::string& x) -> void {
+                            if (!ritsuko::is_date(x.c_str(), x.size())) {
+                                 throw std::runtime_error("dates should follow YYYY-MM-DD formatting");
+                            }
+                        }
+                    );
+                } else if (format == StringVector::DATETIME) {
+                    extract_strings(
+                        vals,
+                        ptr,
+                        [&](const std::string& x) -> void {
+                            if (!ritsuko::is_rfc3339(x.c_str(), x.size())) {
+                                 throw std::runtime_error("date-times should follow the Internet Date/Time format");
+                            }
+                        }
+                    );
+                }
+
+                return ptr;
             }
-
-            return ptr;
-        });
+        );
 
     } else if (type == "list") {
-        auto names_ptr = has_names(map, path);
-        const bool has_names = names_ptr != NULL;
-
-        const std::string values_name = "values"; // avoid dangling reference from casting of string literal.
-        const auto& vals = extract_array(map, values_name, path);
-
-        const auto n = vals.size();
-        auto ptr = Provisioner_::new_List(sanisizer::cast<std::size_t>(n), has_names);
-        output.reset(ptr);
-
-        for (I<decltype(n)> i = 0; i < n; ++i) {
-            ptr->set(i, parse_object<Provisioner_>(vals[i].get(), ext, path + "/values/" + std::to_string(i), version));
+        const millijson::Array* names_ptr;
+        try {
+            names_ptr = extract_array_or_null(map, "names");
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("failed to read 'names'"));
         }
 
-        if (has_names) {
-            fill_names(names_ptr, ptr, path);
+        List* lptr;
+        try {
+            const std::string value_field = "values"; // use a separate variable to avoid issues with overzealous GCC warnings.
+            const auto& vals = extract_array(map, value_field);
+
+            const auto n = vals.size();
+            lptr = Provisioner_::new_List(sanisizer::cast<std::size_t>(n), names_ptr != NULL);
+            output.reset(lptr);
+
+            for (I<decltype(n)> i = 0; i < n; ++i) {
+                try {
+                    lptr->set(i, parse_object<Provisioner_>(vals[i].get(), ext, version));
+                } catch (...) {
+                    std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(i))); 
+                }
+            }
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("failed to read 'values'")); 
+        }
+
+        if (names_ptr != NULL) {
+            try {
+                fill_names(names_ptr, lptr);
+            } catch (...) {
+                std::throw_with_nested(std::runtime_error("failed to read 'names'"));
+            }
         }
 
     } else {
-        throw std::runtime_error("unknown object type '" + type + "' at '" + path + "/type'");
+        throw std::runtime_error("unknown object type '" + type + "' in 'type'");
     }
 
     return output;
@@ -460,18 +554,22 @@ ParsedList parse(Reader_& reader, Externals_ ext, const Options& options) {
         const auto& map = static_cast<const millijson::Object*>(contents.get())->value();
         auto vIt = map.find("version");
         if (vIt != map.end()) {
-            if (vIt->second->type() != millijson::STRING) {
-                throw std::runtime_error("expected a string in 'version'");
+            try {
+                if (vIt->second->type() != millijson::STRING) {
+                    throw std::runtime_error("expected a string");
+                }
+                const auto& vstr = static_cast<const millijson::String*>(vIt->second.get())->value();
+                auto vraw = ritsuko::parse_version_string(vstr.c_str(), vstr.size(), /* skip_patch = */ true);
+                version.major = vraw.major;
+                version.minor = vraw.minor;
+            } catch (...) {
+                std::throw_with_nested(std::runtime_error("failed to read 'version'"));
             }
-            const auto& vstr = static_cast<const millijson::String*>(vIt->second.get())->value();
-            auto vraw = ritsuko::parse_version_string(vstr.c_str(), vstr.size(), /* skip_patch = */ true);
-            version.major = vraw.major;
-            version.minor = vraw.minor;
         }
     }
 
     ExternalTracker etrack(std::move(ext));
-    auto output = parse_object<Provisioner_>(contents.get(), etrack, "", version);
+    auto output = parse_object<Provisioner_>(contents.get(), etrack, version);
 
     if (options.strict_list && output->type() != LIST) {
         throw std::runtime_error("top-level object should represent an R list");

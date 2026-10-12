@@ -34,7 +34,7 @@ TEST(JsonNames, Scalar) {
 TEST(JsonNames, Error) {
     expect_json_error("{ \"type\": \"integer\", \"values\": [-99], \"names\": true}", "expected an array");
     expect_json_error("{ \"type\": \"integer\", \"values\": [-99], \"names\": [5]}", "expected a string");
-    expect_json_error("{ \"type\": \"integer\", \"values\": [-99], \"names\": [\"a\", \"b\"]}", "should be the same");
+    expect_json_error("{ \"type\": \"integer\", \"values\": [-99], \"names\": [\"a\", \"b\"]}", "unexpected number of names");
 }
 
 TEST(JsonNames, List) {

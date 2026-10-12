@@ -44,9 +44,9 @@ TEST(JsonList, Nested) {
 }
 
 TEST(JsonList, CheckError) {
-    expect_json_error("{ \"type\":\"list\" }", "expected 'values' property");
+    expect_json_error("{ \"type\":\"list\" }", "no such property");
     expect_json_error("{ \"type\":\"list\", \"values\": 1 }", "expected an array");
     expect_json_error("{ \"type\":\"list\", \"values\": [true] }", "should be represented by a JSON object");
-    expect_json_error("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" } ], \"names\": [\"X\", \"Y\"] }", "should be the same");
+    expect_json_error("{ \"type\":\"list\", \"values\": [ { \"type\": \"nothing\" } ], \"names\": [\"X\", \"Y\"] }", "unexpected number of names");
 }
 
