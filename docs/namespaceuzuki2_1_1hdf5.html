@@ -167,6 +167,7 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="structuzuki2_1_1ParsedList.html" title="Results of parsing a list from file.">ParsedList</a></code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner_</code>, this may contain references to all nested objects.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
+    <tr><td class="paramname">H5::Exception</td><td>Thrown upon HDF5 library failure. This may be wrapped in a <code>std::nexted_exception</code>. </td></tr>
     <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>group</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message.</td></tr>
   </table>
   </dd>
@@ -244,6 +245,7 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="structuzuki2_1_1ParsedList.html" title="Results of parsing a list from file.">ParsedList</a></code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner_</code>, this may contain references to all nested objects.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
+    <tr><td class="paramname">H5::Exception</td><td>Thrown upon HDF5 library failure. This may be wrapped in a <code>std::nexted_exception</code>. </td></tr>
     <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>file</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>
@@ -293,6 +295,7 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
+    <tr><td class="paramname">H5::Exception</td><td>Thrown upon HDF5 library failure. This may be wrapped in a <code>std::nexted_exception</code>. </td></tr>
     <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>group</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>
@@ -348,6 +351,7 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
+    <tr><td class="paramname">H5::Exception</td><td>Thrown upon HDF5 library failure. This may be wrapped in a <code>std::nexted_exception</code>. </td></tr>
     <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>file</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>

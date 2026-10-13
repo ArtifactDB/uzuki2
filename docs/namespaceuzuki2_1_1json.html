@@ -171,7 +171,12 @@ template&lt;class Provisioner_ , class Reader_ , class Externals_ &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="structuzuki2_1_1ParsedList.html" title="Results of parsing a list from file.">ParsedList</a></code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner_</code>, this may contain references to all nested objects.</dd></dl>
-<p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>reader</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -223,7 +228,12 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="structuzuki2_1_1ParsedList.html" title="Results of parsing a list from file.">ParsedList</a></code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner_</code>, this may contain references to all nested objects.</dd></dl>
-<p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>reader</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -269,7 +279,12 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="structuzuki2_1_1ParsedList.html" title="Results of parsing a list from file.">ParsedList</a></code> containing a pointer to the root <code><a class="el" href="classuzuki2_1_1Base.html" title="Base interface for all R objects.">Base</a></code> object. Depending on <code>Provisioner_</code>, this may contain references to all nested objects.</dd></dl>
-<p>Any invalid representations in <code>reader</code> will cause an error to be thrown. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>reader</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -309,7 +324,13 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   <table class="params">
     <tr><td class="paramname">reader</td><td>Instance of a <code><a class="elRef" href="https://ltla.github.io/byteme/classbyteme_1_1Reader.html">byteme::Reader</a></code> providing the contents of the JSON file. </td></tr>
     <tr><td class="paramname">num_external</td><td>Expected number of external references. </td></tr>
-    <tr><td class="paramname">options</td><td><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for parsing. </td></tr>
+    <tr><td class="paramname">options</td><td><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for parsing.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -358,7 +379,13 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>Pointer to an array containing the JSON file contents (possibly Gzip/Zlib-compressed). </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">len</td><td>Length of the buffer in bytes. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">num_external</td><td>Expected number of external references. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">options</td><td><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for parsing. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">options</td><td><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for parsing.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>buffer</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -401,7 +428,13 @@ template&lt;class Provisioner_ , class Externals_ &gt; </div>
   <table class="params">
     <tr><td class="paramname">file</td><td>Path to a (possible Gzip-compressed) JSON file. </td></tr>
     <tr><td class="paramname">num_external</td><td>Expected number of external references. </td></tr>
-    <tr><td class="paramname">options</td><td><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for parsing. </td></tr>
+    <tr><td class="paramname">options</td><td><a class="el" href="structuzuki2_1_1json_1_1Options.html" title="Options for JSON file parsing.">Options</a> for parsing.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::exception</td><td>Thrown upon encountering an invalid representation in <code>file</code>. This may be a <code>std::nested_exception</code> in which case the nested exceptions should be extracted for an informative error message. </td></tr>
   </table>
   </dd>
 </dl>
