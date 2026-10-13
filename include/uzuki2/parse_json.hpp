@@ -540,7 +540,8 @@ struct Options {
  * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner_`, this may contain references to all nested objects.
  *
- * Any invalid representations in `reader` will cause an error to be thrown.
+ * @throw std::exception Thrown upon encountering an invalid representation in `reader`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 template<class Provisioner_, class Reader_, class Externals_>
 ParsedList parse(Reader_& reader, Externals_ ext, const Options& options) {
@@ -594,7 +595,8 @@ ParsedList parse(Reader_& reader, Externals_ ext, const Options& options) {
  * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner_`, this may contain references to all nested objects.
  *
- * Any invalid representations in `reader` will cause an error to be thrown.
+ * @throw std::exception Thrown upon encountering an invalid representation in `reader`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 template<class Provisioner_, class Externals_>
 ParsedList parse_file(const std::string& file, Externals_ ext, const Options& options) {
@@ -623,7 +625,8 @@ ParsedList parse_file(const std::string& file, Externals_ ext, const Options& op
  * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner_`, this may contain references to all nested objects.
  *
- * Any invalid representations in `reader` will cause an error to be thrown.
+ * @throw std::exception Thrown upon encountering an invalid representation in `reader`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 template<class Provisioner_, class Externals_>
 ParsedList parse_buffer(const unsigned char* buffer, std::size_t len, Externals_ ext, const Options& options) {
@@ -643,6 +646,9 @@ ParsedList parse_buffer(const unsigned char* buffer, std::size_t len, Externals_
  * @param reader Instance of a `byteme::Reader` providing the contents of the JSON file.
  * @param num_external Expected number of external references. 
  * @param options Options for parsing.
+ *
+ * @throw std::exception Thrown upon encountering an invalid representation. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 inline void validate(byteme::Reader& reader, int num_external, const Options& options) {
     parse<DummyProvisioner>(reader, DummyExternals(num_external), options);
@@ -655,6 +661,9 @@ inline void validate(byteme::Reader& reader, int num_external, const Options& op
  * @param file Path to a (possible Gzip-compressed) JSON file.
  * @param num_external Expected number of external references. 
  * @param options Options for parsing.
+ *
+ * @throw std::exception Thrown upon encountering an invalid representation in `file`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 inline void validate_file(const std::string& file, int num_external, const Options& options) {
     parse_file<DummyProvisioner>(file, DummyExternals(num_external), options);
@@ -668,6 +677,9 @@ inline void validate_file(const std::string& file, int num_external, const Optio
  * @param len Length of the buffer in bytes.
  * @param num_external Expected number of external references. 
  * @param options Options for parsing.
+ *
+ * @throw std::exception Thrown upon encountering an invalid representation in `buffer`. 
+ * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
 inline void validate_buffer(const unsigned char* buffer, std::size_t len, int num_external, const Options& options) {
     parse_buffer<DummyProvisioner>(buffer, len, DummyExternals(num_external), options);

@@ -732,6 +732,8 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
  * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner_`, this may contain references to all nested objects. 
  *
+ * @throw H5::Exception Thrown upon HDF5 library failure.
+ * This may be wrapped in a `std::nexted_exception`.
  * @throw std::exception Thrown upon encountering an invalid representation in `group`. 
  * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  *
@@ -807,6 +809,8 @@ ParsedList parse(const H5::Group& group, Externals_ ext, const Options& options)
  * @return A `ParsedList` containing a pointer to the root `Base` object.
  * Depending on `Provisioner_`, this may contain references to all nested objects. 
  *
+ * @throw H5::Exception Thrown upon HDF5 library failure.
+ * This may be wrapped in a `std::nexted_exception`.
  * @throw std::exception Thrown upon encountering an invalid representation in `file`. 
  * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
@@ -827,6 +831,8 @@ ParsedList parse(const std::string& file, const std::string& name, Externals_ ex
  * @param num_external Expected number of external references. 
  * @param options Optional parameters.
  *
+ * @throw H5::Exception Thrown upon HDF5 library failure.
+ * This may be wrapped in a `std::nexted_exception`.
  * @throw std::exception Thrown upon encountering an invalid representation in `group`. 
  * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
@@ -842,6 +848,8 @@ inline void validate(const H5::Group& group, int num_external, const Options& op
  * @param num_external Expected number of external references. 
  * @param options Optional parameters.
  *
+ * @throw H5::Exception Thrown upon HDF5 library failure.
+ * This may be wrapped in a `std::nexted_exception`.
  * @throw std::exception Thrown upon encountering an invalid representation in `file`. 
  * This may be a `std::nested_exception` in which case the nested exceptions should be extracted for an informative error message.
  */
