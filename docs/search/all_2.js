@@ -10,6 +10,8 @@ var searchData=
   ['class_2ehpp_7',['class.hpp',['https://ltla.github.io/sanisizer/class_8hpp.html',1,'']]],
   ['comparisons_2ehpp_8',['comparisons.hpp',['https://ltla.github.io/sanisizer/comparisons_8hpp.html',1,'']]],
   ['compression_5flevel_9',['compression_level',['https://ltla.github.io/byteme/structbyteme_1_1GzipFileWriterOptions.html#a9072c378aefb629c314f80ff8b77a964',1,'byteme::GzipFileWriterOptions::compression_level'],['https://ltla.github.io/byteme/structbyteme_1_1ZlibBufferWriterOptions.html#a31ad029c8bd29c6edfe6e1228ee2aab7',1,'byteme::ZlibBufferWriterOptions::compression_level']]],
-  ['create_10',['create',['https://ltla.github.io/sanisizer/namespacesanisizer.html#a0c7c43499ff60d5185708c50b32a40d7',1,'sanisizer']]],
-  ['create_2ehpp_11',['create.hpp',['https://ltla.github.io/sanisizer/create_8hpp.html',1,'']]]
+  ['constant_10',['Constant',['https://ltla.github.io/sanisizer/structsanisizer_1_1Constant.html',1,'sanisizer']]],
+  ['constant_2ehpp_11',['Constant.hpp',['https://ltla.github.io/sanisizer/Constant_8hpp.html',1,'']]],
+  ['create_12',['create',['https://ltla.github.io/sanisizer/namespacesanisizer.html#a0c7c43499ff60d5185708c50b32a40d7',1,'sanisizer']]],
+  ['create_2ehpp_13',['create.hpp',['https://ltla.github.io/sanisizer/create_8hpp.html',1,'']]]
 ];

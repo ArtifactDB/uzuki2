@@ -1,52 +1,50 @@
 <map id="uzuki2/parse_hdf5.hpp" name="uzuki2/parse_hdf5.hpp">
-<area shape="rect" id="Node000001" title="Parsing methods for HDF5 files." alt="" coords="626,5,776,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="154,226,221,252"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="625,21,489,23,327,31,247,39,174,49,113,63,69,81,39,101,17,124,10,137,8,149,10,163,18,177,42,201,73,217,106,227,139,233,138,238,105,233,71,222,39,205,13,180,5,164,3,149,5,135,12,121,35,97,66,77,111,58,173,44,246,34,326,26,489,18,625,16"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="278,226,335,252"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="626,27,518,44,459,60,403,81,350,109,331,126,314,154,306,182,305,211,300,211,301,182,309,152,327,123,347,105,401,77,458,55,517,39,625,22"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="671,79,731,105"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="704,31,704,63,698,63,698,31"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="506,226,560,252"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="691,33,648,81,594,153,551,215,547,212,590,150,644,77,687,30"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="755,79,815,105"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="717,30,761,67,757,71,713,34"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="840,79,917,105"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="732,29,835,70,833,75,730,34"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="941,79,1018,105"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="749,29,927,74,926,80,747,34"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="604,226,664,252"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="692,33,676,54,662,80,651,114,644,150,638,211,632,210,639,149,646,113,657,78,672,51,688,30"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="1041,79,1145,105"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="769,29,1026,76,1025,81,768,34"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="1169,79,1241,105"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="777,24,946,44,1154,76,1154,81,945,49,776,30"/>
-<area shape="rect" id="Node000012" title=" " alt="" coords="1265,79,1393,105"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="777,24,986,45,1250,76,1249,81,985,50,776,29"/>
-<area shape="rect" id="Node000013" href="/github/workspace/docs/sanisizer.tag$sanisizer_8hpp.html" title=" " alt="" coords="1417,79,1569,105"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="777,22,1048,43,1402,76,1401,81,1048,48,776,27"/>
-<area shape="rect" id="Node000014" href="$interfaces_8hpp.html" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="343,153,445,178"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="626,30,511,50,461,64,428,81,417,93,409,108,400,138,395,137,404,106,413,90,425,77,459,59,510,45,625,25"/>
-<area shape="rect" id="Node000016" href="$Dummy_8hpp.html" title="Dummy classes for parsing without storing the results." alt="" coords="438,79,527,105"/>
-<area shape="poly" id="edge19_Node000001_Node000016" title=" " alt="" coords="665,34,535,76,533,71,663,29"/>
-<area shape="rect" id="Node000017" title=" " alt="" coords="1593,79,1729,105"/>
-<area shape="poly" id="edge26_Node000001_Node000017" title=" " alt="" coords="777,20,1119,39,1345,55,1578,76,1578,81,1345,60,1119,44,776,25"/>
-<area shape="rect" id="Node000018" title=" " alt="" coords="27,153,116,178"/>
-<area shape="poly" id="edge27_Node000001_Node000018" title=" " alt="" coords="626,24,482,31,313,42,167,58,116,69,89,81,80,93,75,107,72,138,66,137,70,106,76,90,86,77,115,64,166,53,313,36,481,25,625,19"/>
-<area shape="rect" id="Node000019" href="$ParsedList_8hpp.html" title="Class to hold the parsed list." alt="" coords="100,79,208,105"/>
-<area shape="poly" id="edge28_Node000001_Node000019" title=" " alt="" coords="626,31,228,82,225,82,224,77,227,76,625,26"/>
-<area shape="poly" id="edge15_Node000014_Node000002" title=" " alt="" coords="360,181,237,224,235,219,358,176"/>
-<area shape="poly" id="edge16_Node000014_Node000003" title=" " alt="" coords="381,181,334,219,331,214,378,177"/>
-<area shape="poly" id="edge14_Node000014_Node000005" title=" " alt="" coords="419,177,497,216,494,221,417,181"/>
-<area shape="poly" id="edge17_Node000014_Node000009" title=" " alt="" coords="436,176,590,222,588,227,434,181"/>
-<area shape="rect" id="Node000015" title=" " alt="" coords="390,226,454,252"/>
-<area shape="poly" id="edge18_Node000014_Node000015" title=" " alt="" coords="401,178,414,211,409,213,396,180"/>
-<area shape="poly" id="edge21_Node000016_Node000002" title=" " alt="" coords="438,108,377,128,313,155,260,186,216,218,213,214,257,182,310,150,375,123,436,103"/>
-<area shape="poly" id="edge20_Node000016_Node000003" title=" " alt="" coords="438,103,383,120,356,135,334,154,318,182,311,211,306,210,313,180,329,151,353,131,381,116,436,98"/>
-<area shape="poly" id="edge22_Node000016_Node000005" title=" " alt="" coords="489,104,526,210,521,212,484,106"/>
-<area shape="poly" id="edge23_Node000016_Node000009" title=" " alt="" coords="496,103,613,214,609,218,493,107"/>
-<area shape="poly" id="edge25_Node000016_Node000014" title=" " alt="" coords="469,107,422,145,419,141,466,103"/>
-<area shape="poly" id="edge24_Node000016_Node000015" title=" " alt="" coords="482,106,473,139,459,179,441,214,436,212,454,177,468,138,477,104"/>
-<area shape="poly" id="edge29_Node000019_Node000002" title=" " alt="" coords="160,104,184,210,179,212,154,106"/>
-<area shape="poly" id="edge30_Node000019_Node000014" title=" " alt="" coords="196,103,340,145,338,150,194,108"/>
-<area shape="poly" id="edge31_Node000019_Node000018" title=" " alt="" coords="142,107,99,144,95,140,138,103"/>
+<area shape="rect" id="Node000001" title="Parsing methods for HDF5 files." alt="" coords="538,5,688,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="879,226,946,252"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="688,21,927,40,1034,56,1070,66,1091,77,1107,102,1112,128,1106,153,1091,180,1064,206,1031,223,996,233,963,239,962,233,995,228,1029,218,1061,201,1087,177,1101,151,1107,128,1102,104,1087,81,1068,71,1033,62,926,46,688,26"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="11,226,68,252"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="537,24,398,30,236,41,97,58,50,68,25,81,16,95,10,111,9,146,17,181,29,212,24,214,12,183,4,147,5,110,11,93,22,77,48,63,96,52,236,35,398,25,537,19"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="279,226,333,252"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="689,16,785,18,892,27,942,34,986,45,1022,59,1047,77,1053,92,1047,106,1025,126,996,144,919,173,823,196,717,213,608,225,505,233,348,240,348,234,504,227,607,219,716,207,822,190,917,168,994,139,1022,122,1043,103,1048,92,1043,81,1020,64,985,50,941,40,891,32,785,23,688,21"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="167,79,227,105"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="538,32,404,52,243,81,242,76,403,46,537,27"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="251,79,329,105"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="558,34,345,81,343,76,556,29"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="353,79,430,105"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="576,34,444,76,443,71,574,29"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="92,226,152,252"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="538,24,402,31,246,41,112,58,66,69,43,81,33,96,31,113,35,131,43,149,69,185,98,214,94,218,65,188,38,152,30,133,26,113,28,95,39,77,65,64,111,53,246,36,402,25,537,19"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="505,79,608,105"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="606,33,578,68,574,65,601,30"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="633,79,704,105"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="624,30,652,65,648,68,620,33"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="729,79,856,105"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="644,29,749,70,747,75,642,34"/>
+<area shape="rect" id="Node000012" href="/github/workspace/docs/sanisizer.tag$sanisizer_8hpp.html" title=" " alt="" coords="881,79,1032,105"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="672,29,884,73,883,78,671,34"/>
+<area shape="rect" id="Node000013" href="$interfaces_8hpp.html" title="Defines the interfaces to use in HDF5 parsing." alt="" coords="255,153,357,178"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="590,34,494,81,443,107,350,149,348,144,441,102,492,77,587,29"/>
+<area shape="rect" id="Node000015" href="$Dummy_8hpp.html" title="Dummy classes for parsing without storing the results." alt="" coords="53,79,143,105"/>
+<area shape="poly" id="edge18_Node000001_Node000015" title=" " alt="" coords="537,30,368,51,159,81,158,76,367,45,537,25"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="1158,79,1294,105"/>
+<area shape="poly" id="edge25_Node000001_Node000016" title=" " alt="" coords="689,25,1140,76,1143,77,1143,82,1139,82,688,30"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="1372,153,1461,178"/>
+<area shape="poly" id="edge26_Node000001_Node000017" title=" " alt="" coords="689,17,881,18,1117,26,1230,34,1327,44,1400,58,1425,67,1440,77,1448,92,1448,109,1436,140,1431,138,1443,108,1443,93,1436,81,1422,72,1399,63,1327,49,1230,39,1117,31,880,24,688,22"/>
+<area shape="rect" id="Node000018" href="$ParsedList_8hpp.html" title="Class to hold the parsed list." alt="" coords="1317,79,1426,105"/>
+<area shape="poly" id="edge27_Node000001_Node000018" title=" " alt="" coords="689,21,956,40,1126,56,1302,76,1302,81,1126,61,955,46,688,26"/>
+<area shape="poly" id="edge14_Node000013_Node000002" title=" " alt="" coords="358,170,864,229,863,235,358,176"/>
+<area shape="poly" id="edge15_Node000013_Node000003" title=" " alt="" coords="259,182,84,228,82,223,258,176"/>
+<area shape="poly" id="edge13_Node000013_Node000004" title=" " alt="" coords="309,179,309,211,303,211,303,179"/>
+<area shape="poly" id="edge16_Node000013_Node000008" title=" " alt="" coords="276,181,168,223,166,218,274,176"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="182,226,246,252"/>
+<area shape="poly" id="edge17_Node000013_Node000014" title=" " alt="" coords="292,181,243,219,240,215,289,177"/>
+<area shape="poly" id="edge20_Node000015_Node000002" title=" " alt="" coords="144,100,155,102,564,176,864,227,863,232,563,181,154,107,143,105"/>
+<area shape="poly" id="edge19_Node000015_Node000003" title=" " alt="" coords="96,106,53,213,48,211,91,104"/>
+<area shape="poly" id="edge21_Node000015_Node000004" title=" " alt="" coords="117,103,278,215,275,219,114,107"/>
+<area shape="poly" id="edge22_Node000015_Node000008" title=" " alt="" coords="103,105,120,210,115,211,97,105"/>
+<area shape="poly" id="edge24_Node000015_Node000013" title=" " alt="" coords="134,103,257,145,256,150,133,108"/>
+<area shape="poly" id="edge23_Node000015_Node000014" title=" " alt="" coords="110,103,197,212,193,216,106,107"/>
+<area shape="poly" id="edge28_Node000018_Node000002" title=" " alt="" coords="1342,108,1252,142,1140,181,962,229,961,224,1139,176,1251,137,1340,103"/>
+<area shape="poly" id="edge29_Node000018_Node000013" title=" " alt="" coords="1317,106,1306,107,1036,133,769,150,373,166,373,160,769,145,1035,128,1306,102,1316,101"/>
+<area shape="poly" id="edge30_Node000018_Node000017" title=" " alt="" coords="1381,103,1403,138,1399,141,1377,106"/>
 </map>

@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['rawbufferreader_2ehpp_0',['RawBufferReader.hpp',['https://ltla.github.io/byteme/RawBufferReader_8hpp.html',1,'']]],
-  ['rawbufferwriter_2ehpp_1',['RawBufferWriter.hpp',['https://ltla.github.io/byteme/RawBufferWriter_8hpp.html',1,'']]],
-  ['rawfilereader_2ehpp_2',['RawFileReader.hpp',['https://ltla.github.io/byteme/RawFileReader_8hpp.html',1,'']]],
-  ['rawfilewriter_2ehpp_3',['RawFileWriter.hpp',['https://ltla.github.io/byteme/RawFileWriter_8hpp.html',1,'']]],
-  ['reader_2ehpp_4',['Reader.hpp',['https://ltla.github.io/byteme/Reader_8hpp.html',1,'']]]
+  ['sanisizer_2ehpp_0',['sanisizer.hpp',['https://ltla.github.io/sanisizer/sanisizer_8hpp.html',1,'']]],
+  ['sum_2ehpp_1',['sum.hpp',['https://ltla.github.io/sanisizer/sum_8hpp.html',1,'']]]
 ];

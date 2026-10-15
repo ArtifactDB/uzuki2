@@ -1,12 +1,11 @@
 var searchData=
 [
-  ['serialbufferedreader_0',['SerialBufferedReader',['https://ltla.github.io/byteme/classbyteme_1_1SerialBufferedReader.html#a0171352dd5853d7fdbbcff353de3a379',1,'byteme::SerialBufferedReader']]],
-  ['serialbufferedwriter_1',['SerialBufferedWriter',['https://ltla.github.io/byteme/classbyteme_1_1SerialBufferedWriter.html#a8a01232e87e3ab7512225fc4ebf747f2',1,'byteme::SerialBufferedWriter']]],
-  ['set_2',['set',['../classuzuki2_1_1IntegerVector.html#ad2faa2164aba6723641e22c4ea86917a',1,'uzuki2::IntegerVector::set()'],['../classuzuki2_1_1NumberVector.html#a981409188ec1a84226305818467b77ed',1,'uzuki2::NumberVector::set()'],['../classuzuki2_1_1StringVector.html#a8ac94995d690307e8f20d3733cbaa88c',1,'uzuki2::StringVector::set()'],['../classuzuki2_1_1BooleanVector.html#ad757c9bd790ac937dac847de60eb2f23',1,'uzuki2::BooleanVector::set()'],['../classuzuki2_1_1Factor.html#a73cf0020fa41fd97e0453ae4d6b52f7e',1,'uzuki2::Factor::set()'],['../classuzuki2_1_1List.html#a4a769b0986a828218fd76eb6b5689d2d',1,'uzuki2::List::set()']]],
-  ['set_5flevel_3',['set_level',['../classuzuki2_1_1Factor.html#ac1cb02bed16d8c4632020e4c3a71ffb4',1,'uzuki2::Factor']]],
-  ['set_5fmissing_4',['set_missing',['../classuzuki2_1_1Vector.html#ae706b74f023a9ec0fefcfa73368e6abc',1,'uzuki2::Vector']]],
-  ['set_5fname_5',['set_name',['../classuzuki2_1_1Vector.html#a273568a30924904daaa2ab70b6be75b6',1,'uzuki2::Vector::set_name()'],['../classuzuki2_1_1List.html#ab118825a40cf2a1d26a1f6dab6fa30ab',1,'uzuki2::List::set_name()']]],
-  ['size_6',['size',['../classuzuki2_1_1Vector.html#adf197744e386ba3871c126b16f4746d7',1,'uzuki2::Vector::size()'],['../classuzuki2_1_1List.html#ac650f0331083ee83cf5edc697ac94b2b',1,'uzuki2::List::size()']]],
-  ['sum_7',['sum',['https://ltla.github.io/sanisizer/namespacesanisizer.html#ad0351da831c6ee07baf0a96c51a019c9',1,'sanisizer']]],
-  ['sum_5funsafe_8',['sum_unsafe',['https://ltla.github.io/sanisizer/namespacesanisizer.html#a6f87dc746d660a88c85ed46d90e5d54c',1,'sanisizer']]]
+  ['rawbufferreader_0',['RawBufferReader',['https://ltla.github.io/byteme/classbyteme_1_1RawBufferReader.html#a80988c695311f5ebd52680bf93f92847',1,'byteme::RawBufferReader']]],
+  ['rawbufferwriter_1',['RawBufferWriter',['https://ltla.github.io/byteme/classbyteme_1_1RawBufferWriter.html#a2536f89eb9c6a58a68269abfa907f3bd',1,'byteme::RawBufferWriter']]],
+  ['rawfilereader_2',['RawFileReader',['https://ltla.github.io/byteme/classbyteme_1_1RawFileReader.html#a8408ecd4c0c0d0c03d84b205f941f8d2',1,'byteme::RawFileReader']]],
+  ['rawfilewriter_3',['RawFileWriter',['https://ltla.github.io/byteme/classbyteme_1_1RawFileWriter.html#a85b813251f5ce733364d3b02914ad209',1,'byteme::RawFileWriter']]],
+  ['read_4',['read',['https://ltla.github.io/byteme/classbyteme_1_1GzipFileReader.html#a4e293b837f53b17cbdaac22e0305d669',1,'byteme::GzipFileReader::read()'],['https://ltla.github.io/byteme/classbyteme_1_1IstreamReader.html#aced8bbf4560953a5c331c6ec18edd742',1,'byteme::IstreamReader::read()'],['https://ltla.github.io/byteme/classbyteme_1_1RawBufferReader.html#aa2ed5c3a15c37cb69e0ad6a6141f6441',1,'byteme::RawBufferReader::read()'],['https://ltla.github.io/byteme/classbyteme_1_1RawFileReader.html#a42ba2360c659f3365a79d0654e26f737',1,'byteme::RawFileReader::read()'],['https://ltla.github.io/byteme/classbyteme_1_1Reader.html#ac39e5bfe2feae64643a177ba7dcb7fa9',1,'byteme::Reader::read()'],['https://ltla.github.io/byteme/classbyteme_1_1ZlibBufferReader.html#a932af82edf6c8d316f0fb9b54d032179',1,'byteme::ZlibBufferReader::read()']]],
+  ['required_5fbits_5ffor_5ffloat_5',['required_bits_for_float',['https://ltla.github.io/sanisizer/namespacesanisizer.html#a714d5385b83631d2aace857ca004fee8',1,'sanisizer']]],
+  ['reserve_6',['reserve',['https://ltla.github.io/sanisizer/namespacesanisizer.html#a1a07e85a7c7d29d992442f2d40476188',1,'sanisizer']]],
+  ['resize_7',['resize',['https://ltla.github.io/sanisizer/namespacesanisizer.html#a3df6e5117dcf28cab0e705d4ac499f0d',1,'sanisizer']]]
 ];

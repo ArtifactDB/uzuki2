@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['dummy_2ehpp_0',['Dummy.hpp',['../Dummy_8hpp.html',1,'']]]
+  ['float_2ehpp_0',['float.hpp',['https://ltla.github.io/sanisizer/float_8hpp.html',1,'']]]
 ];

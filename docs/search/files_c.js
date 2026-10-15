@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sanisizer_2ehpp_0',['sanisizer.hpp',['https://ltla.github.io/sanisizer/sanisizer_8hpp.html',1,'']]]
+  ['uzuki2_2ehpp_0',['uzuki2.hpp',['../uzuki2_8hpp.html',1,'']]]
 ];

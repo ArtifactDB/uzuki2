@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vector_0',['Vector',['../classuzuki2_1_1Vector.html',1,'uzuki2']]]
+  ['writer_0',['Writer',['https://ltla.github.io/byteme/classbyteme_1_1Writer.html',1,'byteme']]]
 ];
