@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <vector>
-#include <cctype>
 #include <string>
 #include <cstring>
 #include <stdexcept>
@@ -359,7 +358,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
             output.reset(lptr);
 
             for (I<decltype(len)> i = 0; i < len; ++i) {
-                const auto istr = std::to_string(i);
+                const auto istr = ritsuko::itoa(i);
                 try {
                     auto lhandle = dhandle.openGroup(istr);
                     lptr->set(i, parse_inner<Provisioner_>(lhandle, ext, version, options));
@@ -560,7 +559,7 @@ std::shared_ptr<Base> parse_inner(const H5::Group& handle, Externals_& ext, cons
                     std::vector<std::uint8_t> buffer(vlsptr.length);
                     hhandle.read(buffer.data(), H5::PredType::NATIVE_UINT8, mspace, dspace);
                     auto cptr = reinterpret_cast<const char*>(buffer.data());
-                    set(0, std::string(cptr, cptr + ritsuko::hdf5::strnlen(cptr, vlsptr.length)));
+                    set(0, std::string(cptr, cptr + ritsuko::strnlen(cptr, vlsptr.length)));
 
                 } else {
                     ritsuko::cvls::Stream1dArray<std::uint64_t, std::uint64_t> stream(

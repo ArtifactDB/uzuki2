@@ -3,11 +3,9 @@
 
 #include <memory>
 #include <vector>
-#include <cctype>
 #include <string>
 #include <stdexcept>
 #include <exception>
-#include <cmath>
 #include <unordered_map>
 #include <unordered_set>
 #include <type_traits>
@@ -82,7 +80,7 @@ void fill_names(const millijson::Array* names_ptr, Destination_* dest) {
     const auto nnames = names.size();
     for (I<decltype(nnames)> i = 0; i < nnames; ++i) {
         if (names[i]->type() != millijson::STRING) {
-            throw std::runtime_error("expected a string at element " + std::to_string(i));
+            throw std::runtime_error("expected a string at element " + ritsuko::itoa(i));
         }
         dest->set_name(i, static_cast<const millijson::String*>(names[i].get())->value());
     }
@@ -161,7 +159,7 @@ void extract_integers(const std::vector<std::shared_ptr<millijson::Base> >& valu
             check(ival);
             dest->set(i, ival);
         } catch (...) {
-            std::throw_with_nested(std::runtime_error("failed to process element " + std::to_string(i)));
+            std::throw_with_nested(std::runtime_error("failed to process element " + ritsuko::itoa(i)));
         }
     }
 }
@@ -184,7 +182,7 @@ void extract_strings(const std::vector<std::shared_ptr<millijson::Base> >& value
             check(str);
             dest->set(i, str);
         } catch (...) {
-            std::throw_with_nested(std::runtime_error("failed to process element " + std::to_string(i)));
+            std::throw_with_nested(std::runtime_error("failed to process element " + ritsuko::itoa(i)));
         }
     }
 }
@@ -317,7 +315,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                     fptr->set_level(l, level);
                     existing.insert(level);
                 } catch (...) {
-                    std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(l)));
+                    std::throw_with_nested(std::runtime_error("failed to read element " + ritsuko::itoa(l)));
                 }
             }
         } catch (...) {
@@ -348,7 +346,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                         }
                         ptr->set(i, static_cast<const millijson::Boolean*>(vals[i].get())->value());
                     } catch (...) {
-                        std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(i)));
+                        std::throw_with_nested(std::runtime_error("failed to read element " + ritsuko::itoa(i)));
                     }
                 }
 
@@ -388,7 +386,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                             throw std::runtime_error("expected a number");
                         }
                     } catch (...) {
-                        std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(i)));
+                        std::throw_with_nested(std::runtime_error("failed to read element " + ritsuko::itoa(i)));
                     }
                 }
 
@@ -476,7 +474,7 @@ std::shared_ptr<Base> parse_object(const millijson::Base* contents, Externals_& 
                 try {
                     lptr->set(i, parse_object<Provisioner_>(vals[i].get(), ext, version));
                 } catch (...) {
-                    std::throw_with_nested(std::runtime_error("failed to read element " + std::to_string(i))); 
+                    std::throw_with_nested(std::runtime_error("failed to read element " + ritsuko::itoa(i))); 
                 }
             }
         } catch (...) {
