@@ -140,7 +140,8 @@ Each external object is represented as a JSON object with the following properti
 
 - `type`, set to `"external"`.
 - `index`, a non-negative JSON number that can fit into a 32-bit signed integer.
-  This identifies this external object uniquely within the entire list.
+  This identifies this external object uniquely within the entire list, so each value of `**/index` should be used exactly once through the list.
+  The set of all `**/index` values in a single list should be `(0, 1, ..., N - 1)` where `N` is the total number of external objects in the list.
 
 By indexing some external metadata with the value of `index`, we can restore the external object in its appropriate location in the R list.
 The exact mechanism by which this restoration occurs is implementation-defined.
