@@ -145,7 +145,8 @@ Each external object is represented as a HDF5 group (`**/`) with the following a
 
 This should contain an `**/index` scalar dataset, containing an index that identifies this external object uniquely within the entire list.
 This should use a datatype that can be represented by a 32-bit signed integer.
-`**/index` should start at zero and be incremented whenever an external object is encountered. 
+Each value of `**/index` should be used exactly once through the list,
+and the set of all `**/index` values in a single list should be `(0, 1, ..., N - 1)` where `N` is the total number of external objects in the list.
 
 By indexing some external metadata with the value of `**/index`, we can restore the external object in its appropriate location in the R list.
 The exact mechanism by which this restoration occurs is implementation-defined.
