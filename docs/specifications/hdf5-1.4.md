@@ -172,7 +172,6 @@ If no null character is present, the entire slice should be used as the contents
 
 Entries of `**/data` may occur in any order and may refer to overlapping or non-contiguous slices.
 The only requirement is that each `[offset, offset + length)` slice lies within the boundaries of the heap dataset.
-That said, we'd recommend that entries in the same chunk of the `**/data` dataset refer to neighboring parts of the `**/heap` dataset, to allow readers to efficiently extract the strings.
 
 No restrictions are placed on the contents of the `**/heap` dataset, as long as the strings can be recovered from slices as described above.
 Writers of the `**/heap` dataset may concatenate strings in arbitrary order, merge duplicate strings, add padding between strings, etc.
