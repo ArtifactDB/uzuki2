@@ -164,7 +164,7 @@ This group should contain:
 - `**/data`, a 1-dimensional dataset of a compound datatype of 2 members, `"offset"` and `"length"`.
   Each member should be of a datatype that can be represented by an unsigned 64-bit integer.
 - `**/heap`, a 1-dimensional dataset of unsigned 8-bit integers.
-  This contains the concatenation of bytes from all of the strings in the array.
+  This contains bytes from all of the strings in the array, e.g., by concatenating all strings.
 
 Each entry of `**/data` refers to a slice `[offset, offset + length)` of the `**/heap` dataset.
 This defines a variable-length UTF-8-encoded string, terminated at the first null in the slice.
