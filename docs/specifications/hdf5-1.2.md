@@ -22,13 +22,13 @@ The aim is to guarantee that implementations can safely use the declared type to
 This avoids the need to implement multiple code paths for different types when reading the data from the HDF5 file.
 Writers are still free to choose a smaller type to reduce the size of the dataset/attribute on disk.
 
-If a dataset/attribute contains integers, the specification should declare the bit width and signedness of the largest integer datatype. 
+If a dataset/attribute contains integers, the specification should declare the bit width and signedness of the largest acceptable integer datatype. 
 We assume a two's complement representation for signed integers.
 For example, most objects containing integers will specify that the corresponding HDF5 dataset/attribute's datatype is no larger than a 32-bit signed integer. 
 Readers can thus safely assume that an `int32_t` is sufficient to represent all possible values.
 Writers may create HDF5 datasets with any integer datatype that can be fully represented by an `int32_t`, e.g., `H5T_NATIVE_INT8`, `H5T_NATIVE_UINT16`.
 
-If a dataset/attribute contains floating-point numbers, the specification should declare the largest float datatype. 
+If a dataset/attribute contains floating-point numbers, the specification should declare the bit width of the largest acceptable float datatype. 
 We assume that all representations are IEEE754-compliant, to ensure the faithful propagation of special values like infinity and NaN.
 For example, most objects containing floats will specify that the corresponding HDF5 dataset/attribute's datatype is no larger than a 64-bit IEEE754-compliant float.
 Readers can thus safely assume that an `double` is sufficient to represent all values in memory.
@@ -36,7 +36,7 @@ Writers may create HDF5 datasets with any floating-point or integer datatype tha
 
 If a dataset/attribute contains strings, any string datatype may be used subject to the following considerations:
 
-- The dataset/attribute use a UTF-8 encoding.
+- The dataset/attribute uses a UTF-8 encoding.
   This implicitly supports ASCII, which is a subset of UTF-8.
 - Both variable and fixed length datatypes may be used.
   For fixed-length datatypes, the length of each string is defined as the number of bytes to the first null character, or as the fixed length if no null character is present.
