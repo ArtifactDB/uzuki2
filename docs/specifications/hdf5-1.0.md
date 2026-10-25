@@ -37,7 +37,7 @@ Writers may create HDF5 datasets with any floating-point or integer datatype tha
 
 If a dataset/attribute contains strings, any string datatype may be used subject to the following considerations:
 
-- The dataset/attribute uses a UTF-8 encoding.
+- The datatype uses a UTF-8 encoding.
   This implicitly supports ASCII, which is a subset of UTF-8.
 - Both variable and fixed length datatypes may be used.
   For fixed-length datatypes, the length of each string is defined as the number of bytes to the first null character, or as the fixed length if no null character is present.
@@ -114,17 +114,12 @@ If no such attribute is present, it can be assumed that there are no missing val
 
 
 
-See ["Missing value placeholders"](https://ArtifactDB.github.io/ritsuko) in the **ritsuko** documentation for more details.
-
-
 ### Factors
 
 A factor is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 - `uzuki_type`, a scalar string dataset containing `"factor"` or `"ordered"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 
 The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
 Vectors of length 1 may also be represented as a scalar dataset.
@@ -134,7 +129,6 @@ The `**/data` dataset should use a HDF5 integer datatype that can be represented
 Admittedly, this should have been an unsigned integer, but we started with a signed integer and we'll just keep it so for back-compatibility.
 
 The group should contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `**/data`.
-This should use a datatype that can be represented by a UTF-8 encoded string.
 Values in `**/levels` should be unique.
 
 Values in `**/data` should be non-negative (missing value placeholders excepted) and less than the length of `**/levels`.
@@ -145,7 +139,6 @@ Missing values in the factor are represented by a placeholder, as described [abo
 
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
-This should use a datatype that can be represented by a UTF-8 encoded string.
 If `**/data` is a scalar, `**/names` should have length 1.
 
 
@@ -157,14 +150,12 @@ If `**/data` is a scalar, `**/names` should have length 1.
 A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"nothing"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 
 ### External object
 
 Each external object is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"external"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 
 This should contain an `**/index` scalar dataset, containing an index that identifies this external object uniquely within the entire list.
 This should use a datatype that can be represented by a 32-bit signed integer.

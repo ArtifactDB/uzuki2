@@ -36,7 +36,7 @@ Writers may create HDF5 datasets with any floating-point or integer datatype tha
 
 If a dataset/attribute contains strings, any string datatype may be used subject to the following considerations:
 
-- The dataset/attribute uses a UTF-8 encoding.
+- The datatype uses a UTF-8 encoding.
   This implicitly supports ASCII, which is a subset of UTF-8.
 - Both variable and fixed length datatypes may be used.
   For fixed-length datatypes, the length of each string is defined as the number of bytes to the first null character, or as the fixed length if no null character is present.
@@ -106,7 +106,7 @@ This approach avoids the need to store a separate mask dataset and is more flexi
 
 The datatype of the placeholder attribute should be exactly the same as that of `**/data`.
 This avoids the risk of changing values upon casting between types prior to the equality comparison.
-The only exception is when `**/data` is a string, in which case the placeholder may be of any string datatype that can be represented by a UTF-8-encoded C-style string. 
+The only exception is when `**/data` is a string, in which case the placeholder may be of any valid string datatype (see comments in ["Datatypes"](#datatypes)).
 All strings in the dataset with the same sequence of bytes (as defined by, e.g., `strcmp`) as the placeholder value should be treated as missing.
 
 Floating-point missingness should be identified by comparing the placeholder and data values as IEEE754-compliant `double`s.
@@ -121,17 +121,12 @@ We do not consider the NaN payload during placeholder comparisons as this may no
 If a dataset does not have a placeholder attribute, it can be assumed that there are no missing values.
 If the specification does not explicitly mention that a placeholder attribute might be present, the dataset should never contain missing values. 
 
-See ["Missing value placeholders"](https://ArtifactDB.github.io/ritsuko) in the **ritsuko** documentation for more details.
-
-
 ### Factors
 
 A factor is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 - `uzuki_type`, a scalar string dataset containing `"factor"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 
 The group should contain an 1-dimensional dataset at `**/data`, containing 0-based indices into the levels.
 Vectors of length 1 may also be represented as a scalar dataset.
@@ -141,7 +136,6 @@ The `**/data` dataset should use a HDF5 integer datatype that can be represented
 Admittedly, this should have been an unsigned integer, but we started with a signed integer and we'll just keep it so for back-compatibility.
 
 The group should contain `**/levels`, a 1-dimensional string dataset that contains the levels for the indices in `**/data`.
-This should use a datatype that can be represented by a UTF-8 encoded string.
 Values in `**/levels` should be unique.
 
 Values in `**/data` should be non-negative (missing value placeholders excepted) and less than the length of `**/levels`.
@@ -153,54 +147,59 @@ Specifically, the `**/data` dataset may contain an optional `missing-value-place
 which contains the placeholder used to represent missing values inside `**/data`.
 
 The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `data`.
-This should use a datatype that can be represented by a UTF-8 encoded string.
 If `**/data` is a scalar, `**/names` should have length 1.
 
 
 
-### Variable length string arrays
+### Compressed variable length string arrays
 
-Arrays of strings can be stored in [**ritsuko**'s compressed variable length string format](https://artifactdb.github.io/ritsuko).
+Arrays of strings can be stored in the compressed variable length string format.
 This is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 - `uzuki_type`, a scalar string dataset containing `"vls"`.
 
-This group should contain the `pointers` and `heap` datasets.
+This group should contain:
 
-- The `**/data` dataset should be a 1-dimensional dataset of a compound datatype of 2 members, `"offset"` and `"length"`.
+- `**/data`, a 1-dimensional dataset of a compound datatype of 2 members, `"offset"` and `"length"`.
   Each member should be of a datatype that can be represented by an unsigned 64-bit integer.
-  Arrays of length 1 may also be represented as a scalar dataset.
-  (While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.)
-- The `**/heap` dataset should be a 1-dimensional dataset of unsigned 8-bit integers.
+- `**/heap`, a 1-dimensional dataset of unsigned 8-bit integers.
+  This contains the concatenation of bytes from all of the strings in the array.
 
 Each entry of `**/data` refers to a slice `[offset, offset + length)` of the `**/heap` dataset.
-This slice defines a variable-length UTF-8 encoded string of length `length` -
-unless the slice contains a null terminator, in which case the string is defined as the interval to the first null. 
-Pointers may be in any order, overlapping or non-contiguous, as long as `[offset, offset + length)` lies within the boundaries of the heap.
+This defines a variable-length UTF-8-encoded string, terminated at the first null in the slice.
+If no null character is present, the entire slice should be used as the contents of the string consists of the entire slice. 
 
-A `missing-value-placeholder` attribute on the `**/data` dataset may be present, defining a placeholder for missing values.
-The attribute should be a scalar and should be of any HDF5 string datatype that can be represented by a UTF-8 encoded string.
+Entries of `**/data` may occur in any order and may refer to overlapping or non-contiguous slices.
+The only requirement is that each `[offset, offset + length)` slice lies within the boundaries of the heap dataset.
+That said, we'd recommend that entries in the same chunk of the `**/data` dataset refer to neighboring parts of the `**/heap` dataset, to allow readers to efficiently extract the strings.
+
+No restrictions are placed on the contents of the `**/heap` dataset, as long as the strings can be recovered from slices as described above.
+Writers of the `**/heap` dataset may concatenate strings in arbitrary order, merge duplicate strings, add padding between strings, etc.
+The heap may contain unused bytes, i.e., not referenced by any slice in `**/data`.
+
+An array of length 1 may instead be represented as a scalar `**/data` dataset of the aforementioned compound datatype.
+While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
+
+Optionally, a `missing-value-placeholder` scalar string attribute on the `**/data` dataset may be present, defining a placeholder for missing values.
 An entry of `**/data` should be considered as missing if its corresponding string is equal to the placeholder.
 
-The group may also contain `**/names`, a 1-dimensional string dataset of length equal to `**/data`.
-This should use a datatype that can be represented by a UTF-8 encoded string.
+The group may also contain `**/names`, a 1-dimensional string dataset of length equal to that of the `**/data` dataset.
 If `**/data` is a scalar, `**/names` should have length 1.
+
+See [the **ritsuko** documentation](https://artifactdb.github.io/ritsuko) for the motivation behind the CVLS format.
 
 ### Nothing
 
 A "nothing" (a.k.a., "null", "none") value is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"nothing"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 
 ### External object
 
 Each external object is represented as a HDF5 group (`**/`) with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"external"`.
-  This should use a datatype that can be represented by a UTF-8 encoded string.
 
 This should contain an `**/index` scalar dataset, containing an index that identifies this external object uniquely within the entire list.
 This should use a datatype that can be represented by a 32-bit signed integer.
