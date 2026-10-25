@@ -7,13 +7,16 @@
 ### General
 
 Every R object is represented by a HDF5 group.
-In the descriptions below, we use `**/` as a placeholder for the name of the group.
+In the specification for each object type (see below), we use `**/` as a placeholder for the name of its group.
 
 All R objects should be nested inside an R list.
 In other words, the top-level HDF5 group should represent an R list.
 
 The top-level group should have a `uzuki_version` attribute, describing the version of the **uzuki2** specification that it uses.
 This attribute should hold a scalar string dataset containing the value "1.2".
+
+Unless explicitly mentioned here, the parametrization of HDF5 properties is left to the implementation.
+This includes dataset properties like chunking and compression, or file properties like page size and fill time and value. 
 
 ### Datatypes
 
