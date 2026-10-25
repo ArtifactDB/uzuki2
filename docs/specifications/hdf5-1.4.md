@@ -170,7 +170,7 @@ Each entry of `**/data` refers to a slice `[offset, offset + length)` of the `**
 This defines a variable-length UTF-8-encoded string, terminated at the first null in the slice.
 If no null character is present, the entire slice should be used as the contents of the string consists of the entire slice. 
 
-Entries of `**/data` may occur in any order and may refer to overlapping or non-contiguous slices.
+Entries of `**/data` may be sorted in any order and may refer to overlapping or non-contiguous slices.
 The only requirement is that each `[offset, offset + length)` slice lies within the boundaries of the heap dataset.
 
 No restrictions are placed on the contents of the `**/heap` dataset, as long as the strings can be recovered from slices as described above.
