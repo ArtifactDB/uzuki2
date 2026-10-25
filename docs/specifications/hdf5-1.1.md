@@ -102,7 +102,7 @@ If `**/data` is a scalar, `**/names` should have length 1.
 The `**/data` dataset may optionally contain a `missing-value-placeholder` attribute.
 This specifies the placeholder that is used to represent missing values in the dataset.
 Any value of `**/data` that is equal to this placeholder should be treated as missing.
-This approach avoids the need to store a separate mask dataset and is more flexible than a fixed placeholder that might conflict with the dataset contents. 
+This approach avoids the need to store a separate mask dataset and is more flexible than a fixed sentinel that might conflict with the dataset contents. 
 
 The datatype of the placeholder attribute should have the same datatype class as `**/data`.
 If the datatypes are not exactly the same, care should be taken to avoid loss of precision, wrap-around, etc. upon casting to the same type for the comparison.
