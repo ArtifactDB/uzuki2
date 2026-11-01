@@ -20,7 +20,6 @@ We do not mandate a specific name or location to provide some flexibility in how
 
 Each R object inside the top-level R list is represented by its own HDF5 group.
 This group should be contained within the HDF5 group corresponding to the top-level R list.
-In the specifications for each R object type, we use `**/` as a placeholder for the group's location within the HDF5 file. 
 
 ### Datatypes
 
@@ -72,26 +71,26 @@ This includes dataset properties like chunking and compression, or file properti
 
 ### List
 
-A list is represented as a HDF5 group (`**/`) with the following attributes:
+A list is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"list"`.
 
-The `**/` group should contain a `data` group that contains the list elements.
-The $i$-th list element should be represented by the `**/data/{i}` group for zero-based $i$, e.g., `**/data/0` for the first element.
-The number of groups inside `**/data` should be equal to the number of list elements, i.e., the length of the list.
+The list's group should contain a `data` group that contains the list elements.
+The $i$-th list element should be represented by the `data/{i}` group for zero-based $i$, e.g., `data/0` for the first element.
+The number of groups inside `data` should be equal to the number of list elements, i.e., the length of the list.
 Each list element may be any of the R object types described in this specification, including further nested list objects.
 
-Optionally, the `**/` group may contain `names`, a 1-dimensional string dataset of length equal to the number of list elements. 
-This contains the names of the list, i.e., the $i$-th element of the `**/names` dataset is the name of the $i$-th list element.
+Optionally, the list's group may contain `names`, a 1-dimensional string dataset of length equal to the number of list elements. 
+This contains the names of the list, i.e., the $i$-th element of the `names` dataset is the name of the $i$-th list element.
 
 ### Atomic vector
 
-An atomic vector is represented as a HDF5 group (`**/`) with the following attributes:
+An atomic vector is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"`, `"string"`, `"date"` or `"date-time"`.
 
-The `**/` group should contain `data`, a 1-dimensional dataset.
+The group should contain `data`, a 1-dimensional dataset.
 The length of this dataset defines the length of the atomic vector.
 The set of allowed HDF5 datatypes for this dataset depends on the value of `uzuki_type`:
 
@@ -110,9 +109,9 @@ While R makes no distinction between scalars and length-1 vectors, this may be u
 
 
 
-Optionally, the `**/` group may contain `names`, a 1-dimensional string dataset of length equal to that of the atomic vector.
-This contains the names of the atomic vector, i.e., the $i$-th element of the `**/names` dataset is the name of the $i$-th atomic vector element.
-If the `**/data` dataset is scalar, the `**/names` dataset should have length 1.
+Optionally, the atomic vector's group may contain `names`, a 1-dimensional string dataset of length equal to that of the atomic vector.
+This contains the names of the atomic vector, i.e., the $i$-th element of the `names` dataset is the name of the $i$-th atomic vector element.
+If the `data` dataset is scalar, the `names` dataset should have length 1.
 
 #### Representing missing values
 
@@ -124,41 +123,41 @@ If the `**/data` dataset is scalar, the `**/names` dataset should have length 1.
 
 Integer or boolean values of -2147483648 are treated as missing.
 Missing floats are represented by [R's NA representation](https://github.com/wch/r-source/blob/869e0f734dc4971c420cf417f5e0d18c0974a5af/src/main/arithmetic.c#L90-L98).
-For strings, the `**/data` dataset may contain a `missing-value-placeholder` attribute.
+For strings, the `data` dataset may contain a `missing-value-placeholder` attribute.
 If present, this should be a scalar string dataset that specifies the placeholder for missing values.
-Any value of `**/data` that is equal to this placeholder should be treated as missing.
+Any value of `data` that is equal to this placeholder should be treated as missing.
 If no such attribute is present, it can be assumed that there are no missing values.
 
 
 
 ### Factor
 
-A factor is represented as a HDF5 group (`**/`) with the following attributes:
+A factor is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing `"factor"` or `"ordered"`.
 
-The `**/` group should contain `data`, a 1-dimensional dataset containing factor codes.
-The `**/data` dataset should use a HDF5 integer datatype that can be represented by a 32-bit signed integer.
+The factor's group should contain `data`, a 1-dimensional dataset containing factor codes.
+The `data` dataset should use a HDF5 integer datatype that can be represented by a 32-bit signed integer.
 (Admittedly, this should have been an unsigned integer, but we started with a signed integer and we'll just keep it so for back-compatibility.)
 The length of this dataset defines the length of the factor.
 
-Optionally, a factor of length 1 may be represented as a scalar `**/data` dataset.
+Optionally, a factor of length 1 may be represented as a scalar `data` dataset.
 While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
 
-The `**/` group should contain `levels`, a 1-dimensional string dataset that contains the factor levels. 
+The factor's group should contain `levels`, a 1-dimensional string dataset that contains the factor levels. 
 Entries of this dataset should be unique.
 
-Codes in the `**/data` dataset should be interpreted as 0-based indices into the `**/levels` dataset, i.e., a code of $i$ refers to the $i$-th factor level.
-Each code should be non-negative and less than the length of `**/levels`, or equal to the missing value placeholder if the `missing-value-placeholder` attribute exists.
-Note that the datatype constraints on `**/data` imply that there should not be more than 2147483648 levels;
-beyond that, the levels cannot be indexed by elements of `**/data`.
+Codes in the `data` dataset should be interpreted as 0-based indices into the `levels` dataset, i.e., a code of $i$ refers to the $i$-th factor level.
+Each code should be non-negative and less than the length of `levels`, or equal to the missing value placeholder if the `missing-value-placeholder` attribute exists.
+Note that the datatype constraints on `data` imply that there should not be more than 2147483648 levels;
+beyond that, the levels cannot be indexed by elements of `data`.
 
-Entries of the `**/data` dataset are treated as missing if they have a value of -2147483648.
+Entries of the `data` dataset are treated as missing if they have a value of -2147483648.
 
-Optionally, the `**/` group may contain `names`, a 1-dimensional string dataset of length equal to that of the  `**/data` dataset.
-This contains the names of the factor, i.e., the $i$-th element of the `**/names` dataset is the name of the $i$-th factor element.
-If the `**/data` dataset is a scalar, the `**/names` dataset should have length 1.
+Optionally, the factor's group may contain `names`, a 1-dimensional string dataset of length equal to that of the  `data` dataset.
+This contains the names of the factor, i.e., the $i$-th element of the `names` dataset is the name of the $i$-th factor element.
+If the `data` dataset is a scalar, the `names` dataset should have length 1.
 
 
 
@@ -172,14 +171,14 @@ A null (a.k.a., "nothing", "none") is represented as a HDF5 group with the follo
 
 ### External object
 
-An external object is represented as a HDF5 group (`**/`) with the following attributes:
+An external object is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"external"`.
 
-The `**/` group should contain an `index` scalar dataset of any datatype that can be represented by a 32-bit signed integer.
+The external object's group should contain an `index` scalar dataset of any datatype that can be represented by a 32-bit signed integer.
 The dataset contains an index that identifies this external object uniquely within the top-level R list.
-By indexing some external metadata with the value of `**/index`, we can restore the external object at its appropriate location within the list.
+By indexing some external metadata with the value of `index`, we can restore the external object at its appropriate location within the list.
 The exact mechanism by which this restoration occurs is implementation-defined.
 
-Given a top-level R list, the set of all of `**/index` values should be $(0, 1, ..., N - 1)$ where $N$ is the total number of external objects.
-That is, each `**/index` value should be used exactly once, starting from zero and incrementing for each external object in the top-level list.
+Given a top-level R list, the set of all of `index` values should be $(0, 1, ..., N - 1)$ where $N$ is the total number of external objects.
+That is, each `index` value should be used exactly once, starting from zero and incrementing for each external object in the top-level list.

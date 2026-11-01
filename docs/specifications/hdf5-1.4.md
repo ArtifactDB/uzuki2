@@ -20,7 +20,6 @@ We do not mandate a specific name or location to provide some flexibility in how
 
 Each R object inside the top-level R list is represented by its own HDF5 group.
 This group should be contained within the HDF5 group corresponding to the top-level R list.
-In the specifications for each R object type, we use `**/` as a placeholder for the group's location within the HDF5 file. 
 
 ### Datatypes
 
@@ -71,26 +70,26 @@ This includes dataset properties like chunking and compression, or file properti
 
 ### List
 
-A list is represented as a HDF5 group (`**/`) with the following attributes:
+A list is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"list"`.
 
-The `**/` group should contain a `data` group that contains the list elements.
-The $i$-th list element should be represented by the `**/data/{i}` group for zero-based $i$, e.g., `**/data/0` for the first element.
-The number of groups inside `**/data` should be equal to the number of list elements, i.e., the length of the list.
+The list's group should contain a `data` group that contains the list elements.
+The $i$-th list element should be represented by the `data/{i}` group for zero-based $i$, e.g., `data/0` for the first element.
+The number of groups inside `data` should be equal to the number of list elements, i.e., the length of the list.
 Each list element may be any of the R object types described in this specification, including further nested list objects.
 
-Optionally, the `**/` group may contain `names`, a 1-dimensional string dataset of length equal to the number of list elements. 
-This contains the names of the list, i.e., the $i$-th element of the `**/names` dataset is the name of the $i$-th list element.
+Optionally, the list's group may contain `names`, a 1-dimensional string dataset of length equal to the number of list elements. 
+This contains the names of the list, i.e., the $i$-th element of the `names` dataset is the name of the $i$-th list element.
 
 ### Atomic vector
 
-An atomic vector is represented as a HDF5 group (`**/`) with the following attributes:
+An atomic vector is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing one of `"integer"`, `"boolean"`, `"number"` or `"string"`.
 
-The `**/` group should contain `data`, a 1-dimensional dataset.
+The group should contain `data`, a 1-dimensional dataset.
 The length of this dataset defines the length of the atomic vector.
 The set of allowed HDF5 datatypes for this dataset depends on the value of `uzuki_type`:
 
@@ -104,24 +103,24 @@ The set of allowed HDF5 datatypes for this dataset depends on the value of `uzuk
 An atomic vector of length 1 may also be represented as a scalar dataset.
 While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
 
-Optionally, for the `string` type, the `**/` group may contain `format`.
-This should be a scalar string dataset that specifies constraints to the format of the strings in `**/data`:
+Optionally, for the `string` type, the atomic vector's group may contain `format`.
+This should be a scalar string dataset that specifies constraints to the format of the strings in `data`:
 
 - `"date"`: strings should be `YYYY-MM-DD` dates or the placeholder value.
 - `"date-time"`: strings should be in the Internet Date/Time format ([RFC 3339, Section 5.6](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)) or the placeholder value.
 
-Optionally, the `**/` group may contain `names`, a 1-dimensional string dataset of length equal to that of the atomic vector.
-This contains the names of the atomic vector, i.e., the $i$-th element of the `**/names` dataset is the name of the $i$-th atomic vector element.
-If the `**/data` dataset is scalar, the `**/names` dataset should have length 1.
+Optionally, the atomic vector's group may contain `names`, a 1-dimensional string dataset of length equal to that of the atomic vector.
+This contains the names of the atomic vector, i.e., the $i$-th element of the `names` dataset is the name of the $i$-th atomic vector element.
+If the `data` dataset is scalar, the `names` dataset should have length 1.
 
 #### Representing missing values
 
-Optionally, the `**/data` dataset may contain a `missing-value-placeholder` scalar attribute.
+Optionally, the `data` dataset may contain a `missing-value-placeholder` scalar attribute.
 This specifies the placeholder that is used to represent missing values in the dataset.
-Any value of `**/data` that is equal to this placeholder should be treated as missing.
+Any value of `data` that is equal to this placeholder should be treated as missing.
 This approach avoids the need to store a separate mask dataset and is more flexible than a fixed sentinel that might conflict with the dataset contents. 
 
-The datatype of the placeholder attribute should be exactly the same as that of the `**/data` dataset.
+The datatype of the placeholder attribute should be exactly the same as that of the `data` dataset.
 This avoids the risk of changing values upon casting between types prior to the equality comparison.
 The only exception is for strings , in which case the placeholder may be of any valid string datatype (see comments in ["Datatypes"](#datatypes)).
 All strings in the dataset with the same sequence of bytes (as defined by, e.g., `strcmp`) as the placeholder value should be treated as missing.
@@ -134,39 +133,39 @@ We do not consider the NaN payload during placeholder comparisons as this may no
 
 
 
-If the `**/data` dataset does not have a placeholder attribute, it can be assumed that there are no missing values.
+If the `data` dataset does not have a placeholder attribute, it can be assumed that there are no missing values.
 
 ### Factor
 
-A factor is represented as a HDF5 group (`**/`) with the following attributes:
+A factor is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"vector"`.
 - `uzuki_type`, a scalar string dataset containing `"factor"`.
 
-The `**/` group should contain `data`, a 1-dimensional dataset containing factor codes.
-The `**/data` dataset should use a HDF5 integer datatype that can be represented by a 32-bit signed integer.
+The factor's group should contain `data`, a 1-dimensional dataset containing factor codes.
+The `data` dataset should use a HDF5 integer datatype that can be represented by a 32-bit signed integer.
 (Admittedly, this should have been an unsigned integer, but we started with a signed integer and we'll just keep it so for back-compatibility.)
 The length of this dataset defines the length of the factor.
 
-Optionally, a factor of length 1 may be represented as a scalar `**/data` dataset.
+Optionally, a factor of length 1 may be represented as a scalar `data` dataset.
 While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
 
-The `**/` group should contain `levels`, a 1-dimensional string dataset that contains the factor levels. 
+The factor's group should contain `levels`, a 1-dimensional string dataset that contains the factor levels. 
 Entries of this dataset should be unique.
 
-Codes in the `**/data` dataset should be interpreted as 0-based indices into the `**/levels` dataset, i.e., a code of $i$ refers to the $i$-th factor level.
-Each code should be non-negative and less than the length of `**/levels`, or equal to the missing value placeholder if the `missing-value-placeholder` attribute exists.
-Note that the datatype constraints on `**/data` imply that there should not be more than 2147483648 levels;
-beyond that, the levels cannot be indexed by elements of `**/data`.
+Codes in the `data` dataset should be interpreted as 0-based indices into the `levels` dataset, i.e., a code of $i$ refers to the $i$-th factor level.
+Each code should be non-negative and less than the length of `levels`, or equal to the missing value placeholder if the `missing-value-placeholder` attribute exists.
+Note that the datatype constraints on `data` imply that there should not be more than 2147483648 levels;
+beyond that, the levels cannot be indexed by elements of `data`.
 
-Optionally, the `**/data` dataset may contain a `missing-value-placeholder` scalar attribute.
+Optionally, the `data` dataset may contain a `missing-value-placeholder` scalar attribute.
 This specifies the placeholder that is used to represent missing codes in the dataset.
-Any value of `**/data` that is equal to this placeholder should be treated as missing.
-The datatype of the placeholder attribute should be exactly the same as that of the `**/data` dataset.
+Any value of `data` that is equal to this placeholder should be treated as missing.
+The datatype of the placeholder attribute should be exactly the same as that of the `data` dataset.
 
-Optionally, the `**/` group may contain `names`, a 1-dimensional string dataset of length equal to that of the  `**/data` dataset.
-This contains the names of the factor, i.e., the $i$-th element of the `**/names` dataset is the name of the $i$-th factor element.
-If the `**/data` dataset is a scalar, the `**/names` dataset should have length 1.
+Optionally, the factor's group may contain `names`, a 1-dimensional string dataset of length equal to that of the  `data` dataset.
+This contains the names of the factor, i.e., the $i$-th element of the `names` dataset is the name of the $i$-th factor element.
+If the `data` dataset is a scalar, the `names` dataset should have length 1.
 
 
 
@@ -186,34 +185,34 @@ This group should contain:
 - `heap`, a 1-dimensional dataset of unsigned 8-bit integers.
   This contains bytes from all of the strings in the CVLS array, e.g., by concatenating all strings.
 
-The $i$-th entry of `**/data` refers to a slice $[o_i, o_i + l_i)$ of the `**/heap` dataset,
+The $i$-th entry of `data` refers to a slice $[o_i, o_i + l_i)$ of the `heap` dataset,
 where $o_i$ is the zero-based offset and $l_i$ is the length in bytes from the `offset` and `length` members, respectively.
 This defines a variable-length UTF-8-encoded string, terminated at the first null in the slice.
 If no null character is present, the entire slice should be used as the contents of the string consists of the entire slice. 
 
-Entries of `**/data` may be sorted in any order and may refer to overlapping or non-contiguous slices.
+Entries of `data` may be sorted in any order and may refer to overlapping or non-contiguous slices.
 The only requirement is that each `[offset, offset + length)` slice lies within the boundaries of the heap dataset.
 
-No restrictions are placed on the contents of the `**/heap` dataset, as long as the strings can be recovered from slices as described above.
-Writers of the `**/heap` dataset may concatenate strings in arbitrary order, merge duplicate strings, add padding between strings, etc.
-The heap may even contain unused bytes, i.e., not referenced by any slice in `**/data`.
+No restrictions are placed on the contents of the `heap` dataset, as long as the strings can be recovered from slices as described above.
+Writers of the `heap` dataset may concatenate strings in arbitrary order, merge duplicate strings, add padding between strings, etc.
+The heap may even contain unused bytes, i.e., not referenced by any slice in `data`.
 
-Optionally, a CVLS array of length 1 may be represented as a scalar `**/data` dataset of the aforementioned compound datatype.
+Optionally, a CVLS array of length 1 may be represented as a scalar `data` dataset of the aforementioned compound datatype.
 While R makes no distinction between scalars and length-1 vectors, this may be useful for other frameworks where this difference is relevant.
 
-Optionally, a `missing-value-placeholder` scalar string attribute on the `**/data` dataset may be present, defining a placeholder for missing values.
-An entry of `**/data` should be considered as missing if its corresponding string is equal to the placeholder.
+Optionally, a `missing-value-placeholder` scalar string attribute on the `data` dataset may be present, defining a placeholder for missing values.
+An entry of `data` should be considered as missing if its corresponding string is equal to the placeholder.
 
-Optionally, the group may contain `names`, a 1-dimensional string dataset of length equal to that of the `**/data` dataset.
-This contains the names of the CVLS array, i.e., the $i$-th element of the `**/names` dataset is the name of the $i$-th CVLS array element.
-If `**/data` is a scalar, `**/names` should have length 1.
+Optionally, the group may contain `names`, a 1-dimensional string dataset of length equal to that of the `data` dataset.
+This contains the names of the CVLS array, i.e., the $i$-th element of the `names` dataset is the name of the $i$-th CVLS array element.
+If `data` is a scalar, `names` should have length 1.
 
 #### Further comments
 
 The CVLS format addresses HDF5's inability to efficiently handle arrays of variable-length strings.
 Using a fixed-length datatype requires padding all strings to the longest string, causing an increase in disk usage that cannot be completely offset by compression;
 while HDF5's own variable-length string datatype does not compress the strings themselves, only the pointers to those strings.
-CVLS stores variable-length strings directly without any padding, and the `**/heap` dataset can be chunked and compressed to improve storage efficiency.
+CVLS stores variable-length strings directly without any padding, and the `heap` dataset can be chunked and compressed to improve storage efficiency.
 
 Some care is required to avoid inadvertent casts to/from a `char` of platform-specific signedness to the heap's unsigned integer type.
 Recall that both ASCII and UTF-8 define a character in terms of its binary representation, e.g., `0b01000001` for `A`.
@@ -228,7 +227,7 @@ We recommend following these procedures:
 This approach ensures that each byte is faithfully transferred between the HDF5 file and memory as a `uint8_t` with a well-defined and portable binary representation.
 The aliasing pointer then interprets the byte as a `char` with the same sequence of bits, regardless of the platform's `char` signedness.
 
-When writing a CVLS array, we recommend that entries in the same chunk of the `**/data` dataset refer to neighboring parts of the `**/heap` dataset.
+When writing a CVLS array, we recommend that entries in the same chunk of the `data` dataset refer to neighboring parts of the `heap` dataset.
 This allows readers to efficiently extract bytes from the latter when iterating through chunks of the former.
 
 ### Null
@@ -239,14 +238,14 @@ A null (a.k.a., "nothing", "none") is represented as a HDF5 group with the follo
 
 ### External object
 
-An external object is represented as a HDF5 group (`**/`) with the following attributes:
+An external object is represented as a HDF5 group with the following attributes:
 
 - `uzuki_object`, a scalar string dataset containing the value `"external"`.
 
-The `**/` group should contain an `index` scalar dataset of any datatype that can be represented by a 32-bit signed integer.
+The external object's group should contain an `index` scalar dataset of any datatype that can be represented by a 32-bit signed integer.
 The dataset contains an index that identifies this external object uniquely within the top-level R list.
-By indexing some external metadata with the value of `**/index`, we can restore the external object at its appropriate location within the list.
+By indexing some external metadata with the value of `index`, we can restore the external object at its appropriate location within the list.
 The exact mechanism by which this restoration occurs is implementation-defined.
 
-Given a top-level R list, the set of all of `**/index` values should be $(0, 1, ..., N - 1)$ where $N$ is the total number of external objects.
-That is, each `**/index` value should be used exactly once, starting from zero and incrementing for each external object in the top-level list.
+Given a top-level R list, the set of all of `index` values should be $(0, 1, ..., N - 1)$ where $N$ is the total number of external objects.
+That is, each `index` value should be used exactly once, starting from zero and incrementing for each external object in the top-level list.
