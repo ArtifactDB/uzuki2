@@ -22,9 +22,6 @@ Each R object inside the top-level R list is represented by its own HDF5 group.
 This group should be contained within the HDF5 group corresponding to the top-level R list.
 In the specifications for each R object type, we use `**/` as a placeholder for the group's location within the HDF5 file. 
 
-Unless explicitly mentioned here, the parametrization of HDF5 properties is left to the implementation.
-This includes dataset properties like chunking and compression, or file properties like page size and fill time and value. 
-
 ### Datatypes
 
 This specification will declare the largest HDF5 datatype that can be used for a particular That isdataset/attribute.
